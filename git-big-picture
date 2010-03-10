@@ -1,0 +1,148 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright (C) 2010 Sebastian Pipping <sebastian@pipping.org>
+# Licensed under GPL v3 or later
+#
+import subprocess
+import re
+
+branch_extractor = re.compile('^[* ] ([^ ]+)(?: -> .+)?$')
+sha1_pattern = re.compile('[0-9a-fA-F]{40}')
+
+
+def get_branch_names():
+	branch_names = []
+	p = subprocess.Popen(['git', 'branch', '-a'], stdout=subprocess.PIPE)
+	p.wait()
+	output = p.stdout.read()
+	for line in output.split('\n'):
+		m = branch_extractor.match(line)
+		if m is not None:
+			branch_names.append(m.group(1))
+	return branch_names
+
+def get_tag_names():
+	tag_names = []
+	p = subprocess.Popen(['git', 'tag', '-l'], stdout=subprocess.PIPE)
+	p.wait()
+	output = p.stdout.read()
+	for line in output.split('\n'):
+		if line == '':
+			continue
+		tag_names.append(line)
+	return tag_names
+
+def ref_to_sha1(ref):
+	p = subprocess.Popen(['git', 'rev-parse', ref], stdout=subprocess.PIPE)
+	p.wait()
+	output = p.stdout.read()
+	for line in output.split('\n'):
+		return line
+
+def branch_to_sha1(branch_name):
+	if branch_name.startswith('remotes/'):
+		ref = branch_name
+	else:
+		ref = 'refs/heads/%s' % branch_name
+	return ref_to_sha1(ref)
+
+def tag_to_sha1(tag_name):
+	return ref_to_sha1('refs/tags/%s' % tag_name)
+
+
+def get_parent_map():
+	parents = {}
+	p = subprocess.Popen(['git', 'rev-list', '--all', '--parents'], stdout=subprocess.PIPE)
+	output = p.communicate()[0]
+	for line in output.split('\n'):
+		sha_ones = [e.group(0) for e in re.finditer(sha1_pattern, line)]
+		count = len(sha_ones)
+		if count > 1:
+			parents[sha_ones[0]] = set(sha_ones[1:])
+		elif count == 1:
+			parents[sha_ones[0]] = set()
+	return parents
+
+
+if __name__ == '__main__':
+	labels = {}
+
+	for b in get_branch_names():
+		ref = branch_to_sha1(b)
+		if ref not in labels:
+			labels[ref] = set()
+		labels[ref].add(b)
+		
+	for t in get_tag_names():
+		ref = tag_to_sha1(t)
+		if ref not in labels:
+			labels[ref] = set()
+		labels[ref].add(t)
+
+
+	parents = get_parent_map()
+	children = {}
+	for sha_one, parent_sha_ones in parents.items():
+		for p in parent_sha_ones:
+			if p not in children:
+				children[p] = set()
+			children[p].add(sha_one)
+
+
+	# Check consistency
+	for sha_one, pars in parents.items():
+		for p in pars:
+			for c in children[p]:
+				assert(p in parents[c])
+	for sha_one, chs in children.items():
+		for c in chs:
+			for p in parents[c]:
+				assert(c in children[p])
+		
+
+	# Optimize purely linear runs away
+	todo_list = parents.keys()
+	black_list = set()
+	for sha_one in todo_list:
+		if sha_one in black_list:
+			continue
+
+		path = [sha_one, ]
+		current = sha_one
+		while True:
+			if len(parents[current]) != 1:
+				break
+			parent = list(parents[current])[0]
+			if len(children[parent]) != 1:
+				break
+			path.append(parent)
+			if parent in labels:
+				break
+			current = parent
+			
+		if len(path) > 2:
+			edge_child = path[0]
+			edge_parent = path[-1]
+
+			parents[edge_child].remove(path[1])
+			parents[edge_child].add(edge_parent)
+			children[edge_parent].remove(path[-2])
+			children[edge_parent].add(edge_child)
+			for index, i in enumerate(path[1:-1]):
+				black_list.add(i)
+	for sha_one in black_list:
+		del parents[sha_one]
+		del children[sha_one]
+
+
+	print 'digraph {'
+	for k, v in labels.items():
+		if k not in parents:
+			continue
+		print '\t"%(ref)s"[label="%(label)s", color=lightblue2, style=filled];' % {
+			'ref':k,
+			'label':'%s\\n%s' % (k, '\\n'.join(v))}
+	for child, parents in parents.items():
+		for p in parents:
+			print '\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p}
+	print '}'
