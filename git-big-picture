@@ -64,7 +64,7 @@ def get_parent_map():
 	return parents
 
 
-if __name__ == '__main__':
+def get_label_dict():
 	labels = {}
 
 	for b in get_branch_names():
@@ -79,70 +79,86 @@ if __name__ == '__main__':
 			labels[ref] = set()
 		labels[ref].add(t)
 
-
-	parents = get_parent_map()
-	children = {}
-	for sha_one, parent_sha_ones in parents.items():
-		for p in parent_sha_ones:
-			if p not in children:
-				children[p] = set()
-			children[p].add(sha_one)
+	return labels
 
 
-	# Check consistency
-	for sha_one, pars in parents.items():
-		for p in pars:
-			for c in children[p]:
-				assert(p in parents[c])
-	for sha_one, chs in children.items():
-		for c in chs:
-			for p in parents[c]:
-				assert(c in children[p])
-		
+class CommitGraph(object):
+	def __init__(self, parent_map, label_dict):
+		self.parents = parent_map
+		self.labels = label_dict
 
-	# Optimize purely linear runs away
-	todo_list = parents.keys()
-	black_list = set()
-	for sha_one in todo_list:
-		if sha_one in black_list:
-			continue
+		self.children = {}
+		self._calculate_child_mapping()
+		self._verify_child_mapping()
 
-		path = [sha_one, ]
-		current = sha_one
-		while True:
-			if len(parents[current]) != 1:
-				break
-			parent = list(parents[current])[0]
-			if len(children[parent]) != 1:
-				break
-			path.append(parent)
-			if parent in labels:
-				break
-			current = parent
-			
-		if len(path) > 2:
-			edge_child = path[0]
-			edge_parent = path[-1]
+	def _calculate_child_mapping(self):
+		for sha_one, parent_sha_ones in self.parents.items():
+			for p in parent_sha_ones:
+				if p not in self.children:
+					self.children[p] = set()
+				self.children[p].add(sha_one)
 
-			parents[edge_child].remove(path[1])
-			parents[edge_child].add(edge_parent)
-			children[edge_parent].remove(path[-2])
-			children[edge_parent].add(edge_child)
-			for index, i in enumerate(path[1:-1]):
-				black_list.add(i)
-	for sha_one in black_list:
-		del parents[sha_one]
-		del children[sha_one]
+	def _verify_child_mapping(self):
+		for sha_one, pars in self.parents.items():
+			for p in pars:
+				for c in self.children[p]:
+					assert(p in self.parents[c])
+		for sha_one, chs in self.children.items():
+			for c in chs:
+				for p in self.parents[c]:
+					assert(c in self.children[p])
+
+	def _optimize_linear_runs_away(self):
+		todo_list = self.parents.keys()
+		black_list = set()
+		for sha_one in todo_list:
+			if sha_one in black_list:
+				continue
+
+			path = [sha_one, ]
+			current = sha_one
+			while True:
+				if len(self.parents[current]) != 1:
+					break
+				parent = list(self.parents[current])[0]
+				if len(self.children[parent]) != 1:
+					break
+				path.append(parent)
+				if parent in self.labels:
+					break
+				current = parent
+				
+			if len(path) > 2:
+				edge_child = path[0]
+				edge_parent = path[-1]
+
+				self.parents[edge_child].remove(path[1])
+				self.parents[edge_child].add(edge_parent)
+				self.children[edge_parent].remove(path[-2])
+				self.children[edge_parent].add(edge_child)
+				for index, i in enumerate(path[1:-1]):
+					black_list.add(i)
+		for sha_one in black_list:
+			del self.parents[sha_one]
+			del self.children[sha_one]
+
+	def _print_dot_file(self):
+		print 'digraph {'
+		for k, v in self.labels.items():
+			if k not in self.parents:
+				continue
+			print '\t"%(ref)s"[label="%(label)s", color=lightblue2, style=filled];' % {
+				'ref':k,
+				'label':'%s\\n%s' % (k, '\\n'.join(v))}
+		for child, self.parents in self.parents.items():
+			for p in self.parents:
+				print '\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p}
+		print '}'
 
 
-	print 'digraph {'
-	for k, v in labels.items():
-		if k not in parents:
-			continue
-		print '\t"%(ref)s"[label="%(label)s", color=lightblue2, style=filled];' % {
-			'ref':k,
-			'label':'%s\\n%s' % (k, '\\n'.join(v))}
-	for child, parents in parents.items():
-		for p in parents:
-			print '\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p}
-	print '}'
+
+if __name__ == '__main__':
+
+	graph = CommitGraph(get_parent_map(), get_label_dict())
+	graph._optimize_linear_runs_away()
+	graph._print_dot_file()
