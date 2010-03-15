@@ -71,7 +71,7 @@ def get_label_dict():
 		if ref not in labels:
 			labels[ref] = set()
 		labels[ref].add(b)
-		
+
 	for t in get_tag_names():
 		ref = tag_to_sha1(t)
 		if ref not in labels:
@@ -96,6 +96,8 @@ class CommitGraph(object):
 				if p not in self.children:
 					self.children[p] = set()
 				self.children[p].add(sha_one)
+			if sha_one not in self.children:
+				self.children[sha_one] = set()
 
 	def _verify_child_mapping(self):
 		for sha_one, pars in self.parents.items():
@@ -126,7 +128,7 @@ class CommitGraph(object):
 				if parent in self.labels:
 					break
 				current = parent
-				
+
 			if len(path) > 2:
 				edge_child = path[0]
 				edge_parent = path[-1]
@@ -140,6 +142,144 @@ class CommitGraph(object):
 		for sha_one in black_list:
 			del self.parents[sha_one]
 			del self.children[sha_one]
+
+	def _optimize_merge_branch_fits_away(self):
+		def loop(l):
+			"""Generator looping over a potentially changing
+				iteratable input, e.g. a set"""
+			while l:
+				res = list(l)
+				for r in res:
+					if r not in l:
+						continue
+					yield r
+
+		todo_list = self.parents.keys()
+		black_list = set()
+		for sha_one in todo_list:
+			if sha_one in black_list:
+				continue
+
+			# 1/3 Run up the DAG as far as we can
+			up_runners = set([sha_one, ])
+			## visits = dict([(sha_one, len(children(sha_one))),])
+			_children = dict()
+			_parents = dict()
+			_sources = set()
+			for run_start in loop(up_runners):
+				current = run_start
+				while True:
+					if current not in _parents:
+						_parents[current] = set()
+					if current not in _children:
+						_children[current] = set()
+
+					if current in self.labels \
+							and current != sha_one:
+						up_runners.remove(run_start)
+						_sources.add(current)
+						break
+					if not self.parents[current]:
+						up_runners.remove(run_start)
+						_sources.add(current)
+						break
+					if current != sha_one \
+							and len(_children[current]) \
+							< len(self.children[current]):
+						up_runners.remove(run_start)
+						_sources.add(current)
+						break
+
+					parent_list = list(self.parents[current])
+					for p in parent_list:
+						if p not in _children:
+							_children[p] = set()
+						_children[p].add(current)
+						_parents[current].add(p)
+
+					next, other_parents = parent_list[0], parent_list[1:]
+					for p in other_parents:
+						up_runners.add(p)
+					current = next
+
+			# Remove complete branch points from sources
+			# as we completeness allowed us running further up the DAG
+			for s in list(_sources):
+				if len(_children[s]) == len(self.children[s]):
+					_sources.remove(s)
+
+			# 2/3 Run down the temp DAG cutting edges where a merge
+			# cannot be complete all from this sources
+			_cut_points = set()
+			for s in _sources:
+				down_runners = set([s,])
+				_up_pass_parents = dict()
+				for run_start in loop(down_runners):
+					current = run_start
+					while True:
+						if not _children.get(current, []):
+							down_runners.remove(run_start)
+							break
+
+						child_list = list(_children[current])
+						for ch in child_list:
+							if ch not in _up_pass_parents:
+								_up_pass_parents[ch] = set()
+							_up_pass_parents[ch].add(current)
+
+						next, other_children = child_list[0], child_list[1:]
+						for p in other_children:
+							down_runners.add(p)
+						current = next
+
+				for k, v in _up_pass_parents.items():
+					diff = _parents[k] - _up_pass_parents[k]
+					if diff:
+						_cut_points.add(k)
+
+			## # One source, one sink
+			source_sink_pairs = set()
+			for k, v in _parents.items():
+				if k not in _cut_points and v:
+					# Not a source
+					continue
+
+				# Find sink
+				current = k
+				while True:
+					child_list = list(_children[current])
+					if not child_list or (current in _cut_points and k != current):
+						# Sink found
+						if k != current:
+							source_sink_pairs.add((k, current))
+						break
+					current = child_list[0]
+			sources = set(e[0] for e in source_sink_pairs)
+			sinks = set(e[1] for e in source_sink_pairs)
+			to_delete = set(_parents.keys()) - sources.union(sinks)
+			map(black_list.add, to_delete)
+
+			for d in to_delete:
+				assert(d not in self.labels)
+
+				for p in self.parents[d]:
+					# if d in self.children[p]:
+					self.children[p].remove(d)
+					for ch in self.children[d]:
+						self.children[p].add(ch)
+						self.parents[ch].add(p)
+				for ch in self.children[d]:
+					#if d in self.parents[ch]:
+					self.parents[ch].remove(d)
+					for p in self.parents[d]:
+						self.parents[ch].add(p)
+						self.children[p].add(ch)
+				# self.parents[d].clear()
+				# self.children[d].clear()
+				del self.parents[d]
+				del self.children[d]
+
+		self._verify_child_mapping()
 
 	def _print_dot_file(self):
 		print 'digraph {'
@@ -155,9 +295,8 @@ class CommitGraph(object):
 		print '}'
 
 
-
 if __name__ == '__main__':
-
 	graph = CommitGraph(get_parent_map(), get_label_dict())
-	graph._optimize_linear_runs_away()
+	# graph._optimize_linear_runs_away()
+	graph._optimize_merge_branch_fits_away()
 	graph._print_dot_file()
