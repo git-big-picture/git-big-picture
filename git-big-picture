@@ -162,7 +162,6 @@ class CommitGraph(object):
 
 			# 1/3 Run up the DAG as far as we can
 			up_runners = set([sha_one, ])
-			## visits = dict([(sha_one, len(children(sha_one))),])
 			_children = dict()
 			_parents = dict()
 			_sources = set()
@@ -263,19 +262,15 @@ class CommitGraph(object):
 				assert(d not in self.labels)
 
 				for p in self.parents[d]:
-					# if d in self.children[p]:
 					self.children[p].remove(d)
 					for ch in self.children[d]:
 						self.children[p].add(ch)
 						self.parents[ch].add(p)
 				for ch in self.children[d]:
-					#if d in self.parents[ch]:
 					self.parents[ch].remove(d)
 					for p in self.parents[d]:
 						self.parents[ch].add(p)
 						self.children[p].add(ch)
-				# self.parents[d].clear()
-				# self.children[d].clear()
 				del self.parents[d]
 				del self.children[d]
 
@@ -290,7 +285,6 @@ class CommitGraph(object):
 
 			# 1/3 Run up the DAG as far as we can
 			up_runners = set([sha_one, ])
-			## visits = dict([(sha_one, len(children(sha_one))),])
 			_children = dict()
 			_parents = dict()
 			_sources = set()
@@ -339,32 +333,24 @@ class CommitGraph(object):
 					_sources.remove(s)
 
 			
-			# print '_parents.keys()', '\n'.join(_parents.keys())
-			# print '_sources', '\n'.join(_sources)
-			# print 'sha_one', '\n'.join([sha_one, ])
 			to_delete = (set(_parents.keys()) - _sources) - set([sha_one, ])
-			# print 'to_delete', '\n'.join(to_delete)
 
-			if sha_one not in self.labels: # and len(self.parents[sha_one]) == 1:
+			if sha_one not in self.labels:
 				to_delete.add(sha_one)
 
 			for d in to_delete:
 				assert(d not in self.labels)
 
 				for p in self.parents[d]:
-					# if d in self.children[p]:
 					self.children[p].remove(d)
 					for ch in self.children[d]:
 						self.children[p].add(ch)
 						self.parents[ch].add(p)
 				for ch in self.children[d]:
-					#if d in self.parents[ch]:
 					self.parents[ch].remove(d)
 					for p in self.parents[d]:
 						self.parents[ch].add(p)
 						self.children[p].add(ch)
-				# self.parents[d].clear()
-				# self.children[d].clear()
 				del self.parents[d]
 				del self.children[d]
 				
