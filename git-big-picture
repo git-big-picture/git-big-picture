@@ -281,6 +281,97 @@ class CommitGraph(object):
 
 		self._verify_child_mapping()
 
+	def _optimize_non_labels(self):
+		todo_list = self.parents.keys()
+		black_list = set()
+		for sha_one in todo_list:
+			if sha_one in black_list:
+				continue
+
+			# 1/3 Run up the DAG as far as we can
+			up_runners = set([sha_one, ])
+			## visits = dict([(sha_one, len(children(sha_one))),])
+			_children = dict()
+			_parents = dict()
+			_sources = set()
+			for run_start in loop(up_runners):
+				current = run_start
+				while True:
+					if current not in _parents:
+						_parents[current] = set()
+					if current not in _children:
+						_children[current] = set()
+
+					if current in self.labels \
+							and current != sha_one:
+						up_runners.remove(run_start)
+						_sources.add(current)
+						break
+					if not self.parents[current]:
+						up_runners.remove(run_start)
+						_sources.add(current)
+						break
+					if current != sha_one \
+							and len(_children[current]) \
+							< len(self.children[current]):
+						up_runners.remove(run_start)
+						_sources.add(current)
+						break
+
+					parent_list = list(self.parents[current])
+					for p in parent_list:
+						if p not in _children:
+							_children[p] = set()
+						_children[p].add(current)
+						_parents[current].add(p)
+
+					next, other_parents = parent_list[0], parent_list[1:]
+					for p in other_parents:
+						up_runners.add(p)
+					current = next		
+
+			# Remove complete branch points from sources
+			# as we completeness allowed us running further up the DAG
+			for s in list(_sources):
+				if s in self.labels or not self.parents[s]:
+					continue
+				if len(_children[s]) == len(self.children[s]):
+					_sources.remove(s)
+
+			
+			# print '_parents.keys()', '\n'.join(_parents.keys())
+			# print '_sources', '\n'.join(_sources)
+			# print 'sha_one', '\n'.join([sha_one, ])
+			to_delete = (set(_parents.keys()) - _sources) - set([sha_one, ])
+			# print 'to_delete', '\n'.join(to_delete)
+
+			if sha_one not in self.labels: # and len(self.parents[sha_one]) == 1:
+				to_delete.add(sha_one)
+
+			for d in to_delete:
+				assert(d not in self.labels)
+
+				for p in self.parents[d]:
+					# if d in self.children[p]:
+					self.children[p].remove(d)
+					for ch in self.children[d]:
+						self.children[p].add(ch)
+						self.parents[ch].add(p)
+				for ch in self.children[d]:
+					#if d in self.parents[ch]:
+					self.parents[ch].remove(d)
+					for p in self.parents[d]:
+						self.parents[ch].add(p)
+						self.children[p].add(ch)
+				# self.parents[d].clear()
+				# self.children[d].clear()
+				del self.parents[d]
+				del self.children[d]
+				
+				black_list.add(d)
+
+		self._verify_child_mapping()
+
 	def _print_dot_file(self):
 		print 'digraph {'
 		for k, v in self.labels.items():
