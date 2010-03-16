@@ -379,7 +379,7 @@ class CommitGraph(object):
 				continue
 			print '\t"%(ref)s"[label="%(label)s", color=lightblue2, style=filled];' % {
 				'ref':k,
-				'label':'%s\\n%s' % (k, '\\n'.join(v))}
+				'label':'\\n'.join(v)}
 		for child, self.parents in self.parents.items():
 			for p in self.parents:
 				print '\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p}
