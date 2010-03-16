@@ -10,6 +10,16 @@ branch_extractor = re.compile('^[* ] ([^ ]+)(?: -> .+)?$')
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
 
+def loop(l):
+	"""Generator looping over a potentially changing
+		iteratable input, e.g. a set"""
+	while l:
+		res = list(l)
+		for r in res:
+			if r not in l:
+				continue
+			yield r
+
 def get_command_output(command_list):
 	p = subprocess.Popen(command_list, stdout=subprocess.PIPE)
 	p.wait()
@@ -144,16 +154,6 @@ class CommitGraph(object):
 			del self.children[sha_one]
 
 	def _optimize_merge_branch_fits_away(self):
-		def loop(l):
-			"""Generator looping over a potentially changing
-				iteratable input, e.g. a set"""
-			while l:
-				res = list(l)
-				for r in res:
-					if r not in l:
-						continue
-					yield r
-
 		todo_list = self.parents.keys()
 		black_list = set()
 		for sha_one in todo_list:
