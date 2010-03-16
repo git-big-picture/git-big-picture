@@ -370,6 +370,40 @@ class CommitGraph(object):
 				
 				black_list.add(d)
 
+		# Cut transitive redundant edges
+		for sha_one in self.parents.keys():
+			multi_child_parents = set(e for e in self.parents[sha_one] if len(self.children[e]) > 1)
+			if len(self.parents[sha_one]) < 2:
+				continue
+			for p in multi_child_parents:
+				other_parents = self.parents[sha_one] - set([p, ])
+				down_runners = set([p, ])
+				for run_start in loop(down_runners):
+					current = run_start
+					while True:
+						if current == sha_one:
+							down_runners.remove(run_start)
+							break
+						elif current in other_parents:
+							self.parents[sha_one].remove(p)
+							self.children[p].remove(sha_one)
+							down_runners.clear()
+							break
+
+						child_list = list(self.children[current])
+						l = len(child_list)
+						if l > 1:
+							next, other_children = child_list[0], child_list[1:]
+						elif l == 1:
+							next, other_children = child_list[0], list()
+						else:
+							down_runners.remove(run_start)
+							break
+
+						for c in other_children:
+							down_runners.add(c)
+						current = next
+
 		self._verify_child_mapping()
 
 	def _print_dot_file(self):
