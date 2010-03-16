@@ -389,5 +389,6 @@ class CommitGraph(object):
 if __name__ == '__main__':
 	graph = CommitGraph(get_parent_map(), get_label_dict())
 	# graph._optimize_linear_runs_away()
-	graph._optimize_merge_branch_fits_away()
+	# graph._optimize_merge_branch_fits_away()
+	graph._optimize_non_labels()
 	graph._print_dot_file()
