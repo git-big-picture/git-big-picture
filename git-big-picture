@@ -73,32 +73,39 @@ def get_parent_map():
 	return parents
 
 
-def get_label_dict():
+def get_branch_dict():
 	labels = {}
-
 	for b in get_branch_names():
 		ref = branch_to_sha1(b)
 		if ref not in labels:
 			labels[ref] = set()
 		labels[ref].add(b)
+	return labels
 
+
+def get_tag_dict():
+	labels = {}
 	for t in get_tag_names():
 		ref = tag_to_sha1(t)
 		if ref not in labels:
 			labels[ref] = set()
 		labels[ref].add(t)
-
 	return labels
 
 
 class CommitGraph(object):
-	def __init__(self, parent_map, label_dict):
+	def __init__(self, parent_map, branch_dict, tag_dict):
 		self.parents = parent_map
-		self.labels = label_dict
+		self.branches = branch_dict
+		self.tags = tag_dict
 
 		self.children = {}
 		self._calculate_child_mapping()
 		self._verify_child_mapping()
+
+	def _has_label(self, sha_one):
+		return sha_one in self.branches \
+			or sha_one in self.tags
 
 	def _calculate_child_mapping(self):
 		for sha_one, parent_sha_ones in self.parents.items():
@@ -135,7 +142,7 @@ class CommitGraph(object):
 				if len(self.children[parent]) != 1:
 					break
 				path.append(parent)
-				if parent in self.labels:
+				if self._has_label(parent):
 					break
 				current = parent
 
@@ -173,7 +180,7 @@ class CommitGraph(object):
 					if current not in _children:
 						_children[current] = set()
 
-					if current in self.labels \
+					if self._has_label(current) \
 							and current != sha_one:
 						up_runners.remove(run_start)
 						_sources.add(current)
@@ -259,7 +266,7 @@ class CommitGraph(object):
 			map(black_list.add, to_delete)
 
 			for d in to_delete:
-				assert(d not in self.labels)
+				assert(not self._has_label(d))
 
 				for p in self.parents[d]:
 					self.children[p].remove(d)
@@ -296,7 +303,7 @@ class CommitGraph(object):
 					if current not in _children:
 						_children[current] = set()
 
-					if current in self.labels \
+					if self._has_label(current) \
 							and current != sha_one:
 						up_runners.remove(run_start)
 						_sources.add(current)
@@ -327,7 +334,7 @@ class CommitGraph(object):
 			# Remove complete branch points from sources
 			# as we completeness allowed us running further up the DAG
 			for s in list(_sources):
-				if s in self.labels or not self.parents[s]:
+				if self._has_label(s) or not self.parents[s]:
 					continue
 				if len(_children[s]) == len(self.children[s]):
 					_sources.remove(s)
@@ -335,11 +342,11 @@ class CommitGraph(object):
 			
 			to_delete = (set(_parents.keys()) - _sources) - set([sha_one, ])
 
-			if sha_one not in self.labels:
+			if not self._has_label(sha_one):
 				to_delete.add(sha_one)
 
 			for d in to_delete:
-				assert(d not in self.labels)
+				assert(not self._has_label(d))
 
 				for p in self.parents[d]:
 					self.children[p].remove(d)
@@ -393,13 +400,29 @@ class CommitGraph(object):
 		self._verify_child_mapping()
 
 	def _print_dot_file(self):
+		def label_gen():
+			keys = set(self.branches.keys()).union(set(self.tags.keys()))
+			for k in keys:
+				labels = []
+				case = 0
+				if k in self.tags:
+					case = case + 1
+					map(labels.append, sorted(self.tags[k]))
+				if k in self.branches:
+					case = case + 2
+					map(labels.append, sorted(self.branches[k]))
+				# http://www.graphviz.org/doc/info/colors.html
+				color = "/pastel13/%d" % case
+				yield (k, labels, color)
+					
 		print 'digraph {'
-		for k, v in self.labels.items():
-			if k not in self.parents:
+		for sha_one, labels, color in label_gen():
+			if sha_one not in self.parents:
 				continue
-			print '\t"%(ref)s"[label="%(label)s", color=lightblue2, style=filled];' % {
-				'ref':k,
-				'label':'\\n'.join(v)}
+			print '\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
+				'ref':sha_one,
+				'label':'\\n'.join(labels),
+				'color':color}
 		for child, self.parents in self.parents.items():
 			for p in self.parents:
 				print '\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p}
@@ -407,7 +430,7 @@ class CommitGraph(object):
 
 
 if __name__ == '__main__':
-	graph = CommitGraph(get_parent_map(), get_label_dict())
+	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
 	graph._optimize_non_labels()
