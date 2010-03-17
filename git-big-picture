@@ -446,7 +446,9 @@ if __name__ == '__main__':
 			stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={'GIT_DIR': args[0]})
 		p.wait()
 		if p.returncode:
-			raise Exception('fatal: %s appears not to be a git directory!' % args[0])
+			import sys
+			print 'Fatal: Does not %s appear to be a .git directory!' % args[0]
+			sys.exit(1)
 		else:
 			git_env = {'GIT_DIR': args[0]}
 	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
