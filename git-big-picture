@@ -9,6 +9,7 @@ import re
 
 branch_extractor = re.compile('^[* ] ([^ ]+)(?: -> .+)?$')
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
+git_env = None
 
 
 def loop(l):
@@ -22,7 +23,7 @@ def loop(l):
 			yield r
 
 def get_command_output(command_list):
-	p = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	p = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=git_env)
 	p.wait()
 	if p.returncode:
 		raise Exception('Return code %d from command "%s"' \
@@ -65,7 +66,7 @@ def tag_to_sha1(tag_name):
 
 def get_parent_map():
 	parents = {}
-	p = subprocess.Popen(['git', 'rev-list', '--all', '--parents'], stdout=subprocess.PIPE)
+	p = subprocess.Popen(['git', 'rev-list', '--all', '--parents'], stdout=subprocess.PIPE, env=git_env)
 	output = p.communicate()[0]
 	for line in output.split('\n'):
 		sha_ones = [e.group(0) for e in re.finditer(sha1_pattern, line)]
@@ -436,6 +437,18 @@ class CommitGraph(object):
 
 
 if __name__ == '__main__':
+	from optparse import OptionParser
+	parser = OptionParser()
+	opts, args = parser.parse_args()
+	if len(args) == 1:
+		# check whether the argument is a valid git directory
+		p = subprocess.Popen(['git', 'rev-parse', '--git-dir'],
+			stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={'GIT_DIR': args[0]})
+		p.wait()
+		if p.returncode:
+			raise Exception('fatal: %s appears not to be a git directory!' % args[0])
+		else:
+			git_env = {'GIT_DIR': args[0]}
 	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()

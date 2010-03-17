@@ -22,11 +22,16 @@ Graphviz version.)
 Usage
 =====
 
-To generate a graph (for example in PNG format), simply cd to the git
-directory, call the program, and pipe the output to the Graphviz `dot'
-utility to convert it to PNG:
+To generate a graph (for example in PNG format), simply call the
+program with the git directory to visualize as first argument, and
+pipe the output to the Graphviz `dot' utility to convert it to PNG:
 
-    $ ./git-big-picture | dot -Tpng -ograph.png
+    $ ./git-big-picture ~/git-repository/.git | dot -Tpng -o graph.png
+
+(Please note that you'll have to append '.git' to the working tree
+path, because git stores its files in that directory. If you omit the
+argument, the script will operate on the git repository you are
+currently in.)
 
 You'll then have a file called 'graph.png' in your current working
 directory. If you replace 'png' with 'svg', you'll get a SVG file
