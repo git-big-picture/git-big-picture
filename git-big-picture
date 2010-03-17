@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (C) 2010 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (C) 2010 Julius Plenz <julius@plenz.com>
 # Licensed under GPL v3 or later
 #
 import subprocess
