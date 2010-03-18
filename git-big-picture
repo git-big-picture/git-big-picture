@@ -452,7 +452,7 @@ if __name__ == '__main__':
 		p.wait()
 		if p.returncode:
 			import sys
-			print 'Fatal: Does not %s appear to be a .git directory!' % args[0]
+			sys.stderr.write('Fatal: Does not appear to be a .git directory: %s.\n' % args[0])
 			sys.exit(1)
 		else:
 			git_env = {'GIT_DIR': args[0]}
