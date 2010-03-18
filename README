@@ -46,3 +46,16 @@ If you specify a custom format, but neither a viewer nor an output
 file, the script will output the image to stdout. That is to enable
 you to use it in shell scripts and pipe the result (for example a
 gzipped SVG version) to another program.
+
+Git Integration
+===============
+
+You can easily integrate this script as a regular git command. Simply
+copy the script to one of the directories listed in your $PATH
+(ideally, to $HOME/bin). Then you can use `git big-picture' from any
+git directory:
+
+    $ git big-picture -f pdf -v xpdf -o visualization.pdf
+
+This will present you with a PDF viewer displaying your project's
+graph, and stores this PDF in a file called `visualization.pdf'.
