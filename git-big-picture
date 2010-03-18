@@ -30,9 +30,13 @@ def get_command_output(command_list):
 			% (p.returncode, ' '.join(command_list)))
 	return p.stdout.read()
 
-def get_branch_names():
+def get_branch_names(is_local):
 	branch_names = []
-	output = get_command_output(['git', 'branch', '-a'])
+	if is_local:
+		command_list = ['git', 'branch']
+	else:
+		command_list = ['git', 'branch', '-r']
+	output = get_command_output(command_list)
 	for line in output.split('\n'):
 		m = branch_extractor.match(line)
 		if m is not None:
@@ -53,11 +57,11 @@ def ref_to_sha1(ref):
 	for line in output.split('\n'):
 		return line
 
-def branch_to_sha1(branch_name):
-	if branch_name.startswith('remotes/'):
-		ref = branch_name
-	else:
+def branch_to_sha1(branch_name, is_local):
+	if is_local:
 		ref = 'refs/heads/%s' % branch_name
+	else:
+		ref = 'refs/remotes/%s' % branch_name
 	return ref_to_sha1(ref)
 
 def tag_to_sha1(tag_name):
@@ -80,11 +84,12 @@ def get_parent_map():
 
 def get_branch_dict():
 	labels = {}
-	for b in get_branch_names():
-		ref = branch_to_sha1(b)
-		if ref not in labels:
-			labels[ref] = set()
-		labels[ref].add(b)
+	for is_local in (True, False):
+		for b in get_branch_names(is_local):
+			ref = branch_to_sha1(b, is_local)
+			if ref not in labels:
+				labels[ref] = set()
+			labels[ref].add(b)
 	return labels
 
 
