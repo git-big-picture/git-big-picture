@@ -442,28 +442,7 @@ class CommitGraph(object):
 
 		mapping = labels_to_parents
 
-		self.parents = mapping
-		self._calculate_child_mapping()
-
-	def _reachable_labels_using_contains(self):
-		reverse_mapping = dict()
-		forward_mapping = dict()
-		labels = self.branches.keys() + self.tags.keys()
-		# for each label we look at what other labels contain this label
-		# this we call reverse mapping
-		for l in labels:
-			br = [ref_to_sha1(b) for b in branch_contains(l)]
-			tg = [ref_to_sha1(t) for t in tag_contains(l)]
-			reverse_mapping[l] = set(br + tg)
-			forward_mapping[l] = set()
-		# next we obtain the parents for each label
-		# this we call forward mapping
-		for l1, l2 in ((l1,l2) for l1 in labels for l2 in labels if l1 != l2):
-			if l1 in reverse_mapping[l2]:
-				forward_mapping[l1].add(l2)
-
-		mapping = forward_mapping
-
+		# lastly we prune the edges
 		for l in mapping.keys():
 			# getall parents of this label
 			removal = set()
