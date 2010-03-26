@@ -421,6 +421,48 @@ class CommitGraph(object):
 
 		self._verify_child_mapping()
 
+	def recursive_approach(self):
+		self.seen = dict()
+		# first we build the seen dict
+		for b in self.branches.keys() + self.tags.keys():
+			self.recurse(b)
+		# next we need to remove those entries that have no label
+		labels_to_parents = dict()
+		for l in self.seen.keys():
+			if self._has_label(l):
+				labels_to_parents[l] = self.seen[l]
+
+		mapping = labels_to_parents
+
+		self.parents = mapping
+		self._calculate_child_mapping()
+
+	def recurse(self, commit):
+		all_parents = set()
+		if commit in self.seen.keys():
+			# we have fully explored everything above
+			# just get the parents of this one
+			# add itself to it, and return
+			all_parents = all_parents.union(self.seen[commit])
+		elif len(self.parents[commit]) == 0:
+			# nowhere left to go
+			# commit an empty set to the lookup dict
+			# add itself to it and return
+			self.seen[commit] = all_parents.copy()
+		else:
+			# there are places where we haven't been yet
+			# explore those
+			for p in self.parents[commit]:
+				all_parents = all_parents.union(self.recurse(p))
+			# add those places to the lookup dict
+			# then add itself to it and return
+			self.seen[commit] = all_parents.copy()
+
+		# this has to be done for all three cases
+		if self._has_label(commit):
+			all_parents.add(commit)
+		return all_parents
+
 	def _generate_dot_file(self):
 		def label_gen():
 			keys = set(self.branches.keys()).union(set(self.tags.keys()))
