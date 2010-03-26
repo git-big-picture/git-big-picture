@@ -430,37 +430,7 @@ class CommitGraph(object):
 		self._verify_child_mapping()
 
 	def recursive_approach(self):
-		self.seen = dict()
-		# first we build the seen dict
-		for b in self.branches.keys() + self.tags.keys():
-			self.recurse(b)
-		# next we need to remove those entries that have no label
-		labels_to_parents = dict()
-		for l in self.seen.keys():
-			if self._has_label(l):
-				labels_to_parents[l] = self.seen[l]
-
-		mapping = labels_to_parents
-
-		# lastly we prune the edges
-		for l in mapping.keys():
-			# getall parents of this label
-			removal = set()
-			for p in mapping[l]:
-				# get the parents of this parent, and remove these ones from the
-				# original
-				for pp in mapping[p]:
-					if pp in mapping[l]:
-						removal.add(pp)
-			for s in removal:
-				pass
-				mapping[l].remove(s)
-
-		self.parents = mapping
-		self._calculate_child_mapping()
-
-	def _reachable_labels(self):
-		"""" for each label, calculate what other labels are reachable from it """
+        # first we reduce the graph
 		to_visit = self.branches.keys() + self.tags.keys()
 		seen = set()
 		mapping = dict()
@@ -488,6 +458,34 @@ class CommitGraph(object):
 
 			mapping[node] = reachable
 			seen.add(node)
+
+		self.parents = mapping
+
+		self.seen = dict()
+		# first we build the seen dict
+		for b in self.branches.keys() + self.tags.keys():
+			self.recurse(b)
+		# next we need to remove those entries that have no label
+		labels_to_parents = dict()
+		for l in self.seen.keys():
+			if self._has_label(l):
+				labels_to_parents[l] = self.seen[l]
+
+		mapping = labels_to_parents
+
+		# lastly we prune the edges
+		for l in mapping.keys():
+			# getall parents of this label
+			removal = set()
+			for p in mapping[l]:
+				# get the parents of this parent, and remove these ones from the
+				# original
+				for pp in mapping[p]:
+					if pp in mapping[l]:
+						removal.add(pp)
+			for s in removal:
+				pass
+				mapping[l].remove(s)
 
 		self.parents = mapping
 		self._calculate_child_mapping()
