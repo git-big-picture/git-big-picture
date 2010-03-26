@@ -480,27 +480,27 @@ class CommitGraph(object):
 		self.parents = seen_commits
 		self._calculate_child_mapping()
 
-	def recurse(self, commit, labeled_parents, seen_commits):
+	def recurse(self, commit, in_labeled_parents, out_seen_commits):
 		all_parents = set()
-		if commit in seen_commits.keys():
+		if commit in out_seen_commits.keys():
 			# we have fully explored everything above
 			# just get the parents of this one
 			# add itself to it, and return
-			all_parents = all_parents.union(seen_commits[commit])
-		elif len(labeled_parents[commit]) == 0:
+			all_parents = all_parents.union(out_seen_commits[commit])
+		elif len(in_labeled_parents[commit]) == 0:
 			# nowhere left to go
 			# commit an empty set to the lookup dict
 			# add itself to it and return
-			seen_commits[commit] = all_parents.copy()
+			out_seen_commits[commit] = all_parents.copy()
 		else:
 			# there are places where we haven't been yet
 			# explore those
-			for p in labeled_parents[commit]:
+			for p in in_labeled_parents[commit]:
 				all_parents = all_parents.union(
-					self.recurse(p, labeled_parents, seen_commits))
+					self.recurse(p, in_labeled_parents, out_seen_commits))
 			# add those places to the lookup dict
 			# then add itself to it and return
-			seen_commits[commit] = all_parents.copy()
+			out_seen_commits[commit] = all_parents.copy()
 
 		# this has to be done for all three cases
 		if self._has_label(commit):
