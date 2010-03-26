@@ -465,29 +465,21 @@ class CommitGraph(object):
 		# first we build the seen dict
 		for b in self.branches.keys() + self.tags.keys():
 			self.recurse(b, labeled_parents, seen_commits)
-		# next we need to remove those entries that have no label
-		labels_to_parents = dict()
-		for l in seen_commits.keys():
-			if self._has_label(l):
-				labels_to_parents[l] = seen_commits[l]
-
-		mapping = labels_to_parents
 
 		# lastly we prune the edges
-		for l in mapping.keys():
+		for l in seen_commits.keys():
 			# getall parents of this label
 			removal = set()
-			for p in mapping[l]:
+			for p in seen_commits[l]:
 				# get the parents of this parent, and remove these ones from the
 				# original
-				for pp in mapping[p]:
-					if pp in mapping[l]:
+				for pp in seen_commits[p]:
+					if pp in seen_commits[l]:
 						removal.add(pp)
 			for s in removal:
-				pass
-				mapping[l].remove(s)
+				seen_commits[l].remove(s)
 
-		self.parents = mapping
+		self.parents = seen_commits
 		self._calculate_child_mapping()
 
 	def recurse(self, commit, labeled_parents, seen_commits):
