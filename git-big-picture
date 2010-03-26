@@ -619,7 +619,8 @@ if __name__ == '__main__':
 	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
-	graph._optimize_non_labels()
+	# graph._optimize_non_labels()
+	graph.recursive_approach()
 	dot_file_lines = graph._generate_dot_file()
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
