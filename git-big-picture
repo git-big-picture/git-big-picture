@@ -33,22 +33,28 @@ def get_command_output(command_list):
 	return p.stdout.read()
 
 def get_branch_names(is_local):
-	branch_names = []
 	if is_local:
 		command_list = ['git', 'branch']
 	else:
 		command_list = ['git', 'branch', '-r']
 	output = get_command_output(command_list)
-	for line in output.split('\n'):
+	return convert_raw_branch_list(output)
+
+def convert_raw_branch_list(branch_list):
+	branch_names = []
+	for line in branch_list.split('\n'):
 		m = branch_extractor.match(line)
 		if m is not None:
 			branch_names.append(m.group(1))
 	return branch_names
 
 def get_tag_names():
-	tag_names = []
 	output = get_command_output(['git', 'tag', '-l'])
-	for line in output.split('\n'):
+	return convert_raw_tag_list(output)
+
+def convert_raw_tag_list(tag_list):
+	tag_names = []
+	for line in tag_list.split('\n'):
 		if line == '':
 			continue
 		tag_names.append(line)
