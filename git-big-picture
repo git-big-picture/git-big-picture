@@ -459,6 +459,39 @@ class CommitGraph(object):
 		self.parents = mapping
 		self._calculate_child_mapping()
 
+	def _reachable_labels(self):
+		"""" for each label, calculate what other labels are reachable from it """
+		to_visit = self.branches.keys() + self.tags.keys()
+		seen = set()
+		mapping = dict()
+		for node in to_visit:
+			if node in seen:
+				continue
+
+			local_to_visit = list(self.parents[node])
+			local_seen = set()
+			reachable = set()
+			for commit in local_to_visit:
+				if commit in local_seen:
+					continue
+				elif self._has_label(commit):
+					# remember that commit is reachable from node
+					reachable.add(commit)
+					# lastly we must remember that we have seen this commit in
+					# our local search
+					local_seen.add(commit)
+				else:
+					# no label, and not seen, keep looking at parents
+					local_to_visit.extend(self.parents[commit])
+					# remember that we have seen this commit
+					local_seen.add(commit)
+
+			mapping[node] = reachable
+			seen.add(node)
+
+		self.parents = mapping
+		self._calculate_child_mapping()
+
 	def recurse(self, commit):
 		all_parents = set()
 		if commit in self.seen.keys():
