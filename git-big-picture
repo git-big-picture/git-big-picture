@@ -65,6 +65,14 @@ def ref_to_sha1(ref):
 	for line in output.split('\n'):
 		return line
 
+def branch_contains(sha1):
+	output = get_command_output(['git', 'branch', '--contains', sha1])
+	return convert_raw_branch_list(output)
+
+def tag_contains(sha1):
+	output = get_command_output(['git', 'tag', '--contains', sha1])
+	return convert_raw_tag_list(output)
+
 def branch_to_sha1(branch_name, is_local):
 	if is_local:
 		ref = 'refs/heads/%s' % branch_name
