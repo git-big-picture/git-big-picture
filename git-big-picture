@@ -429,7 +429,34 @@ class CommitGraph(object):
 
 		self._verify_child_mapping()
 
-	def recursive_approach(self):
+	def _remove_non_labels(self):
+		def recurse(commit, in_labeled_parents, out_seen_commits):
+			all_parents = set()
+			if commit in out_seen_commits.keys():
+				# we have fully explored everything above
+				# just get the parents of this one
+				# add itself to it, and return
+				all_parents = all_parents.union(out_seen_commits[commit])
+			elif len(in_labeled_parents[commit]) == 0:
+				# nowhere left to go
+				# commit an empty set to the lookup dict
+				# add itself to it and return
+				out_seen_commits[commit] = all_parents.copy()
+			else:
+				# there are places where we haven't been yet
+				# explore those
+				for p in in_labeled_parents[commit]:
+					all_parents = all_parents.union(
+						recurse(p, in_labeled_parents, out_seen_commits))
+				# add those places to the lookup dict
+				# then add itself to it and return
+				out_seen_commits[commit] = all_parents.copy()
+
+			# this has to be done for all three cases
+			if self._has_label(commit):
+				all_parents.add(commit)
+			return all_parents
+
         # first we reduce the graph
 		to_visit = self.branches.keys() + self.tags.keys()
 		seen = set()
@@ -462,7 +489,7 @@ class CommitGraph(object):
 		seen_commits = dict()
 		# first we build the seen dict
 		for b in self.branches.keys() + self.tags.keys():
-			self.recurse(b, labeled_parents, seen_commits)
+			recurse(b, labeled_parents, seen_commits)
 
 		# lastly we prune the edges
 		for l in seen_commits.keys():
@@ -479,33 +506,6 @@ class CommitGraph(object):
 
 		self.parents = seen_commits
 		self._calculate_child_mapping()
-
-	def recurse(self, commit, in_labeled_parents, out_seen_commits):
-		all_parents = set()
-		if commit in out_seen_commits.keys():
-			# we have fully explored everything above
-			# just get the parents of this one
-			# add itself to it, and return
-			all_parents = all_parents.union(out_seen_commits[commit])
-		elif len(in_labeled_parents[commit]) == 0:
-			# nowhere left to go
-			# commit an empty set to the lookup dict
-			# add itself to it and return
-			out_seen_commits[commit] = all_parents.copy()
-		else:
-			# there are places where we haven't been yet
-			# explore those
-			for p in in_labeled_parents[commit]:
-				all_parents = all_parents.union(
-					self.recurse(p, in_labeled_parents, out_seen_commits))
-			# add those places to the lookup dict
-			# then add itself to it and return
-			out_seen_commits[commit] = all_parents.copy()
-
-		# this has to be done for all three cases
-		if self._has_label(commit):
-			all_parents.add(commit)
-		return all_parents
 
 	def _generate_dot_file(self):
 		def label_gen():
@@ -611,7 +611,7 @@ if __name__ == '__main__':
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
 	# graph._optimize_non_labels()
-	graph.recursive_approach()
+	graph._remove_non_labels()
 	dot_file_lines = graph._generate_dot_file()
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
