@@ -413,7 +413,7 @@ class CommitGraph(object):
 
 		self._verify_child_mapping()
 
-	def _generate_dot_input(self):
+	def _generate_dot_file(self):
 		def label_gen():
 			keys = set(self.branches.keys()).union(set(self.tags.keys()))
 			for k in keys:
@@ -429,25 +429,28 @@ class CommitGraph(object):
 				color = "/pastel13/%d" % case
 				yield (k, labels, color)
 					
-		self.dot_input = ['digraph {']
+		dot_file_lines = ['digraph {']
 		for sha_one, labels, color in label_gen():
-			self.dot_input.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
+			dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
 				'ref':sha_one,
 				'label':'\\n'.join(labels),
 				'color':color})
 		for child, self.parents in self.parents.items():
 			for p in self.parents:
-				self.dot_input.append('\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p})
-		self.dot_input.append('}')
+				dot_file_lines.append('\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p})
+		dot_file_lines.append('}')
+		return dot_file_lines
 
-	def _output(self, format = None, viewer = None, outfile = None):
+
+if True:  # Hack to save our VCS diffs from indentation changes
+	def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = None):
 		import tempfile, os, sys
 		if not format:
 			if outfile:
 				format = outfile.split('.')[-1]
 				sys.stderr.write('guessing format: %s.\n' % format)
 			else: # output plain text
-				for line in self.dot_input:
+				for line in dot_file_lines:
 					print line
 				return 0
 		# output in specified format
@@ -465,7 +468,7 @@ class CommitGraph(object):
 				'probably you specified an invalid format, see "man dot"\n' % p.poll())
 			sys.exit(3)
 		# send dot input, automatically receive and store output
-		dot_output = p.communicate(input='\n'.join(self.dot_input))[0]
+		dot_output = p.communicate(input='\n'.join(dot_file_lines))[0]
 		if viewer or outfile:
 			if outfile:
 				try:
@@ -514,5 +517,5 @@ if __name__ == '__main__':
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
 	graph._optimize_non_labels()
-	graph._generate_dot_input()
-	graph._output(format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
+	dot_file_lines = graph._generate_dot_file()
+	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
