@@ -459,8 +459,6 @@ class CommitGraph(object):
 			labeled_parents[node] = reachable
 			seen.add(node)
 
-		self.parents = labeled_parents
-
 		seen_commits = dict()
 		# first we build the seen dict
 		for b in self.branches.keys() + self.tags.keys():
