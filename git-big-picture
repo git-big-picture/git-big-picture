@@ -444,6 +444,7 @@ class CommitGraph(object):
 				the full parent graph and produce the final output graph
 		"""
 		def recurse(commit, in_labeled_parents, out_seen_commits):
+			""" Recursive call used in step 2. """
 			all_parents = set()
 			if commit in out_seen_commits.keys():
 				# we have already explored the parents
