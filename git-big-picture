@@ -475,12 +475,12 @@ class CommitGraph(object):
 		for b in self.branches.keys() + self.tags.keys():
 			recurse(b, reachable_labeled_parents, seen_commits)
 
-		# lastly we prune the edges
+		# Last:
+		# prunde the edges from the full graph
 		for label in seen_commits.keys():
-			# get all parents of this label
+			# get the parents of the parents of label, and if these are also
+			# parents of label, remove them from label's parent list
 			for parents in seen_commits[label].copy():
-				# get the parents of this parent, and remove these ones from the
-				# original
 				for p_parents in seen_commits[parents]:
 					if p_parents in seen_commits[label]:
 						seen_commits[label].remove(p_parents)
