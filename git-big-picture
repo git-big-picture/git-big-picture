@@ -439,8 +439,7 @@ class CommitGraph(object):
 				out_seen_commits[commit] = all_parents.copy()
 			# add the current commit to the list of parents
 			# and return from recursive step
-			if self._has_label(commit):
-				all_parents.add(commit)
+			all_parents.add(commit)
 			return all_parents
 
 		# First:
