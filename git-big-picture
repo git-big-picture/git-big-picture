@@ -422,6 +422,27 @@ class CommitGraph(object):
 		self._verify_child_mapping()
 
 	def _remove_non_labels(self):
+		""" Generate the subgraph of the Git commit graph that contains only
+		tags and branches.
+
+		The algorithm has three steps:
+
+			1. Generate a reachability graph for labels
+				This will generate a graph of all labels, with edges pointing to
+				all reachable parents. Unfortunately this may possibly include
+				edges from labels to parents that are also parents of the
+				label's parents. These edges are redundant and must be removed.
+
+			2. Generate a full parent graph for labels
+				This will use the information from step 1. to generate a graph
+				of labels, with edges pointing to all parents, where in this
+				case the parent of a parent of a label is also that label's
+				parent.
+
+			3. Generate the reduced commit graph containing tags and branches
+				This will use the information from step 2. to prune the edges of
+				the full parent graph and produce the final output graph
+		"""
 		def recurse(commit, in_labeled_parents, out_seen_commits):
 			all_parents = set()
 			if commit in out_seen_commits.keys():
