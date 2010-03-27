@@ -607,4 +607,4 @@ if __name__ == '__main__':
 	dot_file_lines = graph._generate_dot_file()
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
-# vim: set noexpandtab
+# vim: set noexpandtab:
