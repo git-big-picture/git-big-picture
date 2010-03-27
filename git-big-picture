@@ -477,7 +477,7 @@ class CommitGraph(object):
 
 		# lastly we prune the edges
 		for l in seen_commits.keys():
-			# getall parents of this label
+			# get all parents of this label
 			removal = set()
 			for p in seen_commits[l]:
 				# get the parents of this parent, and remove these ones from the
