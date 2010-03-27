@@ -449,7 +449,8 @@ class CommitGraph(object):
 				all_parents.add(commit)
 			return all_parents
 
-		# first we reduce the graph
+		# First:
+		# for each label find immediately reachable labels
 		labels = self.branches.keys() + self.tags.keys()
 		reachable_labeled_parents = dict()
 		for label in labels:
@@ -462,10 +463,10 @@ class CommitGraph(object):
 				else:
 					seen.add(commit)
 					if self._has_label(commit):
-						# remember that commit is reachable from label
+						# has label and is reachable from current label
 						reachable.add(commit)
 					else:
-						# no label, and not seen, keep looking at parents
+						# no label, continue searching
 						to_visit.extend(self.parents[commit])
 
 			reachable_labeled_parents[label] = reachable
