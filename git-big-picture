@@ -448,7 +448,7 @@ class CommitGraph(object):
 			all_parents = set()
 			if commit in out_seen_commits.keys():
 				# we have already explored the parents
-				all_parents = all_parents.union(out_seen_commits[commit])
+				all_parents = out_seen_commits[commit].copy()
 			elif len(in_labeled_parents[commit]) == 0:
 				# there are no parents
 				out_seen_commits[commit] = all_parents.copy()
