@@ -459,17 +459,14 @@ class CommitGraph(object):
 			for commit in local_to_visit:
 				if commit in local_seen:
 					continue
-				elif self._has_label(commit):
-					# remember that commit is reachable from label
-					reachable.add(commit)
-					# lastly we must remember that we have seen this commit in
-					# our local search
-					local_seen.add(commit)
 				else:
-					# no label, and not seen, keep looking at parents
-					local_to_visit.extend(self.parents[commit])
-					# remember that we have seen this commit
 					local_seen.add(commit)
+					if self._has_label(commit):
+						# remember that commit is reachable from label
+						reachable.add(commit)
+					else:
+						# no label, and not seen, keep looking at parents
+						local_to_visit.extend(self.parents[commit])
 
 			reachable_labeled_parents[label] = reachable
 		seen_commits = dict()
