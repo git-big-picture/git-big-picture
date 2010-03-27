@@ -451,12 +451,8 @@ class CommitGraph(object):
 
 		# first we reduce the graph
 		labels = self.branches.keys() + self.tags.keys()
-		seen = set()
 		labeled_parents = dict()
 		for node in labels:
-			if node in seen:
-				continue
-
 			local_to_visit = list(self.parents[node])
 			local_seen = set()
 			reachable = set()
@@ -476,8 +472,6 @@ class CommitGraph(object):
 					local_seen.add(commit)
 
 			labeled_parents[node] = reachable
-			seen.add(node)
-
 		seen_commits = dict()
 		# first we build the seen dict
 		for b in self.branches.keys() + self.tags.keys():
