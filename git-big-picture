@@ -465,9 +465,8 @@ class CommitGraph(object):
 			return all_parents
 
 		# 1. Generate a reachability graph for labels
-		labels = self.branches.keys() + self.tags.keys()
 		reachable_labeled_parents = dict()
-		for label in labels:
+		for label in self.branches.keys() + self.tags.keys():
 			to_visit = list(self.parents[label])
 			seen = set()
 			reachable_labeled_parents[label] = set()
