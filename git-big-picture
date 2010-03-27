@@ -481,9 +481,9 @@ class CommitGraph(object):
 			for parents in seen_commits[label].copy():
 				# get the parents of this parent, and remove these ones from the
 				# original
-				for pp in seen_commits[parents]:
-					if pp in seen_commits[label]:
-						seen_commits[label].remove(pp)
+				for p_parents in seen_commits[parents]:
+					if p_parents in seen_commits[label]:
+						seen_commits[label].remove(p_parents)
 
 		self.parents = seen_commits
 		self._calculate_child_mapping()
