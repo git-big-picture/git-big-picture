@@ -469,8 +469,9 @@ class CommitGraph(object):
 						# no label, continue searching
 						to_visit.extend(self.parents[commit])
 
+		# Second:
+		# from the reachable labels, find all parent labels
 		seen_commits = dict()
-		# first we build the seen dict
 		for b in self.branches.keys() + self.tags.keys():
 			recurse(b, reachable_labeled_parents, seen_commits)
 
