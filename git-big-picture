@@ -449,11 +449,11 @@ class CommitGraph(object):
 				all_parents.add(commit)
 			return all_parents
 
-        # first we reduce the graph
-		to_visit = self.branches.keys() + self.tags.keys()
+		# first we reduce the graph
+		labels = self.branches.keys() + self.tags.keys()
 		seen = set()
 		labeled_parents = dict()
-		for node in to_visit:
+		for node in labels:
 			if node in seen:
 				continue
 
