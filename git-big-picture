@@ -464,8 +464,7 @@ class CommitGraph(object):
 			all_parents.add(commit)
 			return all_parents
 
-		# First:
-		# for each label find immediately reachable labels
+		# 1. Generate a reachability graph for labels
 		labels = self.branches.keys() + self.tags.keys()
 		reachable_labeled_parents = dict()
 		for label in labels:
@@ -484,14 +483,12 @@ class CommitGraph(object):
 						# no label, continue searching
 						to_visit.extend(self.parents[commit])
 
-		# Second:
-		# from the reachable labels, find all parent labels
+		# 2. Generate a full parent graph for labels
 		seen_commits = dict()
 		for b in self.branches.keys() + self.tags.keys():
 			recurse(b, reachable_labeled_parents, seen_commits)
 
-		# Last:
-		# prunde the edges from the full graph
+		# 3. Generate the reduced commit graph containing tags and branches
 		for label in seen_commits.keys():
 			# get the parents of the parents of label, and if these are also
 			# parents of label, remove them from label's parent list
