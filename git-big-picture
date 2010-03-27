@@ -485,8 +485,8 @@ class CommitGraph(object):
 
 		# 2. Generate a full parent graph for labels
 		seen_commits = dict()
-		for b in self.branches.keys() + self.tags.keys():
-			recurse(b, reachable_labeled_parents, seen_commits)
+		for label in self.branches.keys() + self.tags.keys():
+			recurse(label, reachable_labeled_parents, seen_commits)
 
 		# 3. Generate the reduced commit graph containing tags and branches
 		for label in seen_commits.keys():
