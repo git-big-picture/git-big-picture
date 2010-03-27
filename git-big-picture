@@ -452,15 +452,15 @@ class CommitGraph(object):
 		# first we reduce the graph
 		labels = self.branches.keys() + self.tags.keys()
 		reachable_labeled_parents = dict()
-		for node in labels:
-			local_to_visit = list(self.parents[node])
+		for label in labels:
+			local_to_visit = list(self.parents[label])
 			local_seen = set()
 			reachable = set()
 			for commit in local_to_visit:
 				if commit in local_seen:
 					continue
 				elif self._has_label(commit):
-					# remember that commit is reachable from node
+					# remember that commit is reachable from label
 					reachable.add(commit)
 					# lastly we must remember that we have seen this commit in
 					# our local search
@@ -471,7 +471,7 @@ class CommitGraph(object):
 					# remember that we have seen this commit
 					local_seen.add(commit)
 
-			reachable_labeled_parents[node] = reachable
+			reachable_labeled_parents[label] = reachable
 		seen_commits = dict()
 		# first we build the seen dict
 		for b in self.branches.keys() + self.tags.keys():
