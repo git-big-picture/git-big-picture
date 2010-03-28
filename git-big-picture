@@ -422,6 +422,84 @@ class CommitGraph(object):
 
 		self._verify_child_mapping()
 
+	def _remove_non_labels(self):
+		""" Generate the subgraph of the Git commit graph that contains only
+		tags and branches.
+
+		The algorithm has three steps:
+
+			1. Generate a reachability graph for labels
+				This will generate a graph of all labels, with edges pointing to
+				all reachable parents. Unfortunately this may possibly include
+				edges from labels to parents that are also parents of the
+				label's parents. These edges are redundant and must be removed.
+
+			2. Generate a full parent graph for labels
+				This will use the information from step 1. to generate a graph
+				of labels, with edges pointing to all parents, where in this
+				case the parent of a parent of a label is also that label's
+				parent.
+
+			3. Generate the reduced commit graph containing tags and branches
+				This will use the information from step 2. to prune the edges of
+				the full parent graph and produce the final output graph
+		"""
+		def recurse(commit, in_labeled_parents, out_seen_commits):
+			""" Recursive call used in step 2. """
+			all_parents = set()
+			if commit in out_seen_commits.keys():
+				# we have already explored the parents
+				all_parents = out_seen_commits[commit].copy()
+			elif len(in_labeled_parents[commit]) == 0:
+				# there are no parents
+				out_seen_commits[commit] = all_parents.copy()
+			else:
+				# explore the commits before this one
+				for p in in_labeled_parents[commit]:
+					all_parents = all_parents.union(
+						recurse(p, in_labeled_parents, out_seen_commits))
+				# record what we have seen
+				out_seen_commits[commit] = all_parents.copy()
+			# add the current commit to the list of parents
+			# and return from recursive step
+			all_parents.add(commit)
+			return all_parents
+
+		# 1. Generate a reachability graph for labels
+		reachable_labeled_parents = dict()
+		for label in self.branches.keys() + self.tags.keys():
+			to_visit = list(self.parents[label])
+			seen = set()
+			reachable_labeled_parents[label] = set()
+			for commit in to_visit:
+				if commit in seen:
+					continue
+				else:
+					seen.add(commit)
+					if self._has_label(commit):
+						# has label and is reachable from current label
+						reachable_labeled_parents[label].add(commit)
+					else:
+						# no label, continue searching
+						to_visit.extend(self.parents[commit])
+
+		# 2. Generate a full parent graph for labels
+		seen_commits = dict()
+		for label in self.branches.keys() + self.tags.keys():
+			recurse(label, reachable_labeled_parents, seen_commits)
+
+		# 3. Generate the reduced commit graph containing tags and branches
+		for label in seen_commits.keys():
+			# get the parents of the parents of label, and if these are also
+			# parents of label, remove them from label's parent list
+			for parent in seen_commits[label].copy():
+				for p_parent in seen_commits[parent]:
+					if p_parent in seen_commits[label]:
+						seen_commits[label].remove(p_parent)
+
+		self.parents = seen_commits
+		self._calculate_child_mapping()
+
 	def _generate_dot_file(self):
 		def label_gen():
 			keys = set(self.branches.keys()).union(set(self.tags.keys()))
@@ -525,8 +603,9 @@ if __name__ == '__main__':
 	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
-	graph._optimize_non_labels()
+	# graph._optimize_non_labels()
+	graph._remove_non_labels()
 	dot_file_lines = graph._generate_dot_file()
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
-# vim: set noexpandtab
+# vim: set noexpandtab:
