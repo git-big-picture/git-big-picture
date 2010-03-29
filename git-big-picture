@@ -500,7 +500,7 @@ class CommitGraph(object):
 		self.parents = seen_commits
 		self._calculate_child_mapping()
 
-	def _generate_dot_file(self):
+	def _generate_dot_file(self, sha_ones_on_labels):
 		def label_gen():
 			keys = set(self.branches.keys()).union(set(self.tags.keys()))
 			for k in keys:
@@ -520,7 +520,8 @@ class CommitGraph(object):
 		for sha_one, labels, color in label_gen():
 			dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
 				'ref':sha_one,
-				'label':'\\n'.join(labels),
+				'label':'\\n'.join(labels \
+					+ (sha_ones_on_labels and [sha_one,] or list())),
 				'color':color})
 		for child, self.parents in self.parents.items():
 			for p in self.parents:
@@ -578,13 +579,14 @@ if True:  # Hack to save our VCS diffs from indentation changes
 		else: # print raw SVG, PDF, ...
 			print dot_output
 
-def main():
+def main(opts):
 	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
 	# graph._optimize_non_labels()
-	graph._remove_non_labels()
-	dot_file_lines = graph._generate_dot_file()
+	if not opts.all_commits:
+		graph._remove_non_labels()
+	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits)
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
 
@@ -592,6 +594,8 @@ if __name__ == '__main__':
 	_USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<.git-directory>]'
 	from optparse import OptionParser
 	parser = OptionParser(usage=_USAGE, version=VERSION)
+	parser.add_option('-a', '--all', action='store_true', dest='all_commits',
+		help='include all commits (not just tags and branch heads)')
 	parser.add_option('-f', '--format', action='store', type='string', dest='format',
 		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
 	parser.add_option('-o', '--out', action='store', type='string', dest='outfile',
@@ -619,9 +623,9 @@ if __name__ == '__main__':
 
 	if opts.pstats_outfile is not None:
 		import cProfile
-		cProfile.run('main()', opts.pstats_outfile)
+		cProfile.run('main(opts)', opts.pstats_outfile)
 	else:
-		main()
+		main(opts)
 	
 
 # vim: set noexpandtab:
