@@ -578,6 +578,15 @@ if True:  # Hack to save our VCS diffs from indentation changes
 		else: # print raw SVG, PDF, ...
 			print dot_output
 
+def main():
+	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
+	# graph._optimize_linear_runs_away()
+	# graph._optimize_merge_branch_fits_away()
+	# graph._optimize_non_labels()
+	graph._remove_non_labels()
+	dot_file_lines = graph._generate_dot_file()
+	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
+
 
 if __name__ == '__main__':
 	from optparse import OptionParser
@@ -604,12 +613,7 @@ if __name__ == '__main__':
 			sys.exit(1)
 		else:
 			git_env = {'GIT_DIR': args[0]}
-	graph = CommitGraph(get_parent_map(), get_branch_dict(), get_tag_dict())
-	# graph._optimize_linear_runs_away()
-	# graph._optimize_merge_branch_fits_away()
-	# graph._optimize_non_labels()
-	graph._remove_non_labels()
-	dot_file_lines = graph._generate_dot_file()
-	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
+
+	main()
 
 # vim: set noexpandtab:
