@@ -589,8 +589,9 @@ def main():
 
 
 if __name__ == '__main__':
+	_USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<.git-directory>]'
 	from optparse import OptionParser
-	parser = OptionParser(usage='usage: %prog [-f <format> [-v <viewer>]] [<.git-directory>]', version=VERSION)
+	parser = OptionParser(usage=_USAGE, version=VERSION)
 	parser.add_option('-f', '--format', action='store', type='string', dest='format',
 		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
 	parser.add_option('-o', '--out', action='store', type='string', dest='outfile',
