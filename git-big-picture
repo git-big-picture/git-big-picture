@@ -589,13 +589,17 @@ if __name__ == '__main__':
 	parser.add_option('-v', '--viewer', action='store', type='string', dest='viewer',
 		metavar='CMD', help='write image to tempfile and start specified viewer')
 	opts, args = parser.parse_args()
+
+	import sys
+	if len(args) > 1:
+		parser.print_usage()
+		sys.exit(1)
 	if len(args) == 1:
 		# check whether the argument is a valid git directory
 		p = subprocess.Popen(['git', 'rev-parse', '--git-dir'],
 			stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={'GIT_DIR': args[0]})
 		p.wait()
 		if p.returncode:
-			import sys
 			sys.stderr.write('Fatal: Does not appear to be a .git directory: %s.\n' % args[0])
 			sys.exit(1)
 		else:
