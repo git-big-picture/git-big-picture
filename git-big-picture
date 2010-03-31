@@ -513,7 +513,20 @@ class CommitGraph(object):
 		self.parents = seen_commits
 		self._calculate_child_mapping()
 
-	def _generate_dot_file(self, sha_ones_on_labels):
+	def _minimal_sha_one_digits(self):
+		key_count = len(self.parents)
+		for digit_count in xrange(7, 40):
+			if len(set(e[0:digit_count] for e in self.parents.keys())) == key_count:
+				return digit_count
+		return 40
+
+	def _generate_dot_file(self, sha_ones_on_labels, sha_one_digits=None):
+		def format_sha_one(sha_one):
+			if (sha_one_digits is None) or (sha_one_digits == 40):
+				return sha_one
+			else:
+				return sha_one[0:sha_one_digits]
+
 		def label_gen():
 			keys = set(self.branches.keys()).union(set(self.tags.keys()))
 			for k in keys:
@@ -534,10 +547,15 @@ class CommitGraph(object):
 			dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
 				'ref':sha_one,
 				'label':'\\n'.join(labels \
-					+ (sha_ones_on_labels and [sha_one,] or list())),
+					+ (sha_ones_on_labels and [format_sha_one(sha_one),] or list())),
 				'color':color})
 		for sha_one in self.dotdot:
 			dot_file_lines.append('\t"%(ref)s"[label="..."];' % {'ref':sha_one})
+		if (sha_one_digits is not None) and (sha_one_digits != 40):
+			for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
+				dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
+					'ref':sha_one,
+					'label':format_sha_one(sha_one)})
 		for child, self.parents in self.parents.items():
 			for p in self.parents:
 				dot_file_lines.append('\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p})
@@ -600,13 +618,15 @@ def main(opts):
 	# graph._optimize_merge_branch_fits_away()
 	# graph._optimize_non_labels()
 	if opts.all_commits:
-		pass
+		sha_one_digits = graph._minimal_sha_one_digits()
 	elif opts.some_commits:
+		sha_one_digits = graph._minimal_sha_one_digits()
 		graph._remove_linear_runs()
 	else:
+		sha_one_digits = None
 		graph._remove_non_labels()
 
-	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits)
+	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
 
