@@ -121,6 +121,7 @@ class CommitGraph(object):
 		self.parents = parent_map
 		self.branches = branch_dict
 		self.tags = tag_dict
+		self.dotdot = set()
 
 		self.children = {}
 		self._calculate_child_mapping()
@@ -149,39 +150,51 @@ class CommitGraph(object):
 				for p in self.parents[c]:
 					assert(c in self.children[p])
 
-	def _optimize_linear_runs_away(self):
+	def _remove_linear_runs(self):
 		todo_list = self.parents.keys()
 		black_list = set()
 		for sha_one in todo_list:
 			if sha_one in black_list:
 				continue
+			for p in self.parents[sha_one]:
+				# Run into the past while history
+				# keeps linear locally
+				path = [sha_one, p, ]
+				last = p
 
-			path = [sha_one, ]
-			current = sha_one
-			while True:
-				if len(self.parents[current]) != 1:
-					break
-				parent = list(self.parents[current])[0]
-				if len(self.children[parent]) != 1:
-					break
-				path.append(parent)
-				if self._has_label(parent):
-					break
-				current = parent
+				if len(self.children[last]) != 1 \
+						or self._has_label(last):
+					pass
+				else:
+					while len(self.parents[last]) == 1:
+						last = list(self.parents[last])[0]
+						path.append(last)
+						if len(self.children[last]) != 1 \
+								or self._has_label(last):
+							break
 
-			if len(path) > 2:
-				edge_child = path[0]
+				if len(path) < 3:
+					continue
+
+				# path == [sha_one, edge_child/p, (..,) edge_parent]
+				edge_child = path[1]
 				edge_parent = path[-1]
+				commits_to_delete = path[2:-1]
 
-				self.parents[edge_child].remove(path[1])
+				self.dotdot.add(edge_child)
+				black_list.add(edge_child)
+
+				self.parents[edge_child].remove(path[2])
 				self.parents[edge_child].add(edge_parent)
 				self.children[edge_parent].remove(path[-2])
 				self.children[edge_parent].add(edge_child)
-				for index, i in enumerate(path[1:-1]):
+
+				for i in commits_to_delete:
 					black_list.add(i)
-		for sha_one in black_list:
-			del self.parents[sha_one]
-			del self.children[sha_one]
+					del self.parents[i]
+					del self.children[i]
+
+		self.dotdot = set(self.parents.keys()) & self.dotdot
 
 	def _optimize_merge_branch_fits_away(self):
 		todo_list = self.parents.keys()
@@ -523,6 +536,8 @@ class CommitGraph(object):
 				'label':'\\n'.join(labels \
 					+ (sha_ones_on_labels and [sha_one,] or list())),
 				'color':color})
+		for sha_one in self.dotdot:
+			dot_file_lines.append('\t"%(ref)s"[label="..."];' % {'ref':sha_one})
 		for child, self.parents in self.parents.items():
 			for p in self.parents:
 				dot_file_lines.append('\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p})
@@ -584,8 +599,13 @@ def main(opts):
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
 	# graph._optimize_non_labels()
-	if not opts.all_commits:
+	if opts.all_commits:
+		pass
+	elif opts.some_commits:
+		graph._remove_linear_runs()
+	else:
 		graph._remove_non_labels()
+
 	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits)
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
@@ -596,6 +616,8 @@ if __name__ == '__main__':
 	parser = OptionParser(usage=_USAGE, version=VERSION)
 	parser.add_option('-a', '--all', action='store_true', dest='all_commits',
 		help='include all commits (not just tags and branch heads)')
+	parser.add_option('--some', action='store_true', dest='some_commits',
+		help='include all commits but linear runs')
 	parser.add_option('-f', '--format', action='store', type='string', dest='format',
 		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
 	parser.add_option('-o', '--out', action='store', type='string', dest='outfile',
