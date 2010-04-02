@@ -90,7 +90,7 @@ def branch_to_sha1(branch_name, is_local):
 	return ref_to_sha1(ref)
 
 def tag_to_sha1(tag_name):
-	return ref_to_sha1('refs/tags/%s^{commit}' % tag_name)
+	return ref_to_sha1('refs/tags/%s^{}' % tag_name)
 
 
 def get_parent_map():
@@ -497,7 +497,11 @@ class CommitGraph(object):
 		# 1. Generate a reachability graph for labels
 		reachable_labeled_parents = dict()
 		for label in self.branches.keys() + self.tags.keys():
-			to_visit = list(self.parents[label])
+			# Handle tags pointing to non-commits
+			if label in self.parents:
+				to_visit = list(self.parents[label])
+			else:
+				to_visit = list()
 			seen = set()
 			reachable_labeled_parents[label] = set()
 			for commit in to_visit:
