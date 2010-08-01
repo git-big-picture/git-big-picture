@@ -309,7 +309,7 @@ def get_tag_dict():
 
 	Returns
 	-------
-	tags : dict mapping straings to sets of strings
+	tags : dict mapping strings to sets of strings
 		mapping of sha1s to tag names
 	"""
 
