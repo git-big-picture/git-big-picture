@@ -92,6 +92,52 @@ def branch_to_sha1(branch_name, is_local):
 def tag_to_sha1(tag_name):
 	return ref_to_sha1('refs/tags/%s^{}' % tag_name)
 
+def get_mappings():
+	""" Get mappings for all refs.
+
+	This is implemented using a single call to 'git for-each-ref'. Note that it
+	can handle non commit tags too.
+
+	Returns
+	-------
+	lbranches : dict mapping strings to sets of strings
+		mapping of commit sha1s to local branch names
+	rbranches : dict mapping strings to sets of strings
+		mapping of commit sha1s to remote branch names
+	abranches : dict mapping strings to sets of strings
+		mapping of commit sha1s to all branch names
+	tags : dict mapping strings to sets of strings
+		mapping of commit sha1s to tag names
+	"""
+
+	output = get_command_output(['git', 'for-each-ref',
+		"--format=['%(objectname)',  '%(objecttype)', '%(refname)']"]).splitlines()
+	lbranch_prefix = 'refs/heads/'
+	rbranch_prefix = 'refs/remotes/'
+	tag_prefix = 'refs/tags/'
+	lbranches = dict()
+	rbranches = dict()
+	abranches = dict()
+	tags = dict()
+	def add_to_dict(dic, sha1, name):
+		if sha1 not in dic:
+			dic[sha1] = set()
+		dic[sha1].add(name)
+
+	for ref_info in output:
+		sha1, ref_type, name = eval(ref_info)
+		if ref_type != 'commit':
+			continue
+		elif name.startswith(lbranch_prefix):
+			add_to_dict(lbranches, sha1, name.replace(lbranch_prefix, ''))
+			add_to_dict(abranches, sha1, name.replace(lbranch_prefix, ''))
+		elif name.startswith(rbranch_prefix):
+			add_to_dict(rbranches, sha1, name.replace(rbranch_prefix, ''))
+			add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
+		elif name.startswith(tag_prefix):
+			add_to_dict(tags, sha1, name.replace(tag_prefix, ''))
+
+	return lbranches, rbranches, abranches, tags
 
 def get_parent_map():
 	parents = {}
