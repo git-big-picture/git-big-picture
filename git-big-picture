@@ -339,10 +339,18 @@ class CommitGraph(object):
 		self._verify_child_mapping()
 
 	def _has_label(self, sha_one):
+		""" Check if a sha1 is pointed to by a ref.
+
+		Parameters
+		----------
+		sha_one : string
+		"""
+
 		return sha_one in self.branches \
 			or sha_one in self.tags
 
 	def _calculate_child_mapping(self):
+		""" Populate the self.children dict, using self.parents. """
 		for sha_one, parent_sha_ones in self.parents.items():
 			for p in parent_sha_ones:
 				if p not in self.children:
@@ -352,6 +360,8 @@ class CommitGraph(object):
 				self.children[sha_one] = set()
 
 	def _verify_child_mapping(self):
+		""" Ensure that self.parents and self.children represent the same DAG.
+		"""
 		for sha_one, pars in self.parents.items():
 			for p in pars:
 				for c in self.children[p]:
@@ -650,6 +660,9 @@ class CommitGraph(object):
 		""" Generate the subgraph of the Git commit graph that contains only
 		tags and branches.
 
+		Remove, or 'filter' the unwanted commits from the DAG. This will modify
+		self.parents and when done re-calculate self.children.
+
 		The algorithm has three steps:
 
 			1. Generate a reachability graph for labels
@@ -669,7 +682,18 @@ class CommitGraph(object):
 				the full parent graph and produce the final output graph
 		"""
 		def recurse(commit, in_labeled_parents, out_seen_commits):
-			""" Recursive call used in step 2. """
+			""" Recursive call used in step 2.
+
+			Parameters
+			----------
+			commit : string
+				sha1 of the commit to start at.
+			in_labeled_parents : dict mapping strings to strings
+				mapping from labeled commits to reachable labels
+			out_seen_commits : dict
+				mapping from labeled commits to all their labeled parents
+			"""
+
 			all_parents = set()
 			if commit in out_seen_commits.keys():
 				# we have already explored the parents
@@ -729,6 +753,8 @@ class CommitGraph(object):
 		self._calculate_child_mapping()
 
 	def _minimal_sha_one_digits(self):
+		""" Calculate the minimal number of sha1 digits required to represent
+		all commits unambiguously. """
 		key_count = len(self.parents)
 		for digit_count in xrange(7, 40):
 			if len(set(e[0:digit_count] for e in self.parents.keys())) == key_count:
@@ -736,7 +762,23 @@ class CommitGraph(object):
 		return 40
 
 	def _generate_dot_file(self, sha_ones_on_labels, sha_one_digits=None):
+		""" Generate graphviz input.
+
+		Parameters
+		----------
+		sha_ones_on_labels : boolean
+			if True show sha1 (or minimal) on labels in addition to ref names
+		sha_one_digits : int
+			number of digits to use for showing sha1
+
+		Returns
+		-------
+		dot_file_lines : list of strings
+			lines of the graphviz input
+		"""
+
 		def format_sha_one(sha_one):
+			""" Shorten sha1 if required. """
 			if (sha_one_digits is None) or (sha_one_digits == 40):
 				return sha_one
 			else:
@@ -780,6 +822,24 @@ class CommitGraph(object):
 
 if True:  # Hack to save our VCS diffs from indentation changes
 	def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = None):
+		""" Run 'dot' utility to generate graphical output.
+
+		If viewer and outfile are None, the raw output is printed to stdout.
+		Otherwise it is either displyed in the requested viewer program, or
+		written to file, or both.
+
+		Parameters
+		----------
+		dot_file_lines : list of strings
+			graphviz input lines
+		format : string
+			format of output [svg, png, ps, pdf, ...]
+		viewer : string
+			name of program to disply output with
+		oufile : string
+			file to store output in
+		"""
+
 		import tempfile, os, sys
 		if not format:
 			if outfile:
