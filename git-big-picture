@@ -135,7 +135,9 @@ def get_mappings():
 			add_to_dict(rbranches, sha1, name.replace(rbranch_prefix, ''))
 			add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
 		elif name.startswith(tag_prefix):
-			add_to_dict(tags, tag_sha1, name.replace(tag_prefix, ''))
+			sha1 = get_command_output(['git', 'rev-parse',
+				name+'^{}']).splitlines()[0]
+			add_to_dict(tags, sha1, name.replace(tag_prefix, ''))
 
 	return lbranches, rbranches, abranches, tags
 
