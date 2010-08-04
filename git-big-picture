@@ -96,10 +96,12 @@ def get_mappings():
 	""" Get mappings for all refs.
 
 	This is implemented using a single call to 'git for-each-ref'. Note that it
-	can handle non commit tags too.
+	can handle non commit tags too and retruns these
 
 	Returns
 	-------
+	(lbranches, rbranches, abranches), (tags, ctags, nctags)
+
 	lbranches : dict mapping strings to sets of strings
 		mapping of commit sha1s to local branch names
 	rbranches : dict mapping strings to sets of strings
@@ -107,7 +109,11 @@ def get_mappings():
 	abranches : dict mapping strings to sets of strings
 		mapping of commit sha1s to all branch names
 	tags : dict mapping strings to sets of strings
-		mapping of commit sha1s to tag names
+		mapping of object sha1s to tag names
+	ctags : dict mapping sha1s to sets of strings
+		mapping of commits sha1s to tag names
+	nctags : dict mapping sha1s to sets of strings
+		mapping of non-commit sha1s to sets of strings
 	"""
 
 	output = get_command_output(['git', 'for-each-ref',
@@ -119,6 +125,8 @@ def get_mappings():
 	rbranches = dict()
 	abranches = dict()
 	tags = dict()
+	ctags = dict()
+	nctags = dict()
 	def add_to_dict(dic, sha1, name):
 		if sha1 not in dic:
 			dic[sha1] = set()
@@ -135,11 +143,19 @@ def get_mappings():
 			add_to_dict(rbranches, sha1, name.replace(rbranch_prefix, ''))
 			add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
 		elif name.startswith(tag_prefix):
+			# recusively dereference until we find a non-tag object
 			sha1 = get_command_output(['git', 'rev-parse',
 				name+'^{}']).splitlines()[0]
+			# determine object type and to respective dict
+			obj_type = get_command_output(['git', 'cat-file', '-t',
+				sha1]).splitlines()[0]
+			if obj_type in ['blob', 'tree']:
+				add_to_dict(nctags, sha1, name.replace(tag_prefix, ''))
+			else:
+				add_to_dict(ctags, sha1, name.replace(tag_prefix, ''))
 			add_to_dict(tags, sha1, name.replace(tag_prefix, ''))
 
-	return lbranches, rbranches, abranches, tags
+	return (lbranches, rbranches, abranches), (tags, ctags, nctags)
 
 def get_parent_map():
 	parents = {}
