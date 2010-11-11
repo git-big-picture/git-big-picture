@@ -698,8 +698,8 @@ if True:  # Hack to save our VCS diffs from indentation changes
 
 def main(opts):
 	#init_sha1_ref_cache()
-	lb, rb, ab, tb = get_mappings()
-	graph = CommitGraph(get_parent_map(), ab, tb)
+	(lb, rb, ab), (tags, ctags, nctags) = get_mappings()
+	graph = CommitGraph(get_parent_map(), ab, tags)
 	# graph._optimize_linear_runs_away()
 	# graph._optimize_merge_branch_fits_away()
 	# graph._optimize_non_labels()
