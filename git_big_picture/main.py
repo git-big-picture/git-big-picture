@@ -4,6 +4,7 @@
 # Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
 # Licensed under GPL v3 or later
 #
+from __future__ import print_function
 import subprocess
 import re
 
@@ -845,7 +846,7 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 			sys.stderr.write('guessing format: %s.\n' % format)
 		else: # output plain text
 			for line in dot_file_lines:
-				print line
+				print(line)
 			return 0
 	# output in specified format
 	try:
@@ -883,7 +884,7 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 				sys.exit(5)
 		f.close() # tmpfile is automatically deleted
 	else: # print raw SVG, PDF, ...
-		print dot_output
+		print(dot_output)
 
 
 def main(opts):
