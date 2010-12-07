@@ -50,7 +50,7 @@ if opts.pstats_outfile is not None:
 	import cProfile
 	cProfile.run('main(opts)', opts.pstats_outfile)
 else:
-	main(opts)
+	main(opts, git_env)
 
 
 # vim: set noexpandtab:
