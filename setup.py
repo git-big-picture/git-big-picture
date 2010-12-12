@@ -5,7 +5,7 @@
 # Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
 # Licensed under GPL v3 or later
 
-from distutils.core import setup
+from setuptools import setup
 from git_big_picture.main import VERSION
 
 
@@ -16,7 +16,9 @@ setup(name = 'git-big-picture',
 	url = 'http://git.goodpoint.de/?p=git-big-picture.git;a=summary',
 	license = 'GPL v3 or later',
 	packages = ['git_big_picture'],
-	scripts = ['git-big-picture']
+	scripts = ['git-big-picture'],
+	tests_require = ['nose'],
+	test_suite = 'nose.collector',
 )
 
 
