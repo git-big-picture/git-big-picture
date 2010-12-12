@@ -5,6 +5,7 @@
 # Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
 # Licensed under GPL v3 or later
 
+import os
 import tempfile as tf
 import shutil as sh
 import unittest as ut
@@ -19,21 +20,43 @@ class TestGitTools(ut.TestCase):
 		gt.get_command_output(['git', 'init', self.testing_dir])
 
 	def tearDown(self):
-		#sh.rmtree(testing_dir)
-		pass
+		sh.rmtree(self.testing_dir)
 
 	def test_get_parent_map(self):
-		pass
+		def dispatch(command_string):
+			return gt.get_command_output(command_string.split(' '))
 
+		def get_head_sha():
+			return dispatch('git rev-parse HEAD').rstrip()
 
-#def test_tag():
-#	tags_target = {'73dd0407d6c51c9759e694cc296ac4c2dbae18ba': set(['0'])}
-#	nt.assert_equal(tags_target, gbp.get_tag_dict())
-#
-#def test_branch():
-#	branch_target = {'73dd0407d6c51c9759e694cc296ac4c2dbae18ba' : set(['master',
-#																	   'origin/master'])}
-#	nt.assert_equal(branch_target, gbp.get_branch_dict())
+		oldpwd = os.getcwd()
+		os.chdir(self.testing_dir)
 
+		dispatch('/usr/bin/git init')
+		dispatch('git config user.name git-big-picture')
+		dispatch('git config user.email git-big-picture@example.org')
+
+		dispatch('git commit --allow-empty -m 1')
+		sha_1 = get_head_sha()
+		dispatch('git commit --allow-empty -m 2')
+		sha_2 = get_head_sha()
+		dispatch('git checkout -b other HEAD^')
+		dispatch('git commit --allow-empty -m 3')
+		sha_3 = get_head_sha()
+		dispatch('git merge --no-ff master')
+		sha_4 = get_head_sha()
+
+		expected_parents = {
+			sha_1:set(),
+			sha_2:set((sha_1,)),
+			sha_3:set((sha_1,)),
+			sha_4:set((sha_2, sha_3)),
+		}
+
+		actual_parents = gt.get_parent_map()
+
+		self.assertEqual(actual_parents, expected_parents)
+
+		os.chdir(oldpwd)
 
 # vim: set noexpandtab:
