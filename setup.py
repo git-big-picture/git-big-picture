@@ -17,7 +17,6 @@ setup(name = 'git-big-picture',
 	license = 'GPL v3 or later',
 	packages = ['git_big_picture'],
 	scripts = ['git-big-picture'],
-	tests_require = ['nose'],
 	test_suite = 'nose.collector',
 )
 
