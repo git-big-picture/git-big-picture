@@ -64,41 +64,6 @@ def init_sha1_ref_cache():
 	for i, s in enumerate(symbolic):
 		ref_cache[s] = sha1[i]
 
-
-
-def get_tag_names():
-	""" Get a list of tag names.
-
-	Returns
-	-------
-	tag_names :list of strings
-		list of tag names
-	"""
-
-	output = get_command_output(['git', 'tag', '-l'])
-	return convert_raw_tag_list(output)
-
-def convert_raw_tag_list(tag_list):
-	""" Parse output of 'git tag'.
-
-	Parameters
-	----------
-	tag_list : string
-		raw git output
-
-	Returns
-	-------
-	tag_names : list of strings
-		list of tag names
-	"""
-
-	tag_names = []
-	for line in tag_list.split('\n'):
-		if line == '':
-			continue
-		tag_names.append(line)
-	return tag_names
-
 def ref_to_sha1(ref):
 	""" Get sha1 of commit pointed to by ref, possibly using the ref cache.
 
@@ -120,21 +85,6 @@ def ref_to_sha1(ref):
 	for line in output.split('\n'):
 		return line
 
-
-def tag_to_sha1(tag_name):
-	""" Get sha1 of commit pointed to by tag.
-
-	Parameters
-	----------
-	tag : string
-		name of tag
-
-	Returns
-	-------
-	sha1 : string
-		sha1 of desired tag.
-	"""
-	return ref_to_sha1('refs/tags/%s^{}' % tag_name)
 
 def get_mappings():
 	""" Get mappings for all refs.
@@ -226,27 +176,6 @@ def get_parent_map():
 
 
 
-def get_tag_dict():
-	""" Get a mapping of sha1s to tags.
-
-	Returns
-	-------
-	tags : dict mapping strings to sets of strings
-		mapping of sha1s to tag names
-	"""
-
-	labels = {}
-	for t in get_tag_names():
-		try:
-			ref = tag_to_sha1(t)
-
-		except:
-			# Blob-tags get us here (e.g. with git.git)
-			continue
-		if ref not in labels:
-			labels[ref] = set()
-		labels[ref].add(t)
-	return labels
 
 
 class CommitGraph(object):
