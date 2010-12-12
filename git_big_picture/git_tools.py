@@ -28,9 +28,10 @@ def get_command_output(command_list):
 			stderr=subprocess.PIPE, env=git_env)
 	p.wait()
 	if p.returncode:
-		# TODO perhaps add stderr to exception message
-		raise Exception('Return code %d from command "%s"' \
-			% (p.returncode, ' '.join(command_list)))
+		err = p.stderr.read()
+		err = '\n'.join(('> ' + e) for e in err.split('\n'))
+		raise Exception('Stderr:\n%s\nReturn code %d from command "%s"' \
+			% (err, p.returncode, ' '.join(command_list)))
 	return p.stdout.read()
 
 def get_mappings():
