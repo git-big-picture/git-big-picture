@@ -15,8 +15,6 @@ __docformat__ = "restructuredtext"
 
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 git_env = None
-ref_cache = {}
-
 
 def loop(l):
 	"""Generator looping over a potentially changing
@@ -49,42 +47,6 @@ def get_command_output(command_list):
 		raise Exception('Return code %d from command "%s"' \
 			% (p.returncode, ' '.join(command_list)))
 	return p.stdout.read()
-
-def init_sha1_ref_cache():
-	""" Initialise the cache mapping sha1s to refs. """
-
-	symbolic = get_command_output(['git', 'rev-parse', '--symbolic-full-name', '--all']).split('\n')
-	symbolic.remove('') # empty string (from last newline)
-	cmd = ['git', 'rev-parse']
-	for i, s in enumerate(symbolic):
-		if s.startswith('refs/tags/'):
-			symbolic[i] = s + '^{}'
-		cmd.append(symbolic[i])
-	sha1 = get_command_output(cmd).split('\n')
-	for i, s in enumerate(symbolic):
-		ref_cache[s] = sha1[i]
-
-def ref_to_sha1(ref):
-	""" Get sha1 of commit pointed to by ref, possibly using the ref cache.
-
-	Parameters
-	----------
-	ref : string
-		a ref (e.g. branch or tag)
-
-	Returns
-	-------
-	sha1 : string
-		sha1 of the desired ref
-	"""
-
-	if ref in ref_cache:
-		return ref_cache[ref]
-	# Fallback...
-	output = get_command_output(['git', 'rev-parse', ref])
-	for line in output.split('\n'):
-		return line
-
 
 def get_mappings():
 	""" Get mappings for all refs.
@@ -739,7 +701,6 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 
 
 def main(opts):
-	#init_sha1_ref_cache()
 	(lb, rb, ab), (tags, ctags, nctags) = get_mappings()
 	graph = CommitGraph(get_parent_map(), ab, tags)
 	# graph._optimize_linear_runs_away()
