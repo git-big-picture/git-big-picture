@@ -116,7 +116,6 @@ def get_mappings():
 def get_parent_map():
 	""" Get a mapping of children to parents.
 
-
 	Returns
 	-------
 	parents : dict mapping strings to sets of strings
@@ -134,11 +133,6 @@ def get_parent_map():
 		elif count == 1:
 			parents[sha_ones[0]] = set()
 	return parents
-
-
-
-
-
 
 class CommitGraph(object):
 	def __init__(self, parent_map, branch_dict, tag_dict):
