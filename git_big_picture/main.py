@@ -3,8 +3,9 @@
 # Copyright (C) 2010 Julius Plenz <julius@plenz.com>
 # Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
 # Licensed under GPL v3 or later
-#
+
 from __future__ import print_function
+
 import subprocess
 import re
 
