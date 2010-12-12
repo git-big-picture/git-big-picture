@@ -13,7 +13,6 @@ VERSION = '0.8'
 
 __docformat__ = "restructuredtext"
 
-branch_extractor = re.compile('^[* ] ([^ ]+)(?: -> .+)?$')
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 git_env = None
 ref_cache = {}
@@ -65,47 +64,7 @@ def init_sha1_ref_cache():
 	for i, s in enumerate(symbolic):
 		ref_cache[s] = sha1[i]
 
-def get_branch_names(is_local):
-	""" Get a list of branch names.
 
-	Parameters
-	----------
-	is_local : boolean
-		if True get local branches only, if false get remote branches only
-
-	Returns
-	-------
-	branch_names : list of strings
-		list of branch names
-	"""
-
-	if is_local:
-		command_list = ['git', 'branch']
-	else:
-		command_list = ['git', 'branch', '-r']
-	output = get_command_output(command_list)
-	return convert_raw_branch_list(output)
-
-def convert_raw_branch_list(branch_list):
-	""" Parse output of 'git branch'.
-
-	Parameters
-	----------
-	branch_list : string
-		raw git output
-
-	Returns
-	-------
-	branch_names : list of strings
-		list of branch names
-	"""
-
-	branch_names = []
-	for line in branch_list.split('\n'):
-		m = branch_extractor.match(line)
-		if m is not None:
-			branch_names.append(m.group(1))
-	return branch_names
 
 def get_tag_names():
 	""" Get a list of tag names.
@@ -161,27 +120,6 @@ def ref_to_sha1(ref):
 	for line in output.split('\n'):
 		return line
 
-def branch_to_sha1(branch_name, is_local):
-	""" Get sha1 of commit pointed to by branch.
-
-	Parameters
-	----------
-	branch_name : string
-		name of branch
-	is_local : boolean
-		True if desired branch is local, False otherwise
-
-	Returns
-	-------
-	sha1 : string
-		sha1 of the desired branch
-	"""
-
-	if is_local:
-		ref = 'refs/heads/%s' % branch_name
-	else:
-		ref = 'refs/remotes/%s' % branch_name
-	return ref_to_sha1(ref)
 
 def tag_to_sha1(tag_name):
 	""" Get sha1 of commit pointed to by tag.
@@ -286,23 +224,6 @@ def get_parent_map():
 	return parents
 
 
-def get_branch_dict():
-	""" Get a mapping of sha1s to branches.
-
-	Returns
-	-------
-	branches : dict mapping string to sets of strings
-		mapping of commit sha1s to branch names
-	"""
-
-	labels = {}
-	for is_local in (True, False):
-		for b in get_branch_names(is_local):
-			ref = branch_to_sha1(b, is_local)
-			if ref not in labels:
-				labels[ref] = set()
-			labels[ref].add(b)
-	return labels
 
 
 def get_tag_dict():
