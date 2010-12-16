@@ -586,7 +586,6 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 
 def main(opts, git_dir):
 	gt.git_env = git_dir
-	#init_sha1_ref_cache()
 	(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
 	graph = CommitGraph(gt.get_parent_map(), ab, tags)
 	# graph._optimize_linear_runs_away()
