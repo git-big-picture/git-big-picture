@@ -5,13 +5,13 @@
 # Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
 # Licensed under GPL v3 or later
 
-import sys
+import sys, os
 from optparse import OptionParser
 import subprocess
 from git_big_picture.main import VERSION, main
 
 
-_USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<.git-directory>]'
+_USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<repo-directory>]'
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
 
@@ -35,16 +35,27 @@ if len(args) > 1:
 	parser.print_usage()
 	sys.exit(1)
 elif len(args) == 1:
-	# check whether the argument is a valid git directory
-	p = subprocess.Popen(['git', 'rev-parse', '--git-dir'],
-		stdout=subprocess.PIPE, stderr=subprocess.PIPE, env={'GIT_DIR': args[0]})
-	p.wait()
-	if p.returncode:
-		sys.stderr.write('Fatal: Does not appear to be a .git directory: %s.\n' % args[0])
-		sys.exit(1)
-	else:
-		git_env = {'GIT_DIR': args[0]}
+	repodir = args[0]
+else:
+	repodir = os.getcwd()
 
+# Figure out the corresponding GIT_DIR
+p = subprocess.Popen(['git', 'rev-parse', '--git-dir'],
+					 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+					 cwd=repodir)
+
+p.wait()
+pout = p.stdout.readlines()
+
+if not len(pout):
+	sys.stderr.write("Fatal: Cannot determine the GIT_DIR path for %s" % repodir)
+	sys.exit(1)
+
+git_dir = pout[0].rstrip()
+if not git_dir.startswith(os.path.sep):
+	# Prepend full path if we got relative one
+	git_dir = os.path.join(repodir, git_dir)
+git_env = {'GIT_DIR': git_dir}
 
 if opts.pstats_outfile is not None:
 	import cProfile
