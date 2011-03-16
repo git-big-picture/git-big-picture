@@ -73,3 +73,12 @@ You may then use 'git big-picture' as you would any other Git command:
 
 This will present you with a PDF viewer displaying your project's
 graph, and stores this PDF in a file called `visualization.pdf'.
+
+Authors/Contributors
+====================
+
+Sebastian Pipping  <sebastian@pipping.org>
+Julius Plenz       <julius@plenz.com>
+Valentin Haenel    <valentin.haenel@gmx.de>
+Yaroslav Halchenko <debian@onerussian.com>
+
