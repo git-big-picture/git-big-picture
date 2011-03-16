@@ -9,6 +9,7 @@ import sys, os
 from optparse import OptionParser
 import subprocess
 from git_big_picture.main import VERSION, main
+import git_big_picture.git_tools as gt
 
 
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<repo-directory>]'
@@ -39,22 +40,13 @@ elif len(args) == 1:
 else:
 	repodir = os.getcwd()
 
-# Figure out the corresponding GIT_DIR
-p = subprocess.Popen(['git', 'rev-parse', '--git-dir'],
-					 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-					 cwd=repodir)
+git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
+		                       cwd=repodir).rstrip()
 
-p.wait()
-pout = p.stdout.readlines()
-
-if not len(pout):
-	sys.stderr.write("Fatal: Cannot determine the GIT_DIR path for %s" % repodir)
-	sys.exit(1)
-
-git_dir = pout[0].rstrip()
 if not git_dir.startswith(os.path.sep):
 	# Prepend full path if we got relative one
 	git_dir = os.path.join(repodir, git_dir)
+
 git_env = {'GIT_DIR': git_dir}
 
 if opts.pstats_outfile is not None:
