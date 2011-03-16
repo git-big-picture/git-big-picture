@@ -74,6 +74,11 @@ You may then use 'git big-picture' as you would any other Git command:
 This will present you with a PDF viewer displaying your project's
 graph, and stores this PDF in a file called `visualization.pdf'.
 
+License
+=======
+
+Licensed under GPL v3 or later, see file COPYING for details.
+
 Authors/Contributors
 ====================
 
