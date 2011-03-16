@@ -6,13 +6,35 @@ a filter that removes uninteresting commits from a DAG modelling a Git
 repository and thereby exposes the big picture: the hierarchy of tags and
 branches.
 
+Dependencies
+============
+
+* Python 2.6 (2.5 will not work, 2.7 may work)
+* Git (1.7.1 works)
+* graphviz utility
+* nosetest (only for running tests)
+
+Installation
+============
+
+Just run it straight from a clone or download:
+
+    $ git clone http://git.goodpoint.de/?p=git-big-picture.git;a=summary
+    $ cd git-big-picture
+    $ ./git-big-picture --help
+
+Alternatively, use the standard 'setup.py' script to install it system wide.
+
+    $ ./setup.py install
+    (may need root privileges)
+
+Internals
+=========
+
 It uses an easy-to-write Graphviz syntax to output the graph data for
 the repository. The output will then be processes by the Graphviz
 `dot' utility to convert it to a picture in various formats, e.g. SVG
 or PNG.
-
-Installation
-============
 
 You just need a working Python installation on your machine. If you
 want to convert the output to an actual image, you'll also have to
