@@ -1,9 +1,10 @@
 Program Description
 ===================
 
-When run from within a git working tree, this python script generates
-a directed acyclic graph (DAG) of the hierarchy of all tags and
-branches present in the git repository.
+Git-big-picture is a visualization for Git repositories. You can think of it as
+a filter that removes uninteresting commits from a DAG modelling a Git
+repository and thereby exposes the big picture: the hierarchy of tags and
+branches.
 
 It uses an easy-to-write Graphviz syntax to output the graph data for
 the repository. The output will then be processes by the Graphviz
