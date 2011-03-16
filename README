@@ -74,6 +74,13 @@ You may then use 'git big-picture' as you would any other Git command:
 This will present you with a PDF viewer displaying your project's
 graph, and stores this PDF in a file called `visualization.pdf'.
 
+Testing
+=======
+
+Just run:
+
+    $ ./setup.py test
+
 License
 =======
 
