@@ -1,14 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Pipping <sebastian@pipping.org>
-# Copyright (C) 2010 Julius Plenz <julius@plenz.com>
-# Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
-# Licensed under GPL v3 or later
+#
+# This file is part of git-big-picture
+#
+# Copyright (C) 2010    Sebastian Pipping <sebastian@pipping.org>
+# Copyright (C) 2010    Julius Plenz <julius@plenz.com>
+# Copyright (C) 2010-11 Valentin Haenel <valentin.haenel@gmx.de>
+# Copyright (C) 2011    Yaroslav Halchenko <debian@onerussian.com>
+#
+# git-big-picture is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# git-big-piture is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os
 from optparse import OptionParser
 import subprocess
 from git_big_picture.main import VERSION, main
+import git_big_picture.git_tools as gt
 
 
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<repo-directory>]'
@@ -39,22 +56,13 @@ elif len(args) == 1:
 else:
 	repodir = os.getcwd()
 
-# Figure out the corresponding GIT_DIR
-p = subprocess.Popen(['git', 'rev-parse', '--git-dir'],
-					 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-					 cwd=repodir)
+git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
+		                       cwd=repodir).rstrip()
 
-p.wait()
-pout = p.stdout.readlines()
-
-if not len(pout):
-	sys.stderr.write("Fatal: Cannot determine the GIT_DIR path for %s" % repodir)
-	sys.exit(1)
-
-git_dir = pout[0].rstrip()
 if not git_dir.startswith(os.path.sep):
 	# Prepend full path if we got relative one
 	git_dir = os.path.join(repodir, git_dir)
+
 git_env = {'GIT_DIR': git_dir}
 
 if opts.pstats_outfile is not None:

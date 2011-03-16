@@ -1,8 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Pipping <sebastian@pipping.org>
-# Copyright (C) 2010 Julius Plenz <julius@plenz.com>
-# Copyright (C) 2010 Valentin Haenel <valentin.haenel@gmx.de>
-# Licensed under GPL v3 or later
+#
+# This file is part of git-big-picture
+#
+# Copyright (C) 2010    Sebastian Pipping <sebastian@pipping.org>
+# Copyright (C) 2010    Julius Plenz <julius@plenz.com>
+# Copyright (C) 2010-11 Valentin Haenel <valentin.haenel@gmx.de>
+#
+# git-big-picture is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# git-big-piture is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 import subprocess
 import re
@@ -10,7 +25,7 @@ import re
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 git_env = None
 
-def get_command_output(command_list):
+def get_command_output(command_list, cwd=None):
 	""" Execute arbitrary commands.
 
 	Parameters
@@ -25,7 +40,7 @@ def get_command_output(command_list):
 	"""
 
 	p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE, env=git_env)
+			stderr=subprocess.PIPE, env=git_env, cwd=cwd)
 	load = p.stdout.read()
 	p.wait()
 	if p.returncode:
