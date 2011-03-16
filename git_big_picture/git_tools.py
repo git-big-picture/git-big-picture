@@ -10,7 +10,7 @@ import re
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 git_env = None
 
-def get_command_output(command_list):
+def get_command_output(command_list, cwd=None):
 	""" Execute arbitrary commands.
 
 	Parameters
@@ -25,7 +25,7 @@ def get_command_output(command_list):
 	"""
 
 	p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE, env=git_env)
+			stderr=subprocess.PIPE, env=git_env, cwd=cwd)
 	load = p.stdout.read()
 	p.wait()
 	if p.returncode:
