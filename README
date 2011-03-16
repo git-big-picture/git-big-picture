@@ -31,16 +31,10 @@ Alternatively, use the standard 'setup.py' script to install it system wide.
 Internals
 =========
 
-It uses an easy-to-write Graphviz syntax to output the graph data for
-the repository. The output will then be processes by the Graphviz
-`dot' utility to convert it to a picture in various formats, e.g. SVG
-or PNG.
-
-You just need a working Python installation on your machine. If you
-want to convert the output to an actual image, you'll also have to
-install the `graphviz' tool. (To check whether this tool is installed,
-perform a call to `dot -V' and check if there's something about the
-Graphviz version.)
+The graph operations are written in Python and output the graph-data in the
+easy-to-write Graphviz syntax. This is converted into an image using the
+Graphviz 'dot' utility. Graphiz supports a multitude of image formats, e.g. SVG
+and PDF. Check that Graphiv is installed by invoking: 'dot -V'.
 
 Usage
 =====
