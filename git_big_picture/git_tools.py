@@ -26,13 +26,14 @@ def get_command_output(command_list):
 
 	p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE, env=git_env)
+	load = p.stdout.read()
 	p.wait()
 	if p.returncode:
 		err = p.stderr.read()
 		err = '\n'.join(('> ' + e) for e in err.split('\n'))
 		raise Exception('Stderr:\n%s\nReturn code %d from command "%s"' \
 			% (err, p.returncode, ' '.join(command_list)))
-	return p.stdout.read()
+	return load
 
 def get_mappings():
 	""" Get mappings for all refs.
