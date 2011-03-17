@@ -33,8 +33,8 @@ Internals
 
 The graph operations are written in Python and output the graph-data in the
 easy-to-write Graphviz syntax. This is converted into an image using the
-Graphviz 'dot' utility. Graphiz supports a multitude of image formats, e.g. SVG
-and PDF. Check that Graphiv is installed by invoking: 'dot -V'.
+Graphviz 'dot' utility. Graphviz supports a multitude of image formats, e.g. SVG
+and PDF. Check that Graphviz is installed by invoking: 'dot -V'.
 
 Usage Examples
 ==============
