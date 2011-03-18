@@ -27,6 +27,12 @@ import unittest as ut
 import git_big_picture as gbp
 import git_big_picture.git_tools as gt
 
+def dispatch(command_string):
+	return gt.get_command_output(command_string.split(' '))
+
+def get_head_sha():
+	return dispatch('git rev-parse HEAD').rstrip()
+
 class TestGitTools(ut.TestCase):
 
 	def setUp(self):
@@ -38,11 +44,6 @@ class TestGitTools(ut.TestCase):
 		sh.rmtree(self.testing_dir)
 
 	def test_get_parent_map(self):
-		def dispatch(command_string):
-			return gt.get_command_output(command_string.split(' '))
-
-		def get_head_sha():
-			return dispatch('git rev-parse HEAD').rstrip()
 
 		oldpwd = os.getcwd()
 		os.chdir(self.testing_dir)
