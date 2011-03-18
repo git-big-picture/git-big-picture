@@ -61,14 +61,21 @@ class TestGitTools(ut.TestCase):
 		os.chdir(self.oldpwd)
 
 	def test_get_parent_map(self):
+		""" Check get_parent_map() works:
 
-		dispatch('git commit --allow-empty -m 1')
-		sha_1 = get_head_sha()
-		dispatch('git commit --allow-empty -m 2')
-		sha_2 = get_head_sha()
+				 4 <- other
+				 |\
+				 | \
+	   master -> 2  3
+				 | /
+				 |/
+				 1
+
+		"""
+		sha_1 = empty_commit('1')
+		sha_2 = empty_commit('2')
 		dispatch('git checkout -b other HEAD^')
-		dispatch('git commit --allow-empty -m 3')
-		sha_3 = get_head_sha()
+		sha_3 = empty_commit('3')
 		dispatch('git merge --no-ff master')
 		sha_4 = get_head_sha()
 
@@ -80,7 +87,6 @@ class TestGitTools(ut.TestCase):
 		}
 
 		actual_parents = gt.get_parent_map()
-
 		self.assertEqual(actual_parents, expected_parents)
 
 
