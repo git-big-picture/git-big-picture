@@ -89,6 +89,25 @@ Or alternatively use 'nosetest' directly:
 
     $ nosetest
 
+Profiling
+=========
+
+There are two ways to profile git-big-picture, using the built-in '--pstats'
+option or using the Python module 'cProfile':
+
+Using '--pstats':
+
+    $ ./git-big-picture --pstats=profile-stats -o graph.svg
+
+Profile the script with 'cProfile'
+
+    $ python -m cProfile -o profile-stats git-big-picture -o graph.svg
+
+In either case, you can then use the excellent visualisation tool 'gprof2dot'
+which, incidentally, outputs Graphviz syntax too:
+
+    $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
+
 License
 =======
 
