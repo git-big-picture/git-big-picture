@@ -81,6 +81,10 @@ Just run:
 
     $ ./setup.py test
 
+Or alternatively use 'nosetest' directly:
+
+    $ nosetest
+
 License
 =======
 
