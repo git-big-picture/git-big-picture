@@ -79,4 +79,31 @@ class TestGitTools(ut.TestCase):
 
 		os.chdir(oldpwd)
 
+	def test_remove_non_labels_one(self):
+		""" Remove a single commit from between two commits.
+			3 <-- master
+			2
+			1 <-- one
+
+		No ref pointing to B, thus it should be removed.
+
+		"""
+		oldpwd = os.getcwd()
+		os.chdir(self.testing_dir)
+		dispatch('/usr/bin/git init')
+		dispatch('git config user.name git-big-picture')
+		dispatch('git config user.email git-big-picture@example.org')
+		one = empty_commit('1')
+		dispatch('git branch one')
+		two = empty_commit('2')
+		three = empty_commit('3')
+		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+		graph._remove_non_labels()
+		expected_reduced_parents = {
+			one:set(),
+			three:set((one,)),
+		}
+		self.assertEqual(expected_reduced_parents, graph.parents)
+
 # vim: set noexpandtab:
