@@ -40,21 +40,27 @@ def empty_commit(mess):
 class TestGitTools(ut.TestCase):
 
 	def setUp(self):
+		""" Setup testing environment.
+
+		Create temporary directory, initialise git repo, and set some options.
+
+		"""
 		self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
 		gbp.git_tools.git_env = {'GIT_DIR' : "%s/.git" % self.testing_dir }
 		gt.get_command_output(['git', 'init', self.testing_dir])
-
-	def tearDown(self):
-		sh.rmtree(self.testing_dir)
-
-	def test_get_parent_map(self):
-
-		oldpwd = os.getcwd()
+		self.oldpwd = os.getcwd()
 		os.chdir(self.testing_dir)
 
 		dispatch('/usr/bin/git init')
 		dispatch('git config user.name git-big-picture')
 		dispatch('git config user.email git-big-picture@example.org')
+
+	def tearDown(self):
+		""" Remove testing environment """
+		sh.rmtree(self.testing_dir)
+		os.chdir(self.oldpwd)
+
+	def test_get_parent_map(self):
 
 		dispatch('git commit --allow-empty -m 1')
 		sha_1 = get_head_sha()
@@ -77,7 +83,6 @@ class TestGitTools(ut.TestCase):
 
 		self.assertEqual(actual_parents, expected_parents)
 
-		os.chdir(oldpwd)
 
 	def test_remove_non_labels_one(self):
 		""" Remove a single commit from between two commits.
@@ -88,11 +93,6 @@ class TestGitTools(ut.TestCase):
 		No ref pointing to B, thus it should be removed.
 
 		"""
-		oldpwd = os.getcwd()
-		os.chdir(self.testing_dir)
-		dispatch('/usr/bin/git init')
-		dispatch('git config user.name git-big-picture')
-		dispatch('git config user.email git-big-picture@example.org')
 		one = empty_commit('1')
 		dispatch('git branch one')
 		two = empty_commit('2')
