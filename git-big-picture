@@ -71,5 +71,15 @@ if opts.pstats_outfile is not None:
 else:
 	main(opts, git_env)
 
+	# cases: total: 11
+	# no output args -> print graphviz
+	# format only -> print dot output
+	# viewer only -> use default format
+	# outfile -> put graphviz to file, use extension
+	# format + viewer -> use format and viewer
+	# format and outfile -> save image, get extension from format
+	# format and viewer -> generate outfile, use default extension, open in # viewer
+	# format, outfile, and viewer -> start viewer on outputfile
+
 
 # vim: set noexpandtab:
