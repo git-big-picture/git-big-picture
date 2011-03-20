@@ -28,7 +28,7 @@ from git_big_picture.main import VERSION, main
 import git_big_picture.git_tools as gt
 
 
-_USAGE = '\n  %prog  [-f <format> [-v <viewer>]]  [<repo-directory>]'
+_USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
 
