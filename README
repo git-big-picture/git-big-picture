@@ -19,7 +19,7 @@ Installation
 
 Just run it straight from a clone or download:
 
-    $ git clone http://git.goodpoint.de/?p=git-big-picture.git;a=summary
+    $ git clone git://git.goodpoint.de/git-big-picture.git
     $ cd git-big-picture
     $ ./git-big-picture --help
 
