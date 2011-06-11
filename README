@@ -61,7 +61,7 @@ Output Graphviz synatx:
 
     $ ./git-big-picture -p
 
-Output raw Graphviz output:
+Output raw Graphviz output (i.e. the image)
 
     $ ./git-big-picture -f svg
 
@@ -102,13 +102,8 @@ Manually pipe the Graphviz commands to the 'dot' utility:
 
     $ ./git-big-picture --plain ~/git-repo | dot -Tpng -o graph.png
 
-Without options, the script has a simple plaintext output mode which
-is understood by 'dot'. For further information see `man dot'
+Without any output options, the script will print its usage and exit.
 
-If you specify a custom format, but neither a viewer nor an output
-file, the script will output the image to stdout. That is to enable
-you to use it in shell scripts and pipe the result (for example a
-gzipped SVG version) to another program.
 
 Git Integration
 ===============
