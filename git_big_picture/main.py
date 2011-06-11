@@ -23,6 +23,9 @@ from __future__ import print_function
 
 import subprocess
 import git_tools as gt
+import tempfile
+import os
+import sys
 
 VERSION = '0.8'
 
@@ -532,87 +535,5 @@ class CommitGraph(object):
 		return dot_file_lines
 
 
-def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = None):
-	""" Run 'dot' utility to generate graphical output.
-
-	If viewer and outfile are None, the raw output is printed to stdout.
-	Otherwise it is either displyed in the requested viewer program, or
-	written to file, or both.
-
-	Parameters
-	----------
-	dot_file_lines : list of strings
-		graphviz input lines
-	format : string
-		format of output [svg, png, ps, pdf, ...]
-	viewer : string
-		name of program to disply output with
-	outfile : string
-		file to store output in
-	"""
-
-	import tempfile, os, sys
-	if not format:
-		if outfile:
-			format = outfile.split('.')[-1]
-			sys.stderr.write('guessing format: %s.\n' % format)
-		else: # output plain text
-			for line in dot_file_lines:
-				print(line)
-			return 0
-	dot_output = run_dot(format, dot_file_lines)
-	if viewer or outfile:
-		if outfile:
-			try:
-				f = open(outfile, 'w+b')
-			except IOError, e:
-				sys.stderr.write('Fatal: could not open file %s (errno: %d)!\n' % (outfile, e.errno))
-				sys.exit(4)
-		elif viewer:
-			f = tempfile.NamedTemporaryFile(prefix='git-big-picture')
-		f.write(dot_output)
-		f.flush()
-		os.fsync(f.fileno())
-		if viewer:
-			try:
-				subprocess.call([viewer, f.name])
-			except OSError, e:
-				sys.stderr.write('Error calling `' + viewer + '\'!')
-				sys.exit(5)
-		f.close() # tmpfile is automatically deleted
-	else: # print raw SVG, PDF, ...
-		print(dot_output)
-
-def run_dot(output_format, dot_file_lines):
-	""" Run the 'dot' utility.
-
-	Parameters
-	----------
-	output_format : string
-		format of output [svg, png, ps, pdf, ...]
-	dot_file_lines : list of strings
-		graphviz input lines
-
-	Returns
-	-------
-	Raw output from 'dot' utility
-
-	"""
-	try:
-		p = subprocess.Popen(['dot', '-T'+output_format], stdin=subprocess.PIPE,
-			stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	except OSError, e:
-		if e.errno == 2:
-			sys.stderr.write('Fatal: `dot\' not found! Please install the Graphviz utility.\n')
-		else:
-			sys.stderr.write('Fatal: A problem occured calling `dot -T' +
-					output_format + '\'!\n')
-		sys.exit(2)
-	if p.poll():
-		sys.stderr.write('`dot\' terminated prematurely with error code %d;\n'
-			'probably you specified an invalid format, see "man dot"\n' % p.poll())
-		sys.exit(3)
-	# send dot input, automatically receive and store output
-	return p.communicate(input='\n'.join(dot_file_lines))[0]
 
 # vim: set noexpandtab:

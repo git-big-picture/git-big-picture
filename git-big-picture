@@ -24,7 +24,7 @@
 import sys, os
 from optparse import OptionParser
 import subprocess
-from git_big_picture.main import VERSION, CommitGraph, _process_dot_output
+from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
 
 
@@ -76,6 +76,100 @@ git_env = {'GIT_DIR': git_dir}
 	# format and viewer -> generate outfile, use default extension, open in # viewer
 	# format, outfile, and viewer -> start viewer on outputfile
 
+def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = None):
+	""" Run 'dot' utility to generate graphical output.
+
+	If viewer and outfile are None, the raw output is printed to stdout.
+	Otherwise it is either displyed in the requested viewer program, or
+	written to file, or both.
+
+	Parameters
+	----------
+	dot_file_lines : list of strings
+		graphviz input lines
+	format : string
+		format of output [svg, png, ps, pdf, ...]
+	viewer : string
+		name of program to disply output with
+	outfile : string
+		file to store output in
+	"""
+
+	if not format:
+		if outfile:
+			format = outfile.split('.')[-1]
+			sys.stderr.write('guessing format: %s.\n' % format)
+		else: # output plain text
+			print_dot_lines(dot_file_lines)
+			return
+	dot_output = run_dot(format, dot_file_lines)
+	if viewer or outfile:
+		if outfile:
+			write_to_file(outfile, dot_output)
+		if viewer:
+			show_in_viewer(output_file, viewer)
+	else: # print raw SVG, PDF, ...
+		print(dot_output)
+
+def run_dot(output_format, dot_file_lines):
+	""" Run the 'dot' utility.
+
+	Parameters
+	----------
+	output_format : string
+		format of output [svg, png, ps, pdf, ...]
+	dot_file_lines : list of strings
+		graphviz input lines
+
+	Returns
+	-------
+	Raw output from 'dot' utility
+
+	"""
+	try:
+		p = subprocess.Popen(['dot', '-T'+output_format], stdin=subprocess.PIPE,
+				stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	except OSError, e:
+		if e.errno == 2:
+			sys.stderr.write('Fatal: `dot\' not found! Please install the Graphviz utility.\n')
+		else:
+			sys.stderr.write('Fatal: A problem occured calling `dot -T' +
+					output_format + '\'!\n')
+			sys.exit(2)
+	if p.poll():
+		sys.stderr.write('`dot\' terminated prematurely with error code %d;\n'
+				'probably you specified an invalid format, see "man dot"\n' % p.poll())
+		sys.exit(3)
+	# send dot input, automatically receive and store output
+	return p.communicate(input='\n'.join(dot_file_lines))[0]
+
+def print_dot_lines(dot_file_lines):
+	""" Print input for 'dot' to stdout. """
+	for line in dot_file_lines:
+		print(line)
+
+def write_to_file(output_file, dot_output):
+	""" Write the output from the 'dot' utility to file. """
+	try:
+		f = open(output_file, 'w+b')
+	except IOError, e:
+		sys.stderr.write('Fatal: could not open file %s (errno: %d)!\n' % (outfile, e.errno))
+		sys.exit(4)
+
+	f.write(dot_output)
+	f.flush()
+	os.fsync(f.fileno())
+
+def show_in_viewer(output_file, viewer):
+	""" Show the output of 'dot' utility in a viewer. """
+	if not output_file:
+		output_file = tempfile.NamedTemporaryFile(prefix='git-big-picture')
+	try:
+		subprocess.call([viewer, output_file.name])
+	except OSError, e:
+		sys.stderr.write('Error calling `' + viewer + '\'!')
+		sys.exit(5)
+
 def main(opts, git_dir):
 	gt.git_env = git_dir
 	(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
@@ -93,6 +187,7 @@ def main(opts, git_dir):
 		graph._remove_non_labels()
 
 	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
+
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
 if opts.pstats_outfile is not None:
