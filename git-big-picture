@@ -154,11 +154,6 @@ def run_dot(output_format, dot_file_lines):
 	# send dot input, automatically receive and store output
 	return p.communicate(input='\n'.join(dot_file_lines))[0]
 
-def print_dot_lines(dot_file_lines):
-	""" Print input for 'dot' to stdout. """
-	for line in dot_file_lines:
-		print(line)
-
 def write_to_file(output_file, dot_output):
 	""" Write the output from the 'dot' utility to file. """
 	try:
@@ -170,16 +165,26 @@ def write_to_file(output_file, dot_output):
 	f.write(dot_output)
 	f.flush()
 	os.fsync(f.fileno())
+	f.close()
 
-def show_in_viewer(output_file, viewer):
+def show_in_viewer(output, viewer):
 	""" Show the output of 'dot' utility in a viewer. """
-	if not output_file:
+	if type(output) is not file:
 		output_file = tempfile.NamedTemporaryFile(prefix='git-big-picture')
+		write_to_file(output_file.name, output)
+	else:
+		output_file = output
 	try:
 		subprocess.call([viewer, output_file.name])
 	except OSError, e:
 		sys.stderr.write('Error calling `' + viewer + '\'!')
 		sys.exit(5)
+
+def guess_format_from_filename(output_file):
+	if '.' in output_file:
+		return True, opts.outfile.split('.')[-1]
+	else:
+		return False, None
 
 def main(opts, git_dir):
 	gt.git_env = git_dir
@@ -199,25 +204,49 @@ def main(opts, git_dir):
 
 	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 
+	# option -p|--plain is mutually exclusive with all other output options
+	if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
+		barf("Option '-p|--plain' is incompatible with outher output options.", 2)
+	elif not any([opts.format, opts.viewer, opts.outfile]):
+		barf("Must provide and output option.", 4)
+	# if plain just print dot input to stdout
+	if opts.plain:
+		for line in dot_file_lines:
+			print(line)
+		return
+	# check for format mismatch between -f and -o
+	if opts.format and opts.outfile:
+			(has_suffix, guess) = guess_format_from_filename(opts.outfile)
+			if opts.format != guess:
+				warn("Format mismatch: '%s'(-f|--format)"
+						"vs. '%s'(filename), will use: "
+						"'%s'" % (opts.format, guess, guess))
+	# guess format from outfile and use default if not possible or given
 	if not opts.format:
 		if opts.outfile:
-			opts.format = outfile.split('.')[-1]
-			sys.stderr.write('guessing format: %s.\n' % opts.format)
-		else: # output plain text
-			print_dot_lines(dot_file_lines)
-			return
+			(has_suffix, guess) = guess_format_from_filename(opts.outfile)
+			if has_suffix:
+				warn('Guessing format from filename: %s' % guess)
+			else:
+				warn('Filename had no suffix, using default format: %s' % default_format)
+				opts.format = default_format
+				opts.outfile += '.' + opts.format
+		else:
+			warn('Using default format: %s' % default_format)
+			opts.format = default_format
+	# run the 'dot' utility
 	dot_output = run_dot(opts.format, dot_file_lines)
+	# create outfile and possibly view that or a temporary file in viewer
 	if opts.viewer or opts.outfile:
 		if opts.outfile:
 			write_to_file(opts.outfile, dot_output)
-		if opts.viewer:
+			opts.outfile.close()
+		if opts.viewer and opts.outfile:
 			show_in_viewer(opts.outfile, opts.viewer)
+		else:
+			show_in_viewer(dot_output, opts.viewer)
 	else: # print raw SVG, PDF, ...
 		print(dot_output)
-
-
-if opts.plain and opts.format:
-	barf("Options -p|--plain and -f|--format are mutually exclusive", 1)
 
 if opts.pstats_outfile is not None:
 	import cProfile
