@@ -34,6 +34,7 @@ import sys
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
+default_format='svg'
 
 # commit/ref selection
 parser.add_option('-a', '--all',
