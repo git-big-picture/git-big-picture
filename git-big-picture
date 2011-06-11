@@ -296,7 +296,6 @@ def main(opts, git_dir):
 	if opts.viewer or opts.outfile:
 		if opts.outfile:
 			write_to_file(opts.outfile, dot_output)
-			opts.outfile.close()
 		if opts.viewer and opts.outfile:
 			show_in_viewer(opts.outfile, opts.viewer)
 		else:
