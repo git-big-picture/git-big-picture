@@ -67,7 +67,7 @@ git_env = {'GIT_DIR': git_dir}
 
 if opts.pstats_outfile is not None:
 	import cProfile
-	cProfile.run('main(opts)', opts.pstats_outfile)
+	cProfile.run('main(opts, git_env)', opts.pstats_outfile)
 else:
 	main(opts, git_env)
 
