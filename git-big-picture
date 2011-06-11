@@ -296,6 +296,11 @@ def main(opts, git_dir):
 	else: # print raw SVG, PDF, ...
 		print(dot_output)
 
+try:
+	gt.get_command_output(['git', '--help'])
+except Exception, e:
+	barf("git is either not installed or not on your $PATH:\n>>>%s" % e, 9)
+
 git_env = {'GIT_DIR': parse_args(args)}
 
 if opts.pstats_outfile is not None:
