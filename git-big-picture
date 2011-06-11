@@ -75,7 +75,7 @@ def warn(message):
 
 # parse arguments and get git_dir
 if len(args) > 1:
-	barf('Too many arguments', 1)
+	barf('Too many arguments: %s' % args, 1)
 elif len(args) == 1:
 	repodir = args[0]
 else:
