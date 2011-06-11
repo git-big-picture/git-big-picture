@@ -81,13 +81,18 @@ graph, and stores this PDF in a file called `visualization.pdf'.
 Testing
 =======
 
-Just run:
+Run the python based test-suite with:
 
     $ ./setup.py test
 
 Or alternatively use 'nosetest' directly:
 
     $ nosetest
+
+Also there are some basic calls to the cli. There are not checked against
+predefined out though.
+
+    $ ./test-cli.sh
 
 Profiling
 =========
