@@ -21,14 +21,13 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os
+import sys
+import os
 from optparse import OptionParser
 import subprocess
 from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
 import tempfile
-import os
-import sys
 
 exit_codes = {	"too_many_args" : 1,
 				"dot_not_found" : 2,
@@ -44,7 +43,7 @@ exit_codes = {	"too_many_args" : 1,
 _USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]"
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
-default_format='svg'
+default_format = 'svg'
 
 # commit/ref selection
 parser.add_option('-a', '--all',
@@ -121,7 +120,7 @@ def parse_args(args):
 		repodir = args[0]
 	else:
 		repodir = os.getcwd()
-	git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
+	git_dir = gt.get_command_output(['git', 'rev-parse', '--git-dir'],
 									cwd=repodir).rstrip()
 	if not git_dir.startswith(os.path.sep):
 		# Prepend full path if we got relative one
@@ -262,15 +261,15 @@ def main(opts, git_dir):
 		return
 	# check for format mismatch between -f and -o
 	if opts.format and opts.outfile:
-			(has_suffix, guess) = guess_format_from_filename(opts.outfile)
-			if opts.format != guess and guess is not None:
-				warn("Format mismatch: '%s'(-f|--format)"
-						"vs. '%s'(filename), will use: "
-						"'%s'" % (opts.format, guess, guess))
-				opts.format = guess
-			if guess is None:
-				warn('Filename had no suffix, using format: %s' % opts.format)
-				opts.outfile += '.' + opts.format
+		(has_suffix, guess) = guess_format_from_filename(opts.outfile)
+		if opts.format != guess and guess is not None:
+			warn("Format mismatch: '%s'(-f|--format)"
+					"vs. '%s'(filename), will use: "
+					"'%s'" % (opts.format, guess, guess))
+			opts.format = guess
+		if guess is None:
+			warn('Filename had no suffix, using format: %s' % opts.format)
+			opts.outfile += '.' + opts.format
 	# guess format from outfile and use default if not possible or given
 	if not opts.format:
 		if opts.outfile:
