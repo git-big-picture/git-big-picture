@@ -214,7 +214,7 @@ def main(opts, git_dir):
 	# option -p|--plain is mutually exclusive with all other output options
 	if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
 		barf("Option '-p|--plain' is incompatible with outher output options.", 2)
-	elif not any([opts.format, opts.viewer, opts.outfile]):
+	elif not any([opts.plain, opts.format, opts.viewer, opts.outfile]):
 		barf("Must provide and output option.", 4)
 	# if plain just print dot input to stdout
 	if opts.plain:
