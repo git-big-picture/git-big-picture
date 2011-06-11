@@ -207,6 +207,10 @@ def main(opts, git_dir):
 
 	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
 
+
+if opts.plain and opts.format:
+	barf("Options -p|--plain and -f|--format are mutually exclusive", 1)
+
 if opts.pstats_outfile is not None:
 	import cProfile
 	cProfile.run('main(opts, git_env)', opts.pstats_outfile)
