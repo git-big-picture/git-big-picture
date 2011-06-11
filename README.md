@@ -163,8 +163,8 @@ Licensed under GPL v3 or later, see file COPYING for details.
 Authors/Contributors
 ====================
 
-Sebastian Pipping  <sebastian@pipping.org>
-Julius Plenz       <julius@plenz.com>
-Valentin Haenel    <valentin.haenel@gmx.de>
-Yaroslav Halchenko <debian@onerussian.com>
+* Sebastian Pipping  <sebastian@pipping.org>
+* Julius Plenz       <julius@plenz.com>
+* Valentin Haenel    <valentin.haenel@gmx.de>
+* Yaroslav Halchenko <debian@onerussian.com>
 
