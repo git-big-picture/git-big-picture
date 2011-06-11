@@ -90,7 +90,6 @@ if not git_dir.startswith(os.path.sep):
 
 git_env = {'GIT_DIR': git_dir}
 
-
 	# cases: total: 11
 	# no output args -> print graphviz
 	# format only -> print dot output
@@ -100,27 +99,6 @@ git_env = {'GIT_DIR': git_dir}
 	# format and outfile -> save image, get extension from format
 	# format and viewer -> generate outfile, use default extension, open in # viewer
 	# format, outfile, and viewer -> start viewer on outputfile
-
-def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = None):
-	""" Run 'dot' utility to generate graphical output.
-
-	If viewer and outfile are None, the raw output is printed to stdout.
-	Otherwise it is either displyed in the requested viewer program, or
-	written to file, or both.
-
-	Parameters
-	----------
-	dot_file_lines : list of strings
-		graphviz input lines
-	format : string
-		format of output [svg, png, ps, pdf, ...]
-	viewer : string
-		name of program to disply output with
-	outfile : string
-		file to store output in
-	"""
-	pass
-
 
 def run_dot(output_format, dot_file_lines):
 	""" Run the 'dot' utility.
