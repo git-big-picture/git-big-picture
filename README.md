@@ -80,7 +80,7 @@ If you don't have an extension, you could still specify a format:
     $ ./git-big-picture -f pdf -o our-project
     warning: Filename had no suffix, using format: pdf
 
-Otherwise the default format `svg` is used:
+Otherwise the default format SVG is used:
 
     ./git-big-picture -o our-project
     warning: Filename had no suffix, using default format: svg
@@ -111,7 +111,7 @@ Git Integration
 You can easily integrate this script as a regular Git command, by making the
 script `git-big-picture` available on the `$PATH`. For instance: using
 `./setup.py install` method as described above should do the trick. Alternatively symlink
-`git-big-picture` into a directory listed in your $PATH, for example $HOME/bin.
+`git-big-picture` into a directory listed in your `$PATH`, for example `$HOME/bin`.
 
 You may then use `git big-picture` (w/o the first dash) as you would any other Git command:
 
@@ -123,7 +123,7 @@ graph, and stores this PDF in a file called `visualization.pdf`.
 Testing
 =======
 
-Run the python based test-suite with:
+Run the Python based test-suite with:
 
     $ ./setup.py test
 
