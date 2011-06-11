@@ -26,6 +26,9 @@ from optparse import OptionParser
 import subprocess
 from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
+import tempfile
+import os
+import sys
 
 
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'

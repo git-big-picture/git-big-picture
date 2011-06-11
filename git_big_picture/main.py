@@ -23,9 +23,6 @@ from __future__ import print_function
 
 import subprocess
 import git_tools as gt
-import tempfile
-import os
-import sys
 
 VERSION = '0.8'
 
