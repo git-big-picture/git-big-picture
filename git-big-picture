@@ -66,9 +66,9 @@ def barf(message, exit_code):
 	parser.print_usage()
 	sys.exit(exit_code)
 
+# parse arguments and get git_dir
 if len(args) > 1:
-	parser.print_usage()
-	sys.exit(1)
+	barf('Too many arguments', 1)
 elif len(args) == 1:
 	repodir = args[0]
 else:
