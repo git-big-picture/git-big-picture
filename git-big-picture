@@ -277,6 +277,7 @@ def main(opts, git_dir):
 				warn("Format mismatch: '%s'(-f|--format)"
 						"vs. '%s'(filename), will use: "
 						"'%s'" % (opts.format, guess, guess))
+				opts.format = guess
 	# guess format from outfile and use default if not possible or given
 	if not opts.format:
 		if opts.outfile:
