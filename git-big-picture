@@ -40,7 +40,7 @@ exit_codes = {	"too_many_args" : 1,
 				"no_options"           : 8,
 			 }
 
-_USAGE = "%prog -p | [-f <format> [-v <viewer>] [-o <outfile>] [<repo-directory>]"
+_USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]"
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
 default_format='svg'

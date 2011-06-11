@@ -40,7 +40,7 @@ Usage
 =====
 
     $ ./git-big-picture --help
-    Usage: git-big-picture -p | [-f <format> [-v <viewer>] [-o <outfile>] [<repo-directory>]
+    Usage: git-big-picture -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]
 
     Options:
     --version             show program's version number and exit
