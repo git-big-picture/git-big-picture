@@ -547,7 +547,7 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 		format of output [svg, png, ps, pdf, ...]
 	viewer : string
 		name of program to disply output with
-	oufile : string
+	outfile : string
 		file to store output in
 	"""
 
