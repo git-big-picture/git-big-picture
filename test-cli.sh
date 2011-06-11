@@ -45,6 +45,9 @@ echo --- mismatch format
 echo --- try no such viewer
 ./git-big-picture -f svg -v foo
 
+echo -- format but no extension
+./git-big-picture -f svg -o file
+
 echo --- provide no format
 ./git-big-picture -v $viewer
 
