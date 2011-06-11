@@ -38,6 +38,7 @@ exit_codes = {	"too_many_args" : 1,
 				"no_such_viewer"       : 6,
 				"plain_with_others"    : 7,
 				"no_options"           : 8,
+				"no_git"               : 9,
 			 }
 
 _USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]"
@@ -299,7 +300,8 @@ def main(opts, git_dir):
 try:
 	gt.get_command_output(['git', '--help'])
 except Exception, e:
-	barf("git is either not installed or not on your $PATH:\n>>>%s" % e, 9)
+	barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
+			exit_codes["no_git"])
 
 git_env = {'GIT_DIR': parse_args(args)}
 
