@@ -34,6 +34,7 @@ exit_codes = {	"too_many_args" : 1,
 				"dot_not_found" : 2,
 				"problem_with_dot" : 3,
 				"dot_terminated_early" : 4,
+				"not_write_to_file"    : 5,
 			 }
 
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
@@ -183,9 +184,9 @@ def write_to_file(output_file, dot_output):
 	try:
 		f = open(output_file, 'w+b')
 	except IOError, e:
-		sys.stderr.write('Fatal: could not open file %s (errno: %d)!\n' % (outfile, e.errno))
-		sys.exit(4)
-
+		barf("Could not open file '%s':\n>>>%s"
+				% (output_file, e),
+				exit_codes["not_write_to_file"])
 	f.write(dot_output)
 	f.flush()
 	os.fsync(f.fileno())
