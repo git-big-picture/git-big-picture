@@ -24,7 +24,7 @@
 import sys, os
 from optparse import OptionParser
 import subprocess
-from git_big_picture.main import VERSION, main
+from git_big_picture.main import VERSION, CommitGraph, _process_dot_output
 import git_big_picture.git_tools as gt
 
 
@@ -65,11 +65,6 @@ if not git_dir.startswith(os.path.sep):
 
 git_env = {'GIT_DIR': git_dir}
 
-if opts.pstats_outfile is not None:
-	import cProfile
-	cProfile.run('main(opts, git_env)', opts.pstats_outfile)
-else:
-	main(opts, git_env)
 
 	# cases: total: 11
 	# no output args -> print graphviz
@@ -81,5 +76,28 @@ else:
 	# format and viewer -> generate outfile, use default extension, open in # viewer
 	# format, outfile, and viewer -> start viewer on outputfile
 
+def main(opts, git_dir):
+	gt.git_env = git_dir
+	(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+	graph = CommitGraph(gt.get_parent_map(), ab, tags)
+	# graph._optimize_linear_runs_away()
+	# graph._optimize_merge_branch_fits_away()
+	# graph._optimize_non_labels()
+	if opts.all_commits:
+		sha_one_digits = graph._minimal_sha_one_digits()
+	elif opts.some_commits:
+		sha_one_digits = graph._minimal_sha_one_digits()
+		graph._remove_linear_runs()
+	else:
+		sha_one_digits = None
+		graph._remove_non_labels()
 
+	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
+	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
+
+if opts.pstats_outfile is not None:
+	import cProfile
+	cProfile.run('main(opts, git_env)', opts.pstats_outfile)
+else:
+	main(opts, git_env)
 # vim: set noexpandtab:

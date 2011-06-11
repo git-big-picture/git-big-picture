@@ -599,24 +599,5 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 		print(dot_output)
 
 
-def main(opts, git_dir):
-	gt.git_env = git_dir
-	(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-	graph = CommitGraph(gt.get_parent_map(), ab, tags)
-	# graph._optimize_linear_runs_away()
-	# graph._optimize_merge_branch_fits_away()
-	# graph._optimize_non_labels()
-	if opts.all_commits:
-		sha_one_digits = graph._minimal_sha_one_digits()
-	elif opts.some_commits:
-		sha_one_digits = graph._minimal_sha_one_digits()
-		graph._remove_linear_runs()
-	else:
-		sha_one_digits = None
-		graph._remove_non_labels()
-
-	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
-	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
-	
 
 # vim: set noexpandtab:
