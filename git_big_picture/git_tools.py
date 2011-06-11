@@ -32,6 +32,8 @@ def get_command_output(command_list, cwd=None):
 	----------
 	command_list : list of strings
 		the command and its arguments
+	cwd : string
+		current working directory to execute command in
 
 	Returns
 	-------
@@ -135,4 +137,4 @@ def get_parent_map():
 		elif count == 1:
 			parents[sha_ones[0]] = set()
 	return parents
-
+# vim: set noexpandtab:
