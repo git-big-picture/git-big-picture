@@ -42,7 +42,7 @@ exit_codes = {	"too_many_args" : 1,
 _USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]"
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
-default_format='svg'
+default_format = 'svg'
 
 # commit/ref selection
 parser.add_option('-a', '--all',
@@ -119,7 +119,7 @@ def parse_args(args):
 		repodir = args[0]
 	else:
 		repodir = os.getcwd()
-	git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
+	git_dir = gt.get_command_output(['git', 'rev-parse', '--git-dir'],
 									cwd=repodir).rstrip()
 	if not git_dir.startswith(os.path.sep):
 		# Prepend full path if we got relative one
