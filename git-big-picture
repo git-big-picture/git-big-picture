@@ -30,6 +30,11 @@ import tempfile
 import os
 import sys
 
+exit_codes = {	"too_many_args" : 1,
+				"dot_not_found" : 2,
+				"problem_with_dot" : 3,
+				"dot_terminated_early" : 4,
+			 }
 
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
 
@@ -106,7 +111,7 @@ def parse_args(args):
 
 	"""
 	if len(args) > 1:
-		barf('Too many arguments: %s' % args, 1)
+		barf('Too many arguments: %s' % args, exit_codes["too_many_args"])
 	elif len(args) == 1:
 		repodir = args[0]
 	else:
@@ -149,17 +154,20 @@ def run_dot(output_format, dot_file_lines):
 				stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	except OSError, e:
 		if e.errno == 2:
-			sys.stderr.write('Fatal: `dot\' not found! Please install the Graphviz utility.\n')
+			barf("'dot' not found! Please install the Graphviz utility.",
+					exit_codes["dot_not_found"])
 		else:
-			sys.stderr.write('Fatal: A problem occured calling `dot -T' +
-					output_format + '\'!\n')
-			sys.exit(2)
-	if p.poll():
-		sys.stderr.write('`dot\' terminated prematurely with error code %d;\n'
-				'probably you specified an invalid format, see "man dot"\n' % p.poll())
-		sys.exit(3)
-	# send dot input, automatically receive and store output
-	return p.communicate(input='\n'.join(dot_file_lines))[0]
+			barf("A problem occured calling 'dot -T%s'" % output_format,
+					exit_codes["problem_with_dot"])
+
+	# send dot input, automatically receive and store output and error
+	out, err = p.communicate(input='\n'.join(dot_file_lines))
+	if p.returncode != 0:
+		barf("'dot' terminated prematurely with error code %d;\n"
+				"probably you specified an invalid format, see 'man dot'.\n"
+				"The error from 'dot' was:\n>>>"
+				% p.returncode + err, exit_codes["dot_terminated_early"])
+	return out
 
 def write_to_file(output_file, dot_output):
 	""" Write the output from the 'dot' utility to file.
