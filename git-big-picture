@@ -41,6 +41,9 @@ parser.add_option('--some',
 		help='include all commits but linear runs')
 
 # output options
+parser.add_option('-p', '--plain',
+		action='store_true', dest='plain',
+		help='output lines suitable as input for dot')
 parser.add_option('-f', '--format',
 		action='store', type='string', dest='format',
 		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
