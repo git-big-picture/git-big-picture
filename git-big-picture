@@ -32,18 +32,29 @@ _USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
 
-parser.add_option('-a', '--all', action='store_true', dest='all_commits',
-	help='include all commits (not just tags and branch heads)')
-parser.add_option('--some', action='store_true', dest='some_commits',
-	help='include all commits but linear runs')
-parser.add_option('-f', '--format', action='store', type='string', dest='format',
-	metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
-parser.add_option('-o', '--out', action='store', type='string', dest='outfile',
-	metavar='FILE', help='write image to specified file')
-parser.add_option('-v', '--viewer', action='store', type='string', dest='viewer',
-	metavar='CMD', help='write image to tempfile and start specified viewer')
-parser.add_option('--pstats', action='store', type='string', dest='pstats_outfile',
-	metavar='FILE', help='run cProfile profiler writing pstats output to FILE')
+# commit/ref selection
+parser.add_option('-a', '--all',
+		action='store_true', dest='all_commits',
+		help='include all commits (not just tags and branch heads)')
+parser.add_option('--some',
+		action='store_true', dest='some_commits',
+		help='include all commits but linear runs')
+
+# output options
+parser.add_option('-f', '--format',
+		action='store', type='string', dest='format',
+		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+parser.add_option('-o', '--out',
+		action='store', type='string', dest='outfile',
+		metavar='FILE', help='write image to specified file')
+parser.add_option('-v', '--viewer',
+		action='store', type='string', dest='viewer',
+		metavar='CMD', help='write image to tempfile and start specified viewer')
+
+# miscellaneous options
+parser.add_option('--pstats',
+		action='store', type='string', dest='pstats_outfile',
+		metavar='FILE', help='run cProfile profiler writing pstats output to FILE')
 
 opts, args = parser.parse_args()
 
