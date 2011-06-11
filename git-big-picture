@@ -21,14 +21,13 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os
+import sys
+import os
 from optparse import OptionParser
 import subprocess
 from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
 import tempfile
-import os
-import sys
 
 exit_codes = {	"too_many_args" : 1,
 				"dot_not_found" : 2,
