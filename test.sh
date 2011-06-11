@@ -20,7 +20,7 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-outfile='file.vg'
+outfile='file.svg'
 viewer='firefox'
 
 echo --- run without options
@@ -33,7 +33,7 @@ echo --- try wrong format
 ./git-big-picture -f foo
 
 echo --- mismatch format
-./git-big-picture -f svg -o $outfile
+./git-big-picture -f pdf -o $outfile
 
 echo --- try no such viewer
 ./git-big-picture -f svg -v foo
