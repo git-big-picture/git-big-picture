@@ -35,6 +35,9 @@ exit_codes = {	"too_many_args" : 1,
 				"problem_with_dot" : 3,
 				"dot_terminated_early" : 4,
 				"not_write_to_file"    : 5,
+				"no_such_viewer"       : 6,
+				"plain_with_others"    : 7,
+				"no_options"           : 8,
 			 }
 
 _USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
@@ -215,8 +218,8 @@ def show_in_viewer(output, viewer):
 	try:
 		subprocess.call([viewer, output_file.name])
 	except OSError, e:
-		sys.stderr.write('Error calling `' + viewer + '\'!')
-		sys.exit(5)
+		barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
+				exit_codes["no_such_viewer"])
 
 def guess_format_from_filename(output_file):
 	""" Guess the output format from the filename.
@@ -258,9 +261,10 @@ def main(opts, git_dir):
 
 	# option -p|--plain is mutually exclusive with all other output options
 	if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
-		barf("Option '-p|--plain' is incompatible with outher output options.", 2)
+		barf("Option '-p|--plain' is incompatible with other output options.",
+				exit_codes["plain_with_others"])
 	elif not any([opts.plain, opts.format, opts.viewer, opts.outfile]):
-		barf("Must provide and output option.", 4)
+		barf("Must provide and output option.", exit_codes["no_options"])
 	# if plain just print dot input to stdout
 	if opts.plain:
 		for line in dot_file_lines:
