@@ -298,7 +298,7 @@ def main(opts, git_dir):
 			write_to_file(opts.outfile, dot_output)
 		if opts.viewer and opts.outfile:
 			show_in_viewer(opts.outfile, opts.viewer)
-		else:
+		elif opts.viewer:
 			show_in_viewer(dot_output, opts.viewer)
 	else: # print raw SVG, PDF, ...
 		print(dot_output)
