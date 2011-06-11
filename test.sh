@@ -20,6 +20,8 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
+# Just some rudimentary tests of the command line interface
+
 outfile='file.svg'
 viewer='firefox'
 
@@ -27,7 +29,12 @@ echo --- run without options
 ./git-big-picture
 
 echo --- run plain
-./git-big-picture -p > /dev/null
+./git-big-picture -p | head
+
+echo --- mix plain and others
+./git-big-picture -p -f svg
+./git-big-picture -p -v $viewer
+./git-big-picture -p -o $outfile
 
 echo --- try wrong format
 ./git-big-picture -f foo
@@ -41,3 +48,4 @@ echo --- try no such viewer
 echo --- provide no format
 ./git-big-picture -v $viewer
 
+rm $outfile
