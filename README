@@ -36,6 +36,24 @@ easy-to-write Graphviz syntax. This is converted into an image using the
 Graphviz 'dot' utility. Graphviz supports a multitude of image formats, e.g. SVG
 and PDF. Check that Graphviz is installed by invoking: 'dot -V'.
 
+Usage
+=====
+
+    $ ./git-big-picture --help
+    Usage: git-big-picture -p | [-f <format> [-v <viewer>] [-o <outfile>] [<repo-directory>]
+
+    Options:
+    --version             show program's version number and exit
+    -h, --help            show this help message and exit
+    -a, --all             include all commits (not just tags and branch heads)
+    --some                include all commits but linear runs
+    -p, --plain           output lines suitable as input for dot
+    -f FMT, --format=FMT  set output format [svg, png, ps, pdf, ...]
+    -v CMD, --viewer=CMD  write image to tempfile and start specified viewer
+    -o FILE, --out=FILE   write image to specified file
+    --pstats=FILE         run cProfile profiler writing pstats output to FILE
+
+
 Usage Examples
 ==============
 

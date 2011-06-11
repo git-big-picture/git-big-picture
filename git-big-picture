@@ -40,7 +40,7 @@ exit_codes = {	"too_many_args" : 1,
 				"no_options"           : 8,
 			 }
 
-_USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
+_USAGE = "%prog -p | [-f <format> [-v <viewer>] [-o <outfile>] [<repo-directory>]"
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
 default_format='svg'
@@ -60,12 +60,12 @@ parser.add_option('-p', '--plain',
 parser.add_option('-f', '--format',
 		action='store', type='string', dest='format',
 		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
-parser.add_option('-o', '--out',
-		action='store', type='string', dest='outfile',
-		metavar='FILE', help='write image to specified file')
 parser.add_option('-v', '--viewer',
 		action='store', type='string', dest='viewer',
 		metavar='CMD', help='write image to tempfile and start specified viewer')
+parser.add_option('-o', '--out',
+		action='store', type='string', dest='outfile',
+		metavar='FILE', help='write image to specified file')
 
 # miscellaneous options
 parser.add_option('--pstats',
