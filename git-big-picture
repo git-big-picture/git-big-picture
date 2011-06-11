@@ -63,6 +63,7 @@ opts, args = parser.parse_args()
 
 def barf(message, exit_code):
 	sys.stderr.write('fatal: %s\n' % message)
+	parser.print_usage()
 	sys.exit(exit_code)
 
 if len(args) > 1:
@@ -111,22 +112,8 @@ def _process_dot_output(dot_file_lines, format = None, viewer = None, outfile = 
 	outfile : string
 		file to store output in
 	"""
+	pass
 
-	if not format:
-		if outfile:
-			format = outfile.split('.')[-1]
-			sys.stderr.write('guessing format: %s.\n' % format)
-		else: # output plain text
-			print_dot_lines(dot_file_lines)
-			return
-	dot_output = run_dot(format, dot_file_lines)
-	if viewer or outfile:
-		if outfile:
-			write_to_file(outfile, dot_output)
-		if viewer:
-			show_in_viewer(output_file, viewer)
-	else: # print raw SVG, PDF, ...
-		print(dot_output)
 
 def run_dot(output_format, dot_file_lines):
 	""" Run the 'dot' utility.
@@ -205,7 +192,21 @@ def main(opts, git_dir):
 
 	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 
-	_process_dot_output(dot_file_lines, format=opts.format, viewer=opts.viewer, outfile=opts.outfile)
+	if not opts.format:
+		if opts.outfile:
+			opts.format = outfile.split('.')[-1]
+			sys.stderr.write('guessing format: %s.\n' % opts.format)
+		else: # output plain text
+			print_dot_lines(dot_file_lines)
+			return
+	dot_output = run_dot(opts.format, dot_file_lines)
+	if opts.viewer or opts.outfile:
+		if opts.outfile:
+			write_to_file(opts.outfile, dot_output)
+		if opts.viewer:
+			show_in_viewer(opts.outfile, opts.viewer)
+	else: # print raw SVG, PDF, ...
+		print(dot_output)
 
 
 if opts.plain and opts.format:
