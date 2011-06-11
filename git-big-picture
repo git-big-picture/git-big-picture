@@ -70,6 +70,9 @@ def barf(message, exit_code):
 	parser.print_usage()
 	sys.exit(exit_code)
 
+def warn(message):
+	sys.stderr.write('warning: %s\n' % message)
+
 # parse arguments and get git_dir
 if len(args) > 1:
 	barf('Too many arguments', 1)
