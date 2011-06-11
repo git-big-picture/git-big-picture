@@ -113,7 +113,7 @@ script `git-big-picture` available on the `$PATH`. For instance: using
 `./setup.py install` method as described above should do the trick. Alternatively symlink
 `git-big-picture` into a directory listed in your $PATH, for example $HOME/bin.
 
-You may then use `git big-picture` as you would any other Git command:
+You may then use `git big-picture` (w/o the first dash) as you would any other Git command:
 
     $ git big-picture -f pdf -v xpdf -o visualization.pdf
 
