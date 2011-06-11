@@ -162,7 +162,16 @@ def run_dot(output_format, dot_file_lines):
 	return p.communicate(input='\n'.join(dot_file_lines))[0]
 
 def write_to_file(output_file, dot_output):
-	""" Write the output from the 'dot' utility to file. """
+	""" Write the output from the 'dot' utility to file.
+
+	Parameters
+	----------
+	output_file : string
+		filename of output file
+	dot_output : list of strings
+		raw output from the 'dot' utility
+
+	"""
 	try:
 		f = open(output_file, 'w+b')
 	except IOError, e:
@@ -175,7 +184,20 @@ def write_to_file(output_file, dot_output):
 	f.close()
 
 def show_in_viewer(output, viewer):
-	""" Show the output of 'dot' utility in a viewer. """
+	""" Show the output of 'dot' utility in a viewer.
+
+	If 'output' is a file, open viewer on that file, else assume its the raw
+	output from the 'dot' utility, write that to a temporary file, and open
+	viewer on that.
+
+	Parameters
+	----------
+	output : file or list of strings
+		the output to open the viewer on
+	viewer : string
+		name of the viewer to use
+
+	"""
 	if type(output) is not file:
 		output_file = tempfile.NamedTemporaryFile(prefix='git-big-picture')
 		write_to_file(output_file.name, output)
@@ -188,6 +210,20 @@ def show_in_viewer(output, viewer):
 		sys.exit(5)
 
 def guess_format_from_filename(output_file):
+	""" Guess the output format from the filename.
+
+	Parameters
+	----------
+	output_file : string
+		filename of the output file
+
+	Returns
+	-------
+	has_suffix : boolean
+		True if the filename had a suffix, False otherwise
+	guess:
+		the format guess if the filename has a suffix and None otherwise
+	"""
 	if '.' in output_file:
 		return True, opts.outfile.split('.')[-1]
 	else:
