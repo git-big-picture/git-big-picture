@@ -24,52 +24,283 @@
 import sys, os
 from optparse import OptionParser
 import subprocess
-from git_big_picture.main import VERSION, main
+from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
+import tempfile
+import os
+import sys
 
+exit_codes = {	"too_many_args" : 1,
+				"dot_not_found" : 2,
+				"problem_with_dot" : 3,
+				"dot_terminated_early" : 4,
+				"not_write_to_file"    : 5,
+				"no_such_viewer"       : 6,
+				"plain_with_others"    : 7,
+				"no_options"           : 8,
+			 }
 
-_USAGE = '\n  %prog  [-f <format> [-v <viewer>]] [-o <outfile>] [<repo-directory>]'
+_USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]"
 
 parser = OptionParser(usage=_USAGE, version=VERSION)
+default_format='svg'
 
-parser.add_option('-a', '--all', action='store_true', dest='all_commits',
-	help='include all commits (not just tags and branch heads)')
-parser.add_option('--some', action='store_true', dest='some_commits',
-	help='include all commits but linear runs')
-parser.add_option('-f', '--format', action='store', type='string', dest='format',
-	metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
-parser.add_option('-o', '--out', action='store', type='string', dest='outfile',
-	metavar='FILE', help='write image to specified file')
-parser.add_option('-v', '--viewer', action='store', type='string', dest='viewer',
-	metavar='CMD', help='write image to tempfile and start specified viewer')
-parser.add_option('--pstats', action='store', type='string', dest='pstats_outfile',
-	metavar='FILE', help='run cProfile profiler writing pstats output to FILE')
+# commit/ref selection
+parser.add_option('-a', '--all',
+		action='store_true', dest='all_commits',
+		help='include all commits (not just tags and branch heads)')
+parser.add_option('--some',
+		action='store_true', dest='some_commits',
+		help='include all commits but linear runs')
+
+# output options
+parser.add_option('-p', '--plain',
+		action='store_true', dest='plain',
+		help='output lines suitable as input for dot')
+parser.add_option('-f', '--format',
+		action='store', type='string', dest='format',
+		metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+parser.add_option('-v', '--viewer',
+		action='store', type='string', dest='viewer',
+		metavar='CMD', help='write image to tempfile and start specified viewer')
+parser.add_option('-o', '--out',
+		action='store', type='string', dest='outfile',
+		metavar='FILE', help='write image to specified file')
+
+# miscellaneous options
+parser.add_option('--pstats',
+		action='store', type='string', dest='pstats_outfile',
+		metavar='FILE', help='run cProfile profiler writing pstats output to FILE')
 
 opts, args = parser.parse_args()
 
+def barf(message, exit_code):
+	""" Abort execution with error message and exit code.
 
-if len(args) > 1:
+	Parameters
+	----------
+	message : string
+		error message
+	exit_code : int
+		exit code for program
+
+	"""
+	sys.stderr.write('fatal: %s\n' % message)
 	parser.print_usage()
-	sys.exit(1)
-elif len(args) == 1:
-	repodir = args[0]
-else:
-	repodir = os.getcwd()
+	sys.exit(exit_code)
 
-git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
-		                       cwd=repodir).rstrip()
+def warn(message):
+	""" Print a warning message.
 
-if not git_dir.startswith(os.path.sep):
-	# Prepend full path if we got relative one
-	git_dir = os.path.join(repodir, git_dir)
+	Parameters
+	----------
+	message : string
+		the warning
 
-git_env = {'GIT_DIR': git_dir}
+	"""
+	sys.stderr.write('warning: %s\n' % message)
+
+def parse_args(args):
+	""" Parse arguments and get git_dir.
+
+	Parameters
+	----------
+	args : list
+		arguments given on command line
+
+	Returns
+	-------
+	git_dir : path
+		full path to the $GIT_DIR
+
+	"""
+	if len(args) > 1:
+		barf('Too many arguments: %s' % args, exit_codes["too_many_args"])
+	elif len(args) == 1:
+		repodir = args[0]
+	else:
+		repodir = os.getcwd()
+	git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
+									cwd=repodir).rstrip()
+	if not git_dir.startswith(os.path.sep):
+		# Prepend full path if we got relative one
+		git_dir = os.path.join(repodir, git_dir)
+	return git_dir
+
+def run_dot(output_format, dot_file_lines):
+	""" Run the 'dot' utility.
+
+	Parameters
+	----------
+	output_format : string
+		format of output [svg, png, ps, pdf, ...]
+	dot_file_lines : list of strings
+		graphviz input lines
+
+	Returns
+	-------
+	Raw output from 'dot' utility
+
+	"""
+	try:
+		p = subprocess.Popen(['dot', '-T'+output_format], stdin=subprocess.PIPE,
+				stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	except OSError, e:
+		if e.errno == 2:
+			barf("'dot' not found! Please install the Graphviz utility.",
+					exit_codes["dot_not_found"])
+		else:
+			barf("A problem occured calling 'dot -T%s'" % output_format,
+					exit_codes["problem_with_dot"])
+
+	# send dot input, automatically receive and store output and error
+	out, err = p.communicate(input='\n'.join(dot_file_lines))
+	if p.returncode != 0:
+		barf("'dot' terminated prematurely with error code %d;\n"
+				"probably you specified an invalid format, see 'man dot'.\n"
+				"The error from 'dot' was:\n>>>"
+				% p.returncode + err, exit_codes["dot_terminated_early"])
+	return out
+
+def write_to_file(output_file, dot_output):
+	""" Write the output from the 'dot' utility to file.
+
+	Parameters
+	----------
+	output_file : string
+		filename of output file
+	dot_output : list of strings
+		raw output from the 'dot' utility
+
+	"""
+	try:
+		f = open(output_file, 'w+b')
+	except IOError, e:
+		barf("Could not open file '%s':\n>>>%s"
+				% (output_file, e),
+				exit_codes["not_write_to_file"])
+	f.write(dot_output)
+	f.flush()
+	os.fsync(f.fileno())
+	f.close()
+
+def show_in_viewer(output, viewer):
+	""" Show the output of 'dot' utility in a viewer.
+
+	If 'output' is a file, open viewer on that file, else assume its the raw
+	output from the 'dot' utility, write that to a temporary file, and open
+	viewer on that.
+
+	Parameters
+	----------
+	output : file or list of strings
+		the output to open the viewer on
+	viewer : string
+		name of the viewer to use
+
+	"""
+	if type(output) is not file:
+		output_file = tempfile.NamedTemporaryFile(prefix='git-big-picture')
+		write_to_file(output_file.name, output)
+	else:
+		output_file = output
+	try:
+		subprocess.call([viewer, output_file.name])
+	except OSError, e:
+		barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
+				exit_codes["no_such_viewer"])
+
+def guess_format_from_filename(output_file):
+	""" Guess the output format from the filename.
+
+	Parameters
+	----------
+	output_file : string
+		filename of the output file
+
+	Returns
+	-------
+	has_suffix : boolean
+		True if the filename had a suffix, False otherwise
+	guess:
+		the format guess if the filename has a suffix and None otherwise
+	"""
+	if '.' in output_file:
+		return True, opts.outfile.split('.')[-1]
+	else:
+		return False, None
+
+def main(opts, git_dir):
+	gt.git_env = git_dir
+	(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+	graph = CommitGraph(gt.get_parent_map(), ab, tags)
+	# graph._optimize_linear_runs_away()
+	# graph._optimize_merge_branch_fits_away()
+	# graph._optimize_non_labels()
+	if opts.all_commits:
+		sha_one_digits = graph._minimal_sha_one_digits()
+	elif opts.some_commits:
+		sha_one_digits = graph._minimal_sha_one_digits()
+		graph._remove_linear_runs()
+	else:
+		sha_one_digits = None
+		graph._remove_non_labels()
+
+	dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
+
+	# option -p|--plain is mutually exclusive with all other output options
+	if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
+		barf("Option '-p|--plain' is incompatible with other output options.",
+				exit_codes["plain_with_others"])
+	elif not any([opts.plain, opts.format, opts.viewer, opts.outfile]):
+		barf("Must provide and output option.", exit_codes["no_options"])
+	# if plain just print dot input to stdout
+	if opts.plain:
+		for line in dot_file_lines:
+			print(line)
+		return
+	# check for format mismatch between -f and -o
+	if opts.format and opts.outfile:
+			(has_suffix, guess) = guess_format_from_filename(opts.outfile)
+			if opts.format != guess and guess is not None:
+				warn("Format mismatch: '%s'(-f|--format)"
+						"vs. '%s'(filename), will use: "
+						"'%s'" % (opts.format, guess, guess))
+				opts.format = guess
+			if guess is None:
+				warn('Filename had no suffix, using format: %s' % opts.format)
+				opts.outfile += '.' + opts.format
+	# guess format from outfile and use default if not possible or given
+	if not opts.format:
+		if opts.outfile:
+			(has_suffix, guess) = guess_format_from_filename(opts.outfile)
+			if has_suffix:
+				warn('Guessing format from filename: %s' % guess)
+			else:
+				warn('Filename had no suffix, using default format: %s' % default_format)
+				opts.format = default_format
+				opts.outfile += '.' + opts.format
+		else:
+			warn('Using default format: %s' % default_format)
+			opts.format = default_format
+	# run the 'dot' utility
+	dot_output = run_dot(opts.format, dot_file_lines)
+	# create outfile and possibly view that or a temporary file in viewer
+	if opts.viewer or opts.outfile:
+		if opts.outfile:
+			write_to_file(opts.outfile, dot_output)
+		if opts.viewer and opts.outfile:
+			show_in_viewer(opts.outfile, opts.viewer)
+		elif opts.viewer:
+			show_in_viewer(dot_output, opts.viewer)
+	else: # print raw SVG, PDF, ...
+		print(dot_output)
+
+git_env = {'GIT_DIR': parse_args(args)}
 
 if opts.pstats_outfile is not None:
 	import cProfile
 	cProfile.run('main(opts, git_env)', opts.pstats_outfile)
 else:
 	main(opts, git_env)
-
-
 # vim: set noexpandtab:

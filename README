@@ -36,32 +36,74 @@ easy-to-write Graphviz syntax. This is converted into an image using the
 Graphviz 'dot' utility. Graphviz supports a multitude of image formats, e.g. SVG
 and PDF. Check that Graphviz is installed by invoking: 'dot -V'.
 
+Usage
+=====
+
+    $ ./git-big-picture --help
+    Usage: git-big-picture -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]
+
+    Options:
+    --version             show program's version number and exit
+    -h, --help            show this help message and exit
+    -a, --all             include all commits (not just tags and branch heads)
+    --some                include all commits but linear runs
+    -p, --plain           output lines suitable as input for dot
+    -f FMT, --format=FMT  set output format [svg, png, ps, pdf, ...]
+    -v CMD, --viewer=CMD  write image to tempfile and start specified viewer
+    -o FILE, --out=FILE   write image to specified file
+    --pstats=FILE         run cProfile profiler writing pstats output to FILE
+
+
 Usage Examples
 ==============
 
+Output Graphviz synatx:
+
+    $ ./git-big-picture -p
+
+Output raw Graphviz output (i.e. the image)
+
+    $ ./git-big-picture -f svg
+
 Generate PNG version of current Git repository and save to 'our-project.png':
-
-    $ ./git-big-picture -f png -o our-project.png
-
-If you omit the format, it will be guessed from the file extension:
 
     $ ./git-big-picture -o our-project.png
 
-Generate SVG graph of the repository in ~/git-repo and view the result in Firefox:
+If you specify the format and a filename with extension, the filename extension will
+be used:
 
-    $ ./git-big-picture -f svg -v firefox ~/git-repo/
+    $ ./git-big-picture -f svg -o our-project.png
+    warning: Format mismatch: 'svg'(-f|--format)vs. 'png'(filename), will use: 'png'
+
+If you don't have an extension, you could still specify a format:
+
+    $ ./git-big-picture -f pdf -o our-project
+    warning: Filename had no suffix, using format: pdf
+
+Otherwise the default format 'svg' is used:
+
+    ./git-big-picture -o our-project
+    warning: Filename had no suffix, using default format: svg
+
+Generate SVG (default format) graph of the repository in ~/git-repo and view the
+result in firefox:
+
+    $ ./git-big-picture -v firefox ~/git-repo/
+
+If you would like to use an alternative viewer, specify viewer and its format:
+
+    $ ./git-big-picture -f pdf -v xpdf
+
+You can also open the viewer automatically on the output file:
+
+    $ ./git-big-picture -v xpdf -o our-project.pdf
 
 Manually pipe the Graphviz commands to the 'dot' utility:
 
-    $ ./git-big-picture ~/git-repository | dot -Tpng -o graph.png
+    $ ./git-big-picture --plain ~/git-repo | dot -Tpng -o graph.png
 
-Without options, the script has a simple plaintext output mode which
-is understood by 'dot'. For further information see `man dot'
+Without any output options, the script will print its usage and exit.
 
-If you specify a custom format, but neither a viewer nor an output
-file, the script will output the image to stdout. That is to enable
-you to use it in shell scripts and pipe the result (for example a
-gzipped SVG version) to another program.
 
 Git Integration
 ===============
@@ -81,13 +123,18 @@ graph, and stores this PDF in a file called `visualization.pdf'.
 Testing
 =======
 
-Just run:
+Run the python based test-suite with:
 
     $ ./setup.py test
 
 Or alternatively use 'nosetest' directly:
 
     $ nosetest
+
+Also there are some basic calls to the cli. There are not checked against
+predefined out though.
+
+    $ ./test-cli.sh
 
 Profiling
 =========
