@@ -66,29 +66,58 @@ parser.add_option('--pstats',
 opts, args = parser.parse_args()
 
 def barf(message, exit_code):
+	""" Abort execution with error message and exit code.
+
+	Parameters
+	----------
+	message : string
+		error message
+	exit_code : int
+		exit code for program
+
+	"""
 	sys.stderr.write('fatal: %s\n' % message)
 	parser.print_usage()
 	sys.exit(exit_code)
 
 def warn(message):
+	""" Print a warning message.
+
+	Parameters
+	----------
+	message : string
+		the warning
+
+	"""
 	sys.stderr.write('warning: %s\n' % message)
 
-# parse arguments and get git_dir
-if len(args) > 1:
-	barf('Too many arguments: %s' % args, 1)
-elif len(args) == 1:
-	repodir = args[0]
-else:
-	repodir = os.getcwd()
+def parse_args(args):
+	""" Parse arguments and get git_dir.
 
-git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
-								cwd=repodir).rstrip()
+	Parameters
+	----------
+	args : list
+		arguments given on command line
 
-if not git_dir.startswith(os.path.sep):
-	# Prepend full path if we got relative one
-	git_dir = os.path.join(repodir, git_dir)
+	Returns
+	-------
+	git_dir : path
+		full path to the $GIT_DIR
 
-git_env = {'GIT_DIR': git_dir}
+	"""
+	if len(args) > 1:
+		barf('Too many arguments: %s' % args, 1)
+	elif len(args) == 1:
+		repodir = args[0]
+	else:
+		repodir = os.getcwd()
+	git_dir = gt.get_command_output(['git','rev-parse', '--git-dir'],
+									cwd=repodir).rstrip()
+	if not git_dir.startswith(os.path.sep):
+		# Prepend full path if we got relative one
+		git_dir = os.path.join(repodir, git_dir)
+	return git_dir
+
 
 	# cases: total: 11
 	# no output args -> print graphviz
@@ -225,6 +254,8 @@ def main(opts, git_dir):
 			show_in_viewer(dot_output, opts.viewer)
 	else: # print raw SVG, PDF, ...
 		print(dot_output)
+
+git_env = {'GIT_DIR': parse_args(args)}
 
 if opts.pstats_outfile is not None:
 	import cProfile
