@@ -6,6 +6,47 @@ a filter that removes uninteresting commits from a DAG modelling a Git
 repository and thereby exposes the big picture: the hierarchy of tags and
 branches.
 
+A Small Example
+---------------
+
+Imagine the follwing Graph:
+
+                 0.1.1   0.1.2
+                   |       |
+    0.0    G---H---I---J---K---L---M maint
+     |    /
+     A---B---C---D---E---F master
+         |    \         /
+        0.1    N---O---P topic
+
+
+Where the following commits have Branches and Tags:
+
+    A -> 0.0
+    B -> 0.1
+    F -> master
+    I -> 0.1.1
+    K -> 0.1.2
+    M -> maint
+    P -> topic
+
+The *reduced* graph of *interesting* commits would be:
+
+          I---K---M
+         /
+    A---B---F
+         \ /
+          L
+
+But since the commits would be labeled with their refs, it would look more like
+(within the lmits of ascii art):
+
+          0.1.1---0.1.2---maint
+         /
+    0.0---0.1---master
+            \     /
+             topic
+
 Dependencies
 ============
 
