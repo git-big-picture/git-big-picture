@@ -32,7 +32,7 @@ echo --- run without options
 ./git-big-picture
 
 echo --- run plain
-./git-big-picture -p | head
+./git-big-picture -p | sed '10q'
 
 echo --- mix plain and others
 ./git-big-picture -p -f svg
