@@ -24,6 +24,7 @@
 
 outfile='file.svg'
 viewer='firefox'
+stats_file='stats'
 
 echo --- run without options
 ./git-big-picture
@@ -42,6 +43,9 @@ echo --- try wrong format
 echo --- mismatch format
 ./git-big-picture -f pdf -o $outfile
 
+echo --- try just filename
+./git-big-picture -o $outfile
+
 echo --- try no such viewer
 ./git-big-picture -f svg -v foo
 
@@ -50,5 +54,8 @@ echo -- format but no extension
 
 echo --- provide no format
 ./git-big-picture -v $viewer
+
+echo --- try profiling
+./git-big-picture --pstats=$stats_file -o $outfile
 
 rm $outfile
