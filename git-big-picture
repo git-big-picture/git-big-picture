@@ -224,6 +224,7 @@ def guess_format_from_filename(output_file):
 		True if the filename had a suffix, False otherwise
 	guess:
 		the format guess if the filename has a suffix and None otherwise
+
 	"""
 	if '.' in output_file:
 		return True, opts.outfile.split('.')[-1]
@@ -309,4 +310,5 @@ if opts.pstats_outfile is not None:
 	cProfile.run('main(opts, git_env)', opts.pstats_outfile)
 else:
 	main(opts, git_env)
+
 # vim: set noexpandtab:
