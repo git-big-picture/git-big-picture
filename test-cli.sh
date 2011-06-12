@@ -22,6 +22,8 @@
 
 # Just some rudimentary tests of the command line interface
 
+set -x
+
 outfile='file.svg'
 viewer='firefox'
 stats_file='stats'
