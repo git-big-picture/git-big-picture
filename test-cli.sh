@@ -61,3 +61,4 @@ echo --- try profiling
 ./git-big-picture --pstats=$stats_file -o $outfile
 
 rm $outfile
+rm $stats_file
