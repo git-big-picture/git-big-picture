@@ -9,7 +9,7 @@ branches.
 A Small Example
 ---------------
 
-Imagine the follwing Graph:
+Imagine the following Graph:
 
                  0.1.1   0.1.2
                    |       |
@@ -36,10 +36,10 @@ The *reduced* graph of *interesting* commits would be:
          /
     A---B---F
          \ /
-          L
+          P
 
 But since the commits would be labeled with their refs, it would look more like
-(within the lmits of ascii art):
+(within the limits of ascii art):
 
           0.1.1---0.1.2---maint
          /
