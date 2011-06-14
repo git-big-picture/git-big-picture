@@ -134,4 +134,23 @@ class TestGitTools(ut.TestCase):
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
 
+	def test_no_commit_tags(self):
+		""" Test for tree-tag and a blob-tag.
+		"""
+
+		a = empty_commit('A')
+		f = open('foo','w')
+		f.writelines('bar')
+		f.close()
+		blob_hash = dispatch('git hash-object -w foo').rstrip()
+		dispatch('git tag -m "blob-tag" blob-tag '+blob_hash)
+
+		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+		graph._remove_non_labels()
+		expected_reduced_parents = {
+			blob_hash:set(),
+			a:set(),
+		}
+		self.assertEqual(expected_reduced_parents, graph.parents)
 # vim: set noexpandtab:
