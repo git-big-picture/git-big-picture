@@ -109,5 +109,29 @@ class TestGitTools(ut.TestCase):
 			c:set((a,)),
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
+	
+	def test_remove_non_labels_with_tags(self):
+		""" Remove three commits and root commmit
+
+            A---B---C---D---E---F
+                |               |
+               0.1            master
+
+		"""
+		a = empty_commit('A')
+		b = empty_commit('B')
+		dispatch('git tag 0.1')
+		c = empty_commit('C')
+		d = empty_commit('D')
+		e = empty_commit('E')
+		f = empty_commit('F')
+		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+		graph._remove_non_labels()
+		expected_reduced_parents = {
+			b:set(),
+			f:set((b,)),
+		}
+		self.assertEqual(expected_reduced_parents, graph.parents)
 
 # vim: set noexpandtab:
