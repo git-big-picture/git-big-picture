@@ -63,27 +63,24 @@ class TestGitTools(ut.TestCase):
 	def test_get_parent_map(self):
 		""" Check get_parent_map() works:
 
-				 4 <- other
-				 |\
-				 | \
-	   master -> 2  3
-				 | /
-				 |/
-				 1
-
+		    master other
+				|   |
+			A---B---D
+			 \     /
+			  --C--
 		"""
-		sha_1 = empty_commit('1')
-		sha_2 = empty_commit('2')
+		a = empty_commit('a')
+		b = empty_commit('b')
 		dispatch('git checkout -b other HEAD^')
-		sha_3 = empty_commit('3')
+		c = empty_commit('c')
 		dispatch('git merge --no-ff master')
-		sha_4 = get_head_sha()
+		d = get_head_sha()
 
 		expected_parents = {
-			sha_1:set(),
-			sha_2:set((sha_1,)),
-			sha_3:set((sha_1,)),
-			sha_4:set((sha_2, sha_3)),
+			a:set(),
+			b:set((a,)),
+			c:set((a,)),
+			d:set((c, b)),
 		}
 
 		actual_parents = gt.get_parent_map()
@@ -92,23 +89,24 @@ class TestGitTools(ut.TestCase):
 
 	def test_remove_non_labels_one(self):
 		""" Remove a single commit from between two commits.
-			3 <-- master
-			2
-			1 <-- one
+
+			A---B---C
+			|       |
+		   one    master
 
 		No ref pointing to B, thus it should be removed.
 
 		"""
-		one = empty_commit('1')
+		a = empty_commit('A')
 		dispatch('git branch one')
-		two = empty_commit('2')
-		three = empty_commit('3')
+		b = empty_commit('B')
+		c = empty_commit('C')
 		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
 		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
 		graph._remove_non_labels()
 		expected_reduced_parents = {
-			one:set(),
-			three:set((one,)),
+			a:set(),
+			c:set((a,)),
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
 
