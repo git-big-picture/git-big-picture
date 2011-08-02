@@ -145,12 +145,21 @@ class TestGitTools(ut.TestCase):
 		f.close()
 		blob_hash = dispatch('git hash-object -w foo').rstrip()
 		dispatch('git tag -m "blob-tag" blob-tag '+blob_hash)
+		os.mkdir('baz')
+		f = open('baz/foo','w')
+		f.writelines('bar')
+		f.close()
+		dispatch('git add baz/foo')
+		tree_hash = dispatch('git write-tree --prefix=baz').rstrip()
+		dispatch('git tag -m "tree-tag" tree-tag '+tree_hash)
+		dispatch('git reset')
 
 		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
 		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
 		graph._remove_non_labels()
 		expected_reduced_parents = {
 			blob_hash:set(),
+			tree_hash:set(),
 			a:set(),
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
