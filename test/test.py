@@ -49,11 +49,10 @@ class TestGitTools(ut.TestCase):
 		"""
 		self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
 		gbp.git_tools.git_env = {'GIT_DIR' : "%s/.git" % self.testing_dir }
-		gt.get_command_output(['git', 'init', self.testing_dir])
 		self.oldpwd = os.getcwd()
 		os.chdir(self.testing_dir)
 
-		dispatch('/usr/bin/git init')
+		dispatch('git init')
 		dispatch('git config user.name git-big-picture')
 		dispatch('git config user.email git-big-picture@example.org')
 
