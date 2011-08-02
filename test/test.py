@@ -170,4 +170,66 @@ class TestGitTools(ut.TestCase):
 			a:set(),
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
+
+	def test_more_realistic(self):
+		""" Test a slightly larger DAG
+
+		input:
+					 0.1.1	 0.1.2
+					   |	   |
+			0.0    G---H---I---J---K---L---M maint
+			|	 /
+			A---B---C---D---E---F master
+				|	 \		   /
+				0.1    N---O---P topic
+
+		output:
+
+					0.1.1---0.1.2---maint
+					/
+			0.0---0.1---master
+					\     /
+					 topic
+		"""
+		a = empty_commit('A')
+		tag(a, '0.0')
+		b = empty_commit('B')
+		tag(b, '0.1')
+		c = empty_commit('C')
+		d = empty_commit('D')
+		e = empty_commit('E')
+		dispatch('git checkout -b maint %s' % b)
+		g = empty_commit('G')
+		h = empty_commit('H')
+		tag(h, '0.1.1')
+		i = empty_commit('I')
+		j = empty_commit('J')
+		tag(j, '0.1.2')
+		k = empty_commit('K')
+		l = empty_commit('L')
+		m = empty_commit('M')
+		dispatch('git checkout -b topic %s' % c)
+		n = empty_commit('N')
+		o = empty_commit('O')
+		p = empty_commit('P')
+		dispatch('git checkout master')
+		dispatch('git merge topic')
+		f = get_head_sha()
+
+		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+		graph._remove_non_labels()
+		expected_reduced_parents = {
+			m:set((j,)),
+			j:set((h,)),
+			h:set((b,)),
+			b:set((a,)),
+			a:set(),
+			f:set((p, b,)),
+			p:set((b,)),
+		}
+		print_dict(expected_reduced_parents)
+		print 'foo'
+		print_dict(graph.parents)
+		self.assertEqual(expected_reduced_parents, graph.parents)
 # vim: set noexpandtab:
