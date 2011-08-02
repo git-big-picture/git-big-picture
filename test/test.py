@@ -32,6 +32,9 @@ import shlex
 def dispatch(command_string):
 	return gt.get_command_output(shlex.split(command_string))
 
+def tag(sha1, tag_name):
+	dispatch('git tag %s %s' % (tag_name, sha1))
+
 def get_head_sha():
 	return dispatch('git rev-parse HEAD').rstrip()
 
