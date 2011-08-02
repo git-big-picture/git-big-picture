@@ -28,6 +28,7 @@ import git_big_picture as gbp
 import git_big_picture.git_tools as gt
 import shlex
 
+debug=False
 
 def dispatch(command_string):
 	return gt.get_command_output(shlex.split(command_string))
@@ -55,6 +56,8 @@ class TestGitTools(ut.TestCase):
 
 		"""
 		self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
+		if debug:
+			print self.testing_dir
 		gbp.git_tools.git_env = {'GIT_DIR' : "%s/.git" % self.testing_dir }
 		self.oldpwd = os.getcwd()
 		os.chdir(self.testing_dir)
@@ -65,7 +68,8 @@ class TestGitTools(ut.TestCase):
 
 	def tearDown(self):
 		""" Remove testing environment """
-		sh.rmtree(self.testing_dir)
+		if not debug:
+			sh.rmtree(self.testing_dir)
 		os.chdir(self.oldpwd)
 
 	def test_get_parent_map(self):
