@@ -42,6 +42,10 @@ def empty_commit(mess):
 	dispatch('git commit --allow-empty -m %s' % mess)
 	return get_head_sha()
 
+def print_dict(dict_):
+	for (k,v) in dict_.iteritems():
+		print k,v
+
 class TestGitTools(ut.TestCase):
 
 	def setUp(self):
