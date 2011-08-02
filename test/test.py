@@ -26,9 +26,11 @@ import shutil as sh
 import unittest as ut
 import git_big_picture as gbp
 import git_big_picture.git_tools as gt
+import shlex
+
 
 def dispatch(command_string):
-	return gt.get_command_output(command_string.split(' '))
+	return gt.get_command_output(shlex.split(command_string))
 
 def get_head_sha():
 	return dispatch('git rev-parse HEAD').rstrip()
