@@ -57,6 +57,9 @@ echo -- format but no extension
 echo --- provide no format
 ./git-big-picture -v $viewer
 
+echo --- provide filename and viewer
+./git-big-picture -o $outfile -v $viewer
+
 echo --- try profiling
 ./git-big-picture --pstats=$stats_file -o $outfile
 

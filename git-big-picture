@@ -184,7 +184,7 @@ def write_to_file(output_file, dot_output):
 	os.fsync(f.fileno())
 	f.close()
 
-def show_in_viewer(output, viewer):
+def show_in_viewer(output_file, viewer):
 	""" Show the output of 'dot' utility in a viewer.
 
 	If 'output' is a file, open viewer on that file, else assume its the raw
@@ -193,19 +193,14 @@ def show_in_viewer(output, viewer):
 
 	Parameters
 	----------
-	output : file or list of strings
-		the output to open the viewer on
+	output_file : str
+		name of the output file
 	viewer : string
 		name of the viewer to use
 
 	"""
-	if type(output) is not file:
-		output_file = tempfile.NamedTemporaryFile(prefix='git-big-picture')
-		write_to_file(output_file.name, output)
-	else:
-		output_file = output
 	try:
-		subprocess.call([viewer, output_file.name])
+		subprocess.call([viewer, output_file])
 	except OSError, e:
 		barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
 				exit_codes["no_such_viewer"])
@@ -291,10 +286,11 @@ def main(opts, git_dir):
 	if opts.viewer or opts.outfile:
 		if opts.outfile:
 			write_to_file(opts.outfile, dot_output)
-		if opts.viewer and opts.outfile:
+		else:
+			opts.outfile = tempfile.NamedTemporaryFile(prefix='git-big-picture').name
+			write_to_file(opts.outfile, dot_output)
+		if opts.viewer:
 			show_in_viewer(opts.outfile, opts.viewer)
-		elif opts.viewer:
-			show_in_viewer(dot_output, opts.viewer)
 	else: # print raw SVG, PDF, ...
 		print(dot_output)
 
