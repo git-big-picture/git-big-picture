@@ -192,6 +192,7 @@ class TestGitTools(ut.TestCase):
 
 		But it is:
 
+			0.0---0.1-topic-master
 
 		"""
 		a = empty_commit('A')
