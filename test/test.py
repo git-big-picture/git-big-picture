@@ -76,10 +76,10 @@ class TestGitTools(ut.TestCase):
 		""" Check get_parent_map() works:
 
 		    master other
-				|   |
-			A---B---D
-			 \     /
-			  --C--
+		        |   |
+		    A---B---D
+		     \     /
+		      --C--
 		"""
 		a = empty_commit('a')
 		b = empty_commit('b')
@@ -102,8 +102,8 @@ class TestGitTools(ut.TestCase):
 	def test_remove_non_labels_one(self):
 		""" Remove a single commit from between two commits.
 
-			A---B---C
-			|       |
+		    A---B---C
+		    |       |
 		   one    master
 
 		No ref pointing to B, thus it should be removed.
@@ -181,14 +181,14 @@ class TestGitTools(ut.TestCase):
 		Observe the following graph:
 
 			 A---B---C---D---E---F master
-			 |	 |	 \		   /
-			0.0	0.1   N---O---P topic
+			 |   |    \         /
+			0.0 0.1    N---O---P topic
 
 		It should be:
 
 			0.0---0.1---master
-					\     /
-					 topic
+			        \     /
+			         topic
 
 		But it is:
 
@@ -242,11 +242,11 @@ class TestGitTools(ut.TestCase):
 
 		output:
 
-					0.1.1---0.1.2---maint
-					/
+			         0.1.1---0.1.2---maint
+			        /
 			0.0---0.1---master
-					\     /
-					 topic
+			        \     /
+			         topic
 		"""
 		a = empty_commit('A')
 		tag(a, '0.0')
