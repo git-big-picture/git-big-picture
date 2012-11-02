@@ -181,8 +181,8 @@ class TestGitTools(ut.TestCase):
 		Observe the following graph:
 
 			 A---B---C---D---E---F master
-			 |	|	 \		   /
-			0.0	0.1    N---O---P topic
+			 |	 |	 \		   /
+			0.0	0.1   N---O---P topic
 
 		It should be:
 
