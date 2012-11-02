@@ -175,7 +175,59 @@ class TestGitTools(ut.TestCase):
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
 
-	def test_more_realistic(self):
+	def test_expose_multi_parent_bug(self):
+		""" Test for a peculiar bug in pruning the graph.
+
+		Observe the following graph:
+
+			 A---B---C---D---E---F master
+			 |	|	 \		   /
+			0.0	0.1    N---O---P topic
+
+		It should be:
+
+			0.0---0.1---master
+					\     /
+					 topic
+
+		But it is:
+
+
+		"""
+		a = empty_commit('A')
+		tag(a, '0.0')
+		b = empty_commit('B')
+		tag(b, '0.1')
+		c = empty_commit('C')
+		d = empty_commit('D')
+		e = empty_commit('E')
+		dispatch('git checkout -b topic %s' % c)
+		n = empty_commit('N')
+		o = empty_commit('O')
+		p = empty_commit('P')
+		dispatch('git checkout master')
+		dispatch('git merge topic')
+		f = get_head_sha()
+		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+		graph._remove_non_labels()
+		expected_reduced_parents = {
+			b:set((a,)),
+			a:set(),
+			f:set((p, b,)),
+			p:set((b,)),
+		}
+		print "a", a
+		print "b", b
+		print "p", p
+		print "f", f
+		print dispatch("git log --oneline %s..%s" % (f, p))
+		print_dict(expected_reduced_parents)
+		print 'foo'
+		print_dict(graph.parents)
+		self.assertEqual(expected_reduced_parents, graph.parents)
+
+	def more_realistic(self):
 		""" Test a slightly larger DAG
 
 		input:

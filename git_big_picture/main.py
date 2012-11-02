@@ -459,6 +459,8 @@ class CommitGraph(object):
 			for parent in seen_commits[label].copy():
 				for p_parent in seen_commits[parent]:
 					if p_parent in seen_commits[label]:
+						# here we must check that the symetric difference
+						# between parent and label is null
 						seen_commits[label].remove(p_parent)
 
 		self.parents = seen_commits
