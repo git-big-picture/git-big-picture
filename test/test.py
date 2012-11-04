@@ -224,7 +224,6 @@ class TestGitTools(ut.TestCase):
 		print "f", f
 		print dispatch("git log --oneline %s..%s" % (f, p))
 		print_dict(expected_reduced_parents)
-		print 'foo'
 		print_dict(graph.parents)
 		self.assertEqual(expected_reduced_parents, graph.parents)
 
@@ -286,7 +285,6 @@ class TestGitTools(ut.TestCase):
 			p:set((b,)),
 		}
 		print_dict(expected_reduced_parents)
-		print 'foo'
 		print_dict(graph.parents)
 		self.assertEqual(expected_reduced_parents, graph.parents)
 # vim: set noexpandtab:
