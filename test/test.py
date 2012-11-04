@@ -175,6 +175,48 @@ class TestGitTools(ut.TestCase):
 		}
 		self.assertEqual(expected_reduced_parents, graph.parents)
 
+	def test_parent_of_parent_loop(self):
+		""" Test the case, where an alternative route may lead to a parents
+		parent.
+
+		   0.1         0.2    master
+		    |           |       |
+		    A---B---C---D---E---F
+		             \     /
+		              --G--
+
+		   0.1 0.2 master
+		    |   |   |
+		    A---D---F
+		    \      /
+		     ------
+
+		"""
+		a = empty_commit('A')
+		tag(a, '0.1')
+		b = empty_commit('B')
+		c = empty_commit('C')
+		d = empty_commit('D')
+		tag(d, '0.2')
+		e = empty_commit('E')
+
+		dispatch('git checkout -b topic %s' % c)
+		g = empty_commit('G')
+		dispatch('git checkout master')
+		dispatch('git merge topic')
+		f = get_head_sha()
+		dispatch('git branch -d topic')
+
+		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+		graph._remove_non_labels()
+		expected_reduced_parents = {
+			d:set((a,)),
+			a:set(),
+			f:set((a, d,)),
+		}
+		self.assertEqual(expected_reduced_parents, graph.parents)
+
 	def test_expose_multi_parent_bug(self):
 		""" Test for a peculiar bug in pruning the graph.
 
