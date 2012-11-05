@@ -49,9 +49,6 @@ default_format = 'svg'
 parser.add_option('-a', '--all',
         action='store_true', dest='all_commits',
         help='include all commits (not just tags and branch heads)')
-parser.add_option('--some',
-        action='store_true', dest='some_commits',
-        help='include all commits but linear runs')
 
 # output options
 parser.add_option('-p', '--plain',
@@ -230,14 +227,8 @@ def main(opts, git_dir):
     gt.git_env = git_dir
     (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
     graph = CommitGraph(gt.get_parent_map(), ab, tags)
-    # graph._optimize_linear_runs_away()
-    # graph._optimize_merge_branch_fits_away()
-    # graph._optimize_non_labels()
     if opts.all_commits:
         sha_one_digits = graph._minimal_sha_one_digits()
-    elif opts.some_commits:
-        sha_one_digits = graph._minimal_sha_one_digits()
-        graph._remove_linear_runs()
     else:
         sha_one_digits = None
         graph._remove_non_labels()
