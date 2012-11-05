@@ -273,13 +273,13 @@ class TestGitTools(ut.TestCase):
 		""" Test a slightly larger DAG
 
 		input:
-					 0.1.1	 0.1.2
-					   |	   |
-			0.0    G---H---I---J---K---L---M maint
-			|	 /
+			        0.1.1   0.1.2
+			          |       |
+			0.0   G---H---I---J---K---L---M maint
+			|    /
 			A---B---C---D---E---F master
-				|	 \		   /
-				0.1    N---O---P topic
+			    |    \         /
+			   0.1    N---O---P topic
 
 		output:
 
