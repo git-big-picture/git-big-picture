@@ -248,6 +248,7 @@ Changelog
 ---------
 
 * v0.8.0 - 2012-11-05
+
     * Snapshot of all developments Mar 2010 - Now
     * Extended command line options for viewing and formatting
     * Option to filter on all, some or decorated commits
