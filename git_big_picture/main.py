@@ -87,11 +87,11 @@ class CommitGraph(object):
         Remove, or 'filter' the unwanted commits from the DAG. This will modify
         self.parents and when done re-calculate self.children.
 
-        Generate a reachability graph for labels
-        This will generate a graph of all labels, with edges pointing to
-        all reachable parents. Unfortunately this may possibly include
-        edges from labels to parents that are also parents of the
-        label's parents. These edges are redundant and must be removed.
+        Generate a reachability graph for labels This will generate a graph of
+        all labels, with edges pointing to all reachable parents. Unfortunately
+        this may possibly include edges from labels to parents that are also
+        parents of the label's parents. These edges are redundant and must be
+        removed.
 
         """
 
