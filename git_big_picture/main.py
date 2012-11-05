@@ -21,8 +21,6 @@
 
 from __future__ import print_function
 
-import git_tools as gt
-
 VERSION = '0.9.0-dev'
 
 __docformat__ = "restructuredtext"
