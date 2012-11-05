@@ -87,57 +87,14 @@ class CommitGraph(object):
         Remove, or 'filter' the unwanted commits from the DAG. This will modify
         self.parents and when done re-calculate self.children.
 
-        The algorithm has three steps:
+        Generate a reachability graph for labels
+        This will generate a graph of all labels, with edges pointing to
+        all reachable parents. Unfortunately this may possibly include
+        edges from labels to parents that are also parents of the
+        label's parents. These edges are redundant and must be removed.
 
-            1. Generate a reachability graph for labels
-                This will generate a graph of all labels, with edges pointing to
-                all reachable parents. Unfortunately this may possibly include
-                edges from labels to parents that are also parents of the
-                label's parents. These edges are redundant and must be removed.
-
-            2. Generate a full parent graph for labels
-                This will use the information from step 1. to generate a graph
-                of labels, with edges pointing to all parents, where in this
-                case the parent of a parent of a label is also that label's
-                parent.
-
-            3. Generate the reduced commit graph containing tags and branches
-                This will use the information from step 2. to prune the edges of
-                the full parent graph and produce the final output graph
         """
-        #def recurse(commit, in_labeled_parents, out_seen_commits):
-        #   """ Recursive call used in step 2.
 
-        #   Parameters
-        #   ----------
-        #   commit : string
-        #       sha1 of the commit to start at.
-        #   in_labeled_parents : dict mapping strings to strings
-        #       mapping from labeled commits to reachable labels
-        #   out_seen_commits : dict
-        #       mapping from labeled commits to all their labeled parents
-        #   """
-
-        #   all_parents = set()
-        #   if commit in out_seen_commits.keys():
-        #       # we have already explored the parents
-        #       all_parents = out_seen_commits[commit].copy()
-        #   elif len(in_labeled_parents[commit]) == 0:
-        #       # there are no parents
-        #       out_seen_commits[commit] = all_parents.copy()
-        #   else:
-        #       # explore the commits before this one
-        #       for p in in_labeled_parents[commit]:
-        #           all_parents = all_parents.union(
-        #               recurse(p, in_labeled_parents, out_seen_commits))
-        #       # record what we have seen
-        #       out_seen_commits[commit] = all_parents.copy()
-        #   # add the current commit to the list of parents
-        #   # and return from recursive step
-        #   all_parents.add(commit)
-        #   return all_parents
-
-        # 1. Generate a reachability graph for labels
         reachable_labeled_parents = dict()
         for label in self.branches.keys() + self.tags.keys():
             # Handle tags pointing to non-commits
@@ -159,24 +116,9 @@ class CommitGraph(object):
                         # no label, continue searching
                         to_visit.extend(self.parents[commit])
 
-        ## 2. Generate a full parent graph for labels
-        #seen_commits = dict()
-        #for label in self.branches.keys() + self.tags.keys():
-        #   recurse(label, reachable_labeled_parents, seen_commits)
-
-        ## 3. Generate the reduced commit graph containing tags and branches
-        #for label in seen_commits.keys():
-        #   # get the parents of the parents of label, and if these are also
-        #   # parents of label, remove them from label's parent list
-        #   for parent in seen_commits[label].copy():
-        #       for p_parent in seen_commits[parent]:
-        #           if p_parent in seen_commits[label]:
-        #               # here we must check that the symetric difference
-        #               # between parent and label is null
-        #               seen_commits[label].remove(p_parent)
-
-        #self.parents = seen_commits
+        # reset the parents of this graph
         self.parents = reachable_labeled_parents
+        # update the child_mapping
         self._calculate_child_mapping()
 
     def _minimal_sha_one_digits(self):
