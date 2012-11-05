@@ -111,7 +111,7 @@ Usage
 Usage Examples
 --------------
 
-Output Graphviz synatx:
+Output Graphviz syntax:
 
 .. code:: shell
 
