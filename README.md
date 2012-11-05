@@ -196,6 +196,15 @@ which, incidentally, outputs Graphviz syntax too:
 
     $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
+Changelog
+=========
+
+* v0.8.0 - 2012-11-05
+    * Snapshot of all developments Mar 2010 - Now
+    * Extended command line options for viewing and formatting
+    * Option to filter on all, some or decorated commits
+    * Simple test suite for python module and command line
+
 License
 =======
 

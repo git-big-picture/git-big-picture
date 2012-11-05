@@ -4,7 +4,7 @@
 #
 # Copyright (C) 2010    Sebastian Pipping <sebastian@pipping.org>
 # Copyright (C) 2010    Julius Plenz <julius@plenz.com>
-# Copyright (C) 2010-11 Valentin Haenel <valentin.haenel@gmx.de>
+# Copyright (C) 2010-12 Valentin Haenel <valentin.haenel@gmx.de>
 #
 # git-big-picture is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from __future__ import print_function
 import subprocess
 import git_tools as gt
 
-VERSION = '0.8'
+VERSION = '0.8.0'
 
 __docformat__ = "restructuredtext"
 
