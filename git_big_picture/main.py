@@ -25,16 +25,6 @@ VERSION = '0.9.0-dev'
 
 __docformat__ = "restructuredtext"
 
-def loop(l):
-    """Generator looping over a potentially changing
-        iteratable input, e.g. a set. """
-
-    while l:
-        res = list(l)
-        for r in res:
-            if r not in l:
-                continue
-            yield r
 
 class CommitGraph(object):
     def __init__(self, parent_map, branch_dict, tag_dict):
