@@ -96,15 +96,20 @@ class CommitGraph(object):
         """
 
         reachable_labeled_parents = dict()
+        # for everything that we are interested in
         for label in self.branches.keys() + self.tags.keys():
             # Handle tags pointing to non-commits
             if label in self.parents:
                 to_visit = list(self.parents[label])
             else:
                 to_visit = list()
+            # create the set of seen commits
             seen = set()
+            # initialise the parents for this label
             reachable_labeled_parents[label] = set()
+            # iterate through to_visit list
             for commit in to_visit:
+                # we have already been here
                 if commit in seen:
                     continue
                 else:
