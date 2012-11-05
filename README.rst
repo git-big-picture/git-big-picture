@@ -101,7 +101,6 @@ Usage
     --version             show program's version number and exit
     -h, --help            show this help message and exit
     -a, --all             include all commits (not just tags and branch heads)
-    --some                include all commits but linear runs
     -p, --plain           output lines suitable as input for dot
     -f FMT, --format=FMT  set output format [svg, png, ps, pdf, ...]
     -v CMD, --viewer=CMD  write image to tempfile and start specified viewer
