@@ -25,15 +25,12 @@ from git_big_picture.main import VERSION
 
 
 setup(name = 'git-big-picture',
-	version = VERSION,
-	author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
-	description = 'Visualize git repositories.',
-	url = 'http://git.goodpoint.de/?p=git-big-picture.git;a=summary',
-	license = 'GPL v3 or later',
-	packages = ['git_big_picture'],
-	scripts = ['git-big-picture'],
-	test_suite = 'nose.collector',
+    version = VERSION,
+    author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
+    description = 'Visualize git repositories.',
+    url = 'http://git.goodpoint.de/?p=git-big-picture.git;a=summary',
+    license = 'GPL v3 or later',
+    packages = ['git_big_picture'],
+    scripts = ['git-big-picture'],
+    test_suite = 'nose.collector',
 )
-
-
-# vim: set noexpandtab:
