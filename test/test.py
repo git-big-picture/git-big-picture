@@ -264,23 +264,19 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, graph.parents)
 
     def test_expose_multi_parent_bug(self):
-        """ Test for a peculiar bug in pruning the graph.
+        """ Test for a peculiar bug that used to exist in pruning the graph.
 
-        Observe the following graph:
+        Before:
 
              A---B---C---D---E---F master
              |   |    \         /
             0.0 0.1    N---O---P topic
 
-        It should be:
+        After:
 
             0.0---0.1---master
                     \     /
                      topic
-
-        But it is:
-
-            0.0---0.1-topic-master
 
         """
         a = empty_commit('A')
