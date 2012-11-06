@@ -96,6 +96,19 @@ class TestGitTools(ut.TestCase):
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
         self.assertEqual(set(graph._find_roots()), set([a, c, d, e]))
 
+    def test_find_merges(self):
+        a = empty_commit('a')
+        b = empty_commit('b')
+        dispatch('git checkout -b other HEAD^')
+        c = empty_commit('c')
+        dispatch('git merge master')
+        d = get_head_sha()
+
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        self.assertEqual(set(graph._find_merges()), set([d]))
+
+
     def test_get_parent_map(self):
         """ Check get_parent_map() works:
 
