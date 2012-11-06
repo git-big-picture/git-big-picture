@@ -70,6 +70,10 @@ class CommitGraph(object):
                 for p in self.parents[c]:
                     assert(c in self.children[p])
 
+    def _find_roots(self):
+        """ Find all root commits. """
+        return [sha for sha, parents in self.parents.items() if not parents]
+
     def _remove_non_labels(self):
         """ Generate the subgraph of the Git commit graph that contains only
         tags and branches.

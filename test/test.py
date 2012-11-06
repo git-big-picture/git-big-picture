@@ -72,6 +72,30 @@ class TestGitTools(ut.TestCase):
             sh.rmtree(self.testing_dir)
         os.chdir(self.oldpwd)
 
+    def test_find_roots(self):
+
+        def create_root(branch_name):
+            dispatch('git read-tree --empty')
+            new_tree = dispatch('git write-tree')
+            new_commit = dispatch('git commit-tree %s -m empty' % new_tree).strip()
+            dispatch('git branch %s %s' % (branch_name, new_commit))
+            return new_commit
+
+        a = empty_commit('a')
+        b = empty_commit('b')
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        self.assertEqual(graph._find_roots(), [a])
+        c = create_root('C')
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        self.assertEqual(set(graph._find_roots()), set([a, c]))
+        d = create_root('D')
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        self.assertEqual(set(graph._find_roots()), set([a, c, d]))
+        e = create_root('E')
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        self.assertEqual(set(graph._find_roots()), set([a, c, d, e]))
+
     def test_get_parent_map(self):
         """ Check get_parent_map() works:
 
