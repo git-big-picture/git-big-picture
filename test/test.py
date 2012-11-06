@@ -96,7 +96,15 @@ class TestGitTools(ut.TestCase):
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
         self.assertEqual(set(graph._find_roots()), set([a, c, d, e]))
 
-    def test_find_merges(self):
+    def test_find_merges_bifurcations(self):
+        """ Check that finding merges and bifurcations works.
+
+            master other
+                |   |
+            A---B---D
+             \     /
+              --C--
+        """
         a = empty_commit('a')
         b = empty_commit('b')
         dispatch('git checkout -b other HEAD^')
@@ -107,6 +115,7 @@ class TestGitTools(ut.TestCase):
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
         self.assertEqual(set(graph._find_merges()), set([d]))
+        self.assertEqual(set(graph._find_bifurcations()), set([a]))
 
 
     def test_get_parent_map(self):
