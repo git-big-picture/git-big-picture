@@ -74,6 +74,14 @@ class CommitGraph(object):
         """ Find all root commits. """
         return [sha for sha, parents in self.parents.items() if not parents]
 
+    def _find_merges(self):
+        return [sha for sha, parents in self.parents.items()
+                if len(parents) > 1]
+
+    def _find_bifurcations(self):
+        return [sha for sha, children in self.children.items()
+                if len(children) > 1]
+
     def _remove_non_labels(self):
         """ Generate the subgraph of the Git commit graph that contains only
         tags and branches.
