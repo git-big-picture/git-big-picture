@@ -31,302 +31,301 @@ import shlex
 debug=False
 
 def dispatch(command_string):
-	return gt.get_command_output(shlex.split(command_string))
+    return gt.get_command_output(shlex.split(command_string))
 
 def tag(sha1, tag_name):
-	dispatch('git tag %s %s' % (tag_name, sha1))
+    dispatch('git tag %s %s' % (tag_name, sha1))
 
 def get_head_sha():
-	return dispatch('git rev-parse HEAD').rstrip()
+    return dispatch('git rev-parse HEAD').rstrip()
 
 def empty_commit(mess):
-	dispatch('git commit --allow-empty -m %s' % mess)
-	return get_head_sha()
+    dispatch('git commit --allow-empty -m %s' % mess)
+    return get_head_sha()
 
 def print_dict(dict_):
-	for (k,v) in dict_.iteritems():
-		print k,v
+    for (k,v) in dict_.iteritems():
+        print k,v
 
 class TestGitTools(ut.TestCase):
 
-	def setUp(self):
-		""" Setup testing environment.
+    def setUp(self):
+        """ Setup testing environment.
 
-		Create temporary directory, initialise git repo, and set some options.
+        Create temporary directory, initialise git repo, and set some options.
 
-		"""
-		self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
-		if debug:
-			print self.testing_dir
-		gbp.git_tools.git_env = {'GIT_DIR' : "%s/.git" % self.testing_dir }
-		self.oldpwd = os.getcwd()
-		os.chdir(self.testing_dir)
+        """
+        self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
+        if debug:
+            print self.testing_dir
+        gbp.git_tools.git_env = {'GIT_DIR' : "%s/.git" % self.testing_dir }
+        self.oldpwd = os.getcwd()
+        os.chdir(self.testing_dir)
 
-		dispatch('git init')
-		dispatch('git config user.name git-big-picture')
-		dispatch('git config user.email git-big-picture@example.org')
+        dispatch('git init')
+        dispatch('git config user.name git-big-picture')
+        dispatch('git config user.email git-big-picture@example.org')
 
-	def tearDown(self):
-		""" Remove testing environment """
-		if not debug:
-			sh.rmtree(self.testing_dir)
-		os.chdir(self.oldpwd)
+    def tearDown(self):
+        """ Remove testing environment """
+        if not debug:
+            sh.rmtree(self.testing_dir)
+        os.chdir(self.oldpwd)
 
-	def test_get_parent_map(self):
-		""" Check get_parent_map() works:
+    def test_get_parent_map(self):
+        """ Check get_parent_map() works:
 
-		    master other
-		        |   |
-		    A---B---D
-		     \     /
-		      --C--
-		"""
-		a = empty_commit('a')
-		b = empty_commit('b')
-		dispatch('git checkout -b other HEAD^')
-		c = empty_commit('c')
-		dispatch('git merge --no-ff master')
-		d = get_head_sha()
+            master other
+                |   |
+            A---B---D
+             \     /
+              --C--
+        """
+        a = empty_commit('a')
+        b = empty_commit('b')
+        dispatch('git checkout -b other HEAD^')
+        c = empty_commit('c')
+        dispatch('git merge --no-ff master')
+        d = get_head_sha()
 
-		expected_parents = {
-			a:set(),
-			b:set((a,)),
-			c:set((a,)),
-			d:set((c, b)),
-		}
+        expected_parents = {
+            a:set(),
+            b:set((a,)),
+            c:set((a,)),
+            d:set((c, b)),
+        }
 
-		actual_parents = gt.get_parent_map()
-		self.assertEqual(actual_parents, expected_parents)
+        actual_parents = gt.get_parent_map()
+        self.assertEqual(actual_parents, expected_parents)
 
 
-	def test_remove_non_labels_one(self):
-		""" Remove a single commit from between two commits.
+    def test_remove_non_labels_one(self):
+        """ Remove a single commit from between two commits.
 
-		    A---B---C
-		    |       |
-		   one    master
+            A---B---C
+            |       |
+           one    master
 
-		No ref pointing to B, thus it should be removed.
+        No ref pointing to B, thus it should be removed.
 
-		"""
-		a = empty_commit('A')
-		dispatch('git branch one')
-		b = empty_commit('B')
-		c = empty_commit('C')
-		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-		graph._remove_non_labels()
-		expected_reduced_parents = {
-			a:set(),
-			c:set((a,)),
-		}
-		self.assertEqual(expected_reduced_parents, graph.parents)
-	
-	def test_remove_non_labels_with_tags(self):
-		""" Remove three commits and root commmit
+        """
+        a = empty_commit('A')
+        dispatch('git branch one')
+        b = empty_commit('B')
+        c = empty_commit('C')
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._remove_non_labels()
+        expected_reduced_parents = {
+            a:set(),
+            c:set((a,)),
+        }
+        self.assertEqual(expected_reduced_parents, graph.parents)
+
+    def test_remove_non_labels_with_tags(self):
+        """ Remove three commits and root commmit
 
             A---B---C---D---E---F
                 |               |
                0.1            master
 
-		"""
-		a = empty_commit('A')
-		b = empty_commit('B')
-		dispatch('git tag 0.1')
-		c = empty_commit('C')
-		d = empty_commit('D')
-		e = empty_commit('E')
-		f = empty_commit('F')
-		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-		graph._remove_non_labels()
-		expected_reduced_parents = {
-			b:set(),
-			f:set((b,)),
-		}
-		self.assertEqual(expected_reduced_parents, graph.parents)
+        """
+        a = empty_commit('A')
+        b = empty_commit('B')
+        dispatch('git tag 0.1')
+        c = empty_commit('C')
+        d = empty_commit('D')
+        e = empty_commit('E')
+        f = empty_commit('F')
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._remove_non_labels()
+        expected_reduced_parents = {
+            b:set(),
+            f:set((b,)),
+        }
+        self.assertEqual(expected_reduced_parents, graph.parents)
 
-	def test_no_commit_tags(self):
-		""" Test for tree-tag and a blob-tag.
-		"""
+    def test_no_commit_tags(self):
+        """ Test for tree-tag and a blob-tag.
+        """
 
-		a = empty_commit('A')
-		f = open('foo','w')
-		f.writelines('bar')
-		f.close()
-		blob_hash = dispatch('git hash-object -w foo').rstrip()
-		dispatch('git tag -m "blob-tag" blob-tag '+blob_hash)
-		os.mkdir('baz')
-		f = open('baz/foo','w')
-		f.writelines('bar')
-		f.close()
-		dispatch('git add baz/foo')
-		tree_hash = dispatch('git write-tree --prefix=baz').rstrip()
-		dispatch('git tag -m "tree-tag" tree-tag '+tree_hash)
-		dispatch('git reset')
+        a = empty_commit('A')
+        f = open('foo','w')
+        f.writelines('bar')
+        f.close()
+        blob_hash = dispatch('git hash-object -w foo').rstrip()
+        dispatch('git tag -m "blob-tag" blob-tag '+blob_hash)
+        os.mkdir('baz')
+        f = open('baz/foo','w')
+        f.writelines('bar')
+        f.close()
+        dispatch('git add baz/foo')
+        tree_hash = dispatch('git write-tree --prefix=baz').rstrip()
+        dispatch('git tag -m "tree-tag" tree-tag '+tree_hash)
+        dispatch('git reset')
 
-		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-		graph._remove_non_labels()
-		expected_reduced_parents = {
-			blob_hash:set(),
-			tree_hash:set(),
-			a:set(),
-		}
-		self.assertEqual(expected_reduced_parents, graph.parents)
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._remove_non_labels()
+        expected_reduced_parents = {
+            blob_hash:set(),
+            tree_hash:set(),
+            a:set(),
+        }
+        self.assertEqual(expected_reduced_parents, graph.parents)
 
-	def test_parent_of_parent_loop(self):
-		""" Test the case, where an alternative route may lead to a parents
-		parent.
+    def test_parent_of_parent_loop(self):
+        """ Test the case, where an alternative route may lead to a parents
+        parent.
 
-		   0.1         0.2    master
-		    |           |       |
-		    A---B---C---D---E---F
-		             \     /
-		              --G--
+           0.1         0.2    master
+            |           |       |
+            A---B---C---D---E---F
+                     \     /
+                      --G--
 
-		   0.1 0.2 master
-		    |   |   |
-		    A---D---F
-		    \      /
-		     ------
+           0.1 0.2 master
+            |   |   |
+            A---D---F
+            \      /
+             ------
 
-		"""
-		a = empty_commit('A')
-		tag(a, '0.1')
-		b = empty_commit('B')
-		c = empty_commit('C')
-		d = empty_commit('D')
-		tag(d, '0.2')
-		e = empty_commit('E')
+        """
+        a = empty_commit('A')
+        tag(a, '0.1')
+        b = empty_commit('B')
+        c = empty_commit('C')
+        d = empty_commit('D')
+        tag(d, '0.2')
+        e = empty_commit('E')
 
-		dispatch('git checkout -b topic %s' % c)
-		g = empty_commit('G')
-		dispatch('git checkout master')
-		dispatch('git merge topic')
-		f = get_head_sha()
-		dispatch('git branch -d topic')
+        dispatch('git checkout -b topic %s' % c)
+        g = empty_commit('G')
+        dispatch('git checkout master')
+        dispatch('git merge topic')
+        f = get_head_sha()
+        dispatch('git branch -d topic')
 
-		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-		graph._remove_non_labels()
-		expected_reduced_parents = {
-			d:set((a,)),
-			a:set(),
-			f:set((a, d,)),
-		}
-		self.assertEqual(expected_reduced_parents, graph.parents)
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._remove_non_labels()
+        expected_reduced_parents = {
+            d:set((a,)),
+            a:set(),
+            f:set((a, d,)),
+        }
+        self.assertEqual(expected_reduced_parents, graph.parents)
 
-	def test_expose_multi_parent_bug(self):
-		""" Test for a peculiar bug in pruning the graph.
+    def test_expose_multi_parent_bug(self):
+        """ Test for a peculiar bug in pruning the graph.
 
-		Observe the following graph:
+        Observe the following graph:
 
-			 A---B---C---D---E---F master
-			 |   |    \         /
-			0.0 0.1    N---O---P topic
+             A---B---C---D---E---F master
+             |   |    \         /
+            0.0 0.1    N---O---P topic
 
-		It should be:
+        It should be:
 
-			0.0---0.1---master
-			        \     /
-			         topic
+            0.0---0.1---master
+                    \     /
+                     topic
 
-		But it is:
+        But it is:
 
-			0.0---0.1-topic-master
+            0.0---0.1-topic-master
 
-		"""
-		a = empty_commit('A')
-		tag(a, '0.0')
-		b = empty_commit('B')
-		tag(b, '0.1')
-		c = empty_commit('C')
-		d = empty_commit('D')
-		e = empty_commit('E')
-		dispatch('git checkout -b topic %s' % c)
-		n = empty_commit('N')
-		o = empty_commit('O')
-		p = empty_commit('P')
-		dispatch('git checkout master')
-		dispatch('git merge topic')
-		f = get_head_sha()
-		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-		graph._remove_non_labels()
-		expected_reduced_parents = {
-			b:set((a,)),
-			a:set(),
-			f:set((p, b,)),
-			p:set((b,)),
-		}
-		print "a", a
-		print "b", b
-		print "p", p
-		print "f", f
-		print dispatch("git log --oneline %s..%s" % (f, p))
-		print_dict(expected_reduced_parents)
-		print_dict(graph.parents)
-		self.assertEqual(expected_reduced_parents, graph.parents)
+        """
+        a = empty_commit('A')
+        tag(a, '0.0')
+        b = empty_commit('B')
+        tag(b, '0.1')
+        c = empty_commit('C')
+        d = empty_commit('D')
+        e = empty_commit('E')
+        dispatch('git checkout -b topic %s' % c)
+        n = empty_commit('N')
+        o = empty_commit('O')
+        p = empty_commit('P')
+        dispatch('git checkout master')
+        dispatch('git merge topic')
+        f = get_head_sha()
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._remove_non_labels()
+        expected_reduced_parents = {
+            b:set((a,)),
+            a:set(),
+            f:set((p, b,)),
+            p:set((b,)),
+        }
+        print "a", a
+        print "b", b
+        print "p", p
+        print "f", f
+        print dispatch("git log --oneline %s..%s" % (f, p))
+        print_dict(expected_reduced_parents)
+        print_dict(graph.parents)
+        self.assertEqual(expected_reduced_parents, graph.parents)
 
-	def more_realistic(self):
-		""" Test a slightly larger DAG
+    def more_realistic(self):
+        """ Test a slightly larger DAG
 
-		input:
-			        0.1.1   0.1.2
-			          |       |
-			0.0   G---H---I---J---K---L---M maint
-			|    /
-			A---B---C---D---E---F master
-			    |    \         /
-			   0.1    N---O---P topic
+        input:
+                    0.1.1   0.1.2
+                      |       |
+            0.0   G---H---I---J---K---L---M maint
+            |    /
+            A---B---C---D---E---F master
+                |    \         /
+               0.1    N---O---P topic
 
-		output:
+        output:
 
-			         0.1.1---0.1.2---maint
-			        /
-			0.0---0.1---master
-			        \     /
-			         topic
-		"""
-		a = empty_commit('A')
-		tag(a, '0.0')
-		b = empty_commit('B')
-		tag(b, '0.1')
-		c = empty_commit('C')
-		d = empty_commit('D')
-		e = empty_commit('E')
-		dispatch('git checkout -b maint %s' % b)
-		g = empty_commit('G')
-		h = empty_commit('H')
-		tag(h, '0.1.1')
-		i = empty_commit('I')
-		j = empty_commit('J')
-		tag(j, '0.1.2')
-		k = empty_commit('K')
-		l = empty_commit('L')
-		m = empty_commit('M')
-		dispatch('git checkout -b topic %s' % c)
-		n = empty_commit('N')
-		o = empty_commit('O')
-		p = empty_commit('P')
-		dispatch('git checkout master')
-		dispatch('git merge topic')
-		f = get_head_sha()
+                     0.1.1---0.1.2---maint
+                    /
+            0.0---0.1---master
+                    \     /
+                     topic
+        """
+        a = empty_commit('A')
+        tag(a, '0.0')
+        b = empty_commit('B')
+        tag(b, '0.1')
+        c = empty_commit('C')
+        d = empty_commit('D')
+        e = empty_commit('E')
+        dispatch('git checkout -b maint %s' % b)
+        g = empty_commit('G')
+        h = empty_commit('H')
+        tag(h, '0.1.1')
+        i = empty_commit('I')
+        j = empty_commit('J')
+        tag(j, '0.1.2')
+        k = empty_commit('K')
+        l = empty_commit('L')
+        m = empty_commit('M')
+        dispatch('git checkout -b topic %s' % c)
+        n = empty_commit('N')
+        o = empty_commit('O')
+        p = empty_commit('P')
+        dispatch('git checkout master')
+        dispatch('git merge topic')
+        f = get_head_sha()
 
-		(lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-		graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-		graph._remove_non_labels()
-		expected_reduced_parents = {
-			m:set((j,)),
-			j:set((h,)),
-			h:set((b,)),
-			b:set((a,)),
-			a:set(),
-			f:set((p, b,)),
-			p:set((b,)),
-		}
-		print_dict(expected_reduced_parents)
-		print_dict(graph.parents)
-		self.assertEqual(expected_reduced_parents, graph.parents)
-# vim: set noexpandtab:
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._remove_non_labels()
+        expected_reduced_parents = {
+            m:set((j,)),
+            j:set((h,)),
+            h:set((b,)),
+            b:set((a,)),
+            a:set(),
+            f:set((p, b,)),
+            p:set((b,)),
+        }
+        print_dict(expected_reduced_parents)
+        print_dict(graph.parents)
+        self.assertEqual(expected_reduced_parents, graph.parents)
