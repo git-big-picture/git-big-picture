@@ -63,10 +63,14 @@ Git-big-picture can output nice images.
 Here is the original repository from the example above:
 
 .. image:: https://raw.github.com/esc/git-big-picture/master/screenshots/before.png
+    :height: 280px
+    :width:  456px
 
 And here is the reduced version:
 
 .. image:: https://raw.github.com/esc/git-big-picture/master/screenshots/after.png
+    :height: 280px
+    :width:  456px
 
 Dependencies
 ------------
