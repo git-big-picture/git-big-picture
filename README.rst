@@ -55,6 +55,19 @@ But since the commits would be labeled with their refs, it would look more like
             \     /
              topic
 
+Screenshots
+-----------
+
+Git-big-picture can output nice images.
+
+Here is the original repository from the example above:
+
+.. image:: https://github.com/esc/git-big-picture/blob/master/screenshots/before.png
+
+And here is the reduced version:
+
+.. image:: https://github.com/esc/git-big-picture/blob/master/screenshots/after.png
+
 Dependencies
 ------------
 
