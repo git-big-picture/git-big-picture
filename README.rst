@@ -13,8 +13,8 @@ Imagine the following Graph:
 
 .. code::
 
-                 0.1.1   0.1.2
-                   |       |
+             0.1.1   0.1.2
+               |       |
     0.0    G---H---I---J---K---L---M maint
      |    /
      A---B---C---D---E---F master
@@ -29,8 +29,8 @@ Where the following commits have Branches and Tags:
     A -> 0.0
     B -> 0.1
     F -> master
-    I -> 0.1.1
-    K -> 0.1.2
+    H -> 0.1.1
+    J -> 0.1.2
     M -> maint
     P -> topic
 
