@@ -27,6 +27,18 @@ __docformat__ = "restructuredtext"
 
 
 class CommitGraph(object):
+    """ Directed Acyclic Graph (DAG) git repository.
+
+    Parameters
+    ----------
+    parent_map : dict mapping SHA1 to list of SHA1
+        the parent map for the repository
+    branch_dict : dict mapping SHA1 to list of strings
+        the branches
+    tag_dict :
+        the tags
+
+    """
     def __init__(self, parent_map, branch_dict, tag_dict):
         self.parents = parent_map
         self.branches = branch_dict
