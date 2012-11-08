@@ -270,6 +270,7 @@ Changelog
   * Fix long standing bug in graph search algorithm
   * Fix long standing conversion from tabbed to 4-spaces
   * Overhaul and refactor the test-suite
+  * Add ability to find root-, merge- and bifurcation-commits
 
 * v0.8.0 - 2012-11-05
 
