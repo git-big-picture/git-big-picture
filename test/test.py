@@ -96,6 +96,18 @@ class TestGitTools(ut.TestCase):
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
         self.assertEqual(set(graph._find_roots()), set([a, c, d, e]))
 
+    def filter_roots(self):
+        a = empty_commit('a')
+        b = empty_commit('b')
+        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
+        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph._filter(roots=True)
+        expected_parents = {
+            a:set(),
+            b:set((a,)),
+        }
+        self.assertEqual(expected_parents, graph.parents)
+
     def test_find_merges_bifurcations(self):
         """ Check that finding merges and bifurcations works.
 
