@@ -21,6 +21,8 @@
 
 from __future__ import print_function
 
+import copy
+
 VERSION = '0.9.0-dev'
 
 __docformat__ = "restructuredtext"
@@ -126,6 +128,11 @@ class CommitGraph(object):
         additional : list of SHA1 sums
             any additional commits to include
 
+        Returns
+        -------
+        commit_graph : CommitGraph
+            the filtered graph
+
         """
         interesting = []
         if branches:
@@ -167,10 +174,9 @@ class CommitGraph(object):
                         # no label, continue searching
                         to_visit.extend(self.parents[commit])
 
-        # reset the parents of this graph
-        self.parents = reachable_labeled_parents
-        # update the child_mapping
-        self._calculate_child_mapping()
+        return CommitGraph(reachable_labeled_parents,
+                copy.deepcopy(self.branches),
+                copy.deepcopy(self.tags))
 
     def _minimal_sha_one_digits(self):
         """ Calculate the minimal number of sha1 digits required to represent

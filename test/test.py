@@ -101,12 +101,12 @@ class TestGitTools(ut.TestCase):
         b = empty_commit('b')
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter(roots=True)
+        filterd_graph = graph._filter(roots=True)
         expected_parents = {
             a:set(),
             b:set((a,)),
         }
-        self.assertEqual(expected_parents, graph.parents)
+        self.assertEqual(expected_parents, filterd_graph.parents)
 
     def test_find_merges_bifurcations(self):
         """ Check that finding merges and bifurcations works.
@@ -173,12 +173,12 @@ class TestGitTools(ut.TestCase):
         c = empty_commit('C')
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter()
+        filterd_graph = graph._filter()
         expected_reduced_parents = {
             a:set(),
             c:set((a,)),
         }
-        self.assertEqual(expected_reduced_parents, graph.parents)
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_filter_with_tags(self):
         """ Remove three commits and root commmit
@@ -197,12 +197,12 @@ class TestGitTools(ut.TestCase):
         f = empty_commit('F')
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter()
+        filterd_graph = graph._filter()
         expected_reduced_parents = {
             b:set(),
             f:set((b,)),
         }
-        self.assertEqual(expected_reduced_parents, graph.parents)
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_no_commit_tags(self):
         """ Test for tree-tag and a blob-tag.
@@ -225,13 +225,13 @@ class TestGitTools(ut.TestCase):
 
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter()
+        filterd_graph = graph._filter()
         expected_reduced_parents = {
             blob_hash:set(),
             tree_hash:set(),
             a:set(),
         }
-        self.assertEqual(expected_reduced_parents, graph.parents)
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_parent_of_parent_loop(self):
         """ Test the case, where an alternative route may lead to a parents
@@ -267,13 +267,13 @@ class TestGitTools(ut.TestCase):
 
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter()
+        filterd_graph = graph._filter()
         expected_reduced_parents = {
             d:set((a,)),
             a:set(),
             f:set((a, d,)),
         }
-        self.assertEqual(expected_reduced_parents, graph.parents)
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_expose_multi_parent_bug(self):
         """ Test for a peculiar bug that used to exist in pruning the graph.
@@ -307,7 +307,7 @@ class TestGitTools(ut.TestCase):
         f = get_head_sha()
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter()
+        filterd_graph = graph._filter()
         expected_reduced_parents = {
             b:set((a,)),
             a:set(),
@@ -321,7 +321,7 @@ class TestGitTools(ut.TestCase):
         print dispatch("git log --oneline %s..%s" % (f, p))
         print_dict(expected_reduced_parents)
         print_dict(graph.parents)
-        self.assertEqual(expected_reduced_parents, graph.parents)
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def more_realistic(self):
         """ Test a slightly larger DAG
@@ -370,7 +370,7 @@ class TestGitTools(ut.TestCase):
 
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._filter()
+        filterd_graph = graph._filter()
         expected_reduced_parents = {
             m:set((j,)),
             j:set((h,)),
@@ -382,4 +382,4 @@ class TestGitTools(ut.TestCase):
         }
         print_dict(expected_reduced_parents)
         print_dict(graph.parents)
-        self.assertEqual(expected_reduced_parents, graph.parents)
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
