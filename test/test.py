@@ -145,7 +145,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(actual_parents, expected_parents)
 
 
-    def test_remove_non_labels_one(self):
+    def test_filter_one(self):
         """ Remove a single commit from between two commits.
 
             A---B---C
@@ -161,14 +161,14 @@ class TestGitTools(ut.TestCase):
         c = empty_commit('C')
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._remove_non_labels()
+        graph._filter()
         expected_reduced_parents = {
             a:set(),
             c:set((a,)),
         }
         self.assertEqual(expected_reduced_parents, graph.parents)
 
-    def test_remove_non_labels_with_tags(self):
+    def test_filter_with_tags(self):
         """ Remove three commits and root commmit
 
             A---B---C---D---E---F
@@ -185,7 +185,7 @@ class TestGitTools(ut.TestCase):
         f = empty_commit('F')
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._remove_non_labels()
+        graph._filter()
         expected_reduced_parents = {
             b:set(),
             f:set((b,)),
@@ -213,7 +213,7 @@ class TestGitTools(ut.TestCase):
 
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._remove_non_labels()
+        graph._filter()
         expected_reduced_parents = {
             blob_hash:set(),
             tree_hash:set(),
@@ -255,7 +255,7 @@ class TestGitTools(ut.TestCase):
 
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._remove_non_labels()
+        graph._filter()
         expected_reduced_parents = {
             d:set((a,)),
             a:set(),
@@ -295,7 +295,7 @@ class TestGitTools(ut.TestCase):
         f = get_head_sha()
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._remove_non_labels()
+        graph._filter()
         expected_reduced_parents = {
             b:set((a,)),
             a:set(),
@@ -358,7 +358,7 @@ class TestGitTools(ut.TestCase):
 
         (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
         graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
-        graph._remove_non_labels()
+        graph._filter()
         expected_reduced_parents = {
             m:set((j,)),
             j:set((h,)),

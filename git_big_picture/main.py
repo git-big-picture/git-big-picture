@@ -82,24 +82,56 @@ class CommitGraph(object):
         return [sha for sha, children in self.children.items()
                 if len(children) > 1]
 
-    def _remove_non_labels(self):
-        """ Generate the subgraph of the Git commit graph that contains only
-        tags and branches.
+    def _filter(self,
+            branches=True,
+            tags=True,
+            roots=False,
+            merges=False,
+            bifurcations=False,
+            additional=None):
+        """ Filter the commmit graph.
 
         Remove, or 'filter' the unwanted commits from the DAG. This will modify
-        self.parents and when done re-calculate self.children.
+        self.parents and when done re-calculate self.children. Keyword
+        arguments can be used to specify 'interesting' commits
 
-        Generate a reachability graph for labels This will generate a graph of
-        all labels, with edges pointing to all reachable parents. Unfortunately
-        this may possibly include edges from labels to parents that are also
-        parents of the label's parents. These edges are redundant and must be
-        removed.
+        Generate a reachability graph for 'interesting' commits. This will
+        generate a graph of all interesting commits, with edges pointing to all
+        reachable 'interesting' parents.
+
+        Parameters
+        ----------
+        branches : bool
+            include commits being pointed to by branches
+        tags : bool
+            include commits being pointed to by tags
+        roots : bool
+            include root commits
+        merges : bool
+            include merge commits
+        bifurcations : bool
+            include bifurcation commits
+        additional : list of SHA1 sums
+            any additional commits to include
 
         """
+        interesting = []
+        if branches:
+            interesting.extend(self.branches.keys())
+        if tags:
+            interesting.extend(self.tags.keys())
+        if roots:
+            interesting.extend(self._find_roots)
+        if merges:
+            interesting.extend(self._find_merges)
+        if bifurcations:
+            interesting.extend(self._find_bifurcations)
+        if additional:
+            interesting.extend(additional)
 
         reachable_labeled_parents = dict()
         # for everything that we are interested in
-        for label in self.branches.keys() + self.tags.keys():
+        for label in interesting:
             # Handle tags pointing to non-commits
             if label in self.parents:
                 to_visit = list(self.parents[label])
