@@ -154,33 +154,33 @@ class CommitGraph(object):
         if additional:
             interesting.extend(additional)
 
-        reachable_labeled_parents = dict()
+        reachable_interesting_parents = dict()
         # for everything that we are interested in
-        for label in interesting:
+        for commit_i in interesting:
             # Handle tags pointing to non-commits
-            if label in self.parents:
-                to_visit = list(self.parents[label])
+            if commit_i in self.parents:
+                to_visit = list(self.parents[commit_i])
             else:
                 to_visit = list()
             # create the set of seen commits
             seen = set()
-            # initialise the parents for this label
-            reachable_labeled_parents[label] = set()
-            # iterate through to_visit list
-            for commit in to_visit:
+            # initialise the parents for this commit_i
+            reachable_interesting_parents[commit_i] = set()
+            # iterate through to_visit list, i.e. go searching in the graph
+            for commit_j in to_visit:
                 # we have already been here
-                if commit in seen:
+                if commit_j in seen:
                     continue
                 else:
-                    seen.add(commit)
-                    if commit in interesting:
-                        # has label and is reachable from current label
-                        reachable_labeled_parents[label].add(commit)
+                    seen.add(commit_j)
+                    if commit_j in interesting:
+                        # is interesting, add and stop
+                        reachable_interesting_parents[commit_i].add(commit_j)
                     else:
-                        # no label, continue searching
-                        to_visit.extend(self.parents[commit])
+                        # is not interesting, keep searching
+                        to_visit.extend(self.parents[commit_j])
 
-        return CommitGraph(reachable_labeled_parents,
+        return CommitGraph(reachable_interesting_parents,
                 copy.deepcopy(self.branches),
                 copy.deepcopy(self.tags))
 
