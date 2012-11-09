@@ -30,6 +30,9 @@ import shlex
 
 debug=False
 
+# The only reason these global commands work, is because we change the cwd of
+# the test script... ugly.
+
 def dispatch(command_string):
     return gt.get_command_output(shlex.split(command_string))
 
