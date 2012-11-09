@@ -224,9 +224,9 @@ def guess_format_from_filename(output_file):
         return False, None
 
 def main(opts, git_dir):
-    gt.git_env = git_dir
-    (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-    graph = CommitGraph(gt.get_parent_map(), ab, tags)
+    git = gt.Git(git_dir)
+    (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
+    graph = CommitGraph(git.get_parent_map(), ab, tags)
     if opts.all_commits:
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
@@ -291,10 +291,10 @@ except Exception, e:
     barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
             exit_codes["no_git"])
 
-git_env = {'GIT_DIR': parse_args(args)}
+git_dir = parse_args(args)
 
 if opts.pstats_outfile is not None:
     import cProfile
-    cProfile.run('main(opts, git_env)', opts.pstats_outfile)
+    cProfile.run('main(opts, git_dir)', opts.pstats_outfile)
 else:
-    main(opts, git_env)
+    main(opts, git_dir)
