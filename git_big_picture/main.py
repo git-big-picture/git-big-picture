@@ -146,7 +146,7 @@ class CommitGraph(object):
         if tags:
             interesting.extend(self.tags.keys())
         if roots:
-            interesting.extend(self._find_roots)
+            interesting.extend(self._find_roots())
         if merges:
             interesting.extend(self._find_merges)
         if bifurcations:
@@ -173,7 +173,7 @@ class CommitGraph(object):
                     continue
                 else:
                     seen.add(commit)
-                    if self._has_label(commit):
+                    if commit in interesting:
                         # has label and is reachable from current label
                         reachable_labeled_parents[label].add(commit)
                     else:
