@@ -64,6 +64,12 @@ parser.add_option('-o', '--out',
         action='store', type='string', dest='outfile',
         metavar='FILE', help='write image to specified file')
 
+# filtering options
+
+parser.add_option('-r', '--roots',
+        action='store_true', dest='roots',
+        help='show root commits')
+
 # miscellaneous options
 parser.add_option('--pstats',
         action='store', type='string', dest='pstats_outfile',
@@ -231,7 +237,8 @@ def main(opts, git_dir):
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
         sha_one_digits = None
-        graph = graph._filter()
+        graph = graph._filter(roots=opts.roots)
+        sha_one_digits = graph._minimal_sha_one_digits()
 
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 
