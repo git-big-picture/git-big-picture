@@ -21,12 +21,26 @@
 
 from __future__ import print_function
 
+import copy
+
 VERSION = '0.9.0-dev'
 
 __docformat__ = "restructuredtext"
 
 
 class CommitGraph(object):
+    """ Directed Acyclic Graph (DAG) git repository.
+
+    Parameters
+    ----------
+    parent_map : dict mapping SHA1 to list of SHA1
+        the parent map for the repository
+    branch_dict : dict mapping SHA1 to list of strings
+        the branches
+    tag_dict :
+        the tags
+
+    """
     def __init__(self, parent_map, branch_dict, tag_dict):
         self.parents = parent_map
         self.branches = branch_dict
@@ -82,24 +96,61 @@ class CommitGraph(object):
         return [sha for sha, children in self.children.items()
                 if len(children) > 1]
 
-    def _remove_non_labels(self):
-        """ Generate the subgraph of the Git commit graph that contains only
-        tags and branches.
+    def _filter(self,
+            branches=True,
+            tags=True,
+            roots=False,
+            merges=False,
+            bifurcations=False,
+            additional=None):
+        """ Filter the commmit graph.
 
         Remove, or 'filter' the unwanted commits from the DAG. This will modify
-        self.parents and when done re-calculate self.children.
+        self.parents and when done re-calculate self.children. Keyword
+        arguments can be used to specify 'interesting' commits
 
-        Generate a reachability graph for labels This will generate a graph of
-        all labels, with edges pointing to all reachable parents. Unfortunately
-        this may possibly include edges from labels to parents that are also
-        parents of the label's parents. These edges are redundant and must be
-        removed.
+        Generate a reachability graph for 'interesting' commits. This will
+        generate a graph of all interesting commits, with edges pointing to all
+        reachable 'interesting' parents.
+
+        Parameters
+        ----------
+        branches : bool
+            include commits being pointed to by branches
+        tags : bool
+            include commits being pointed to by tags
+        roots : bool
+            include root commits
+        merges : bool
+            include merge commits
+        bifurcations : bool
+            include bifurcation commits
+        additional : list of SHA1 sums
+            any additional commits to include
+
+        Returns
+        -------
+        commit_graph : CommitGraph
+            the filtered graph
 
         """
+        interesting = []
+        if branches:
+            interesting.extend(self.branches.keys())
+        if tags:
+            interesting.extend(self.tags.keys())
+        if roots:
+            interesting.extend(self._find_roots)
+        if merges:
+            interesting.extend(self._find_merges)
+        if bifurcations:
+            interesting.extend(self._find_bifurcations)
+        if additional:
+            interesting.extend(additional)
 
         reachable_labeled_parents = dict()
         # for everything that we are interested in
-        for label in self.branches.keys() + self.tags.keys():
+        for label in interesting:
             # Handle tags pointing to non-commits
             if label in self.parents:
                 to_visit = list(self.parents[label])
@@ -123,10 +174,9 @@ class CommitGraph(object):
                         # no label, continue searching
                         to_visit.extend(self.parents[commit])
 
-        # reset the parents of this graph
-        self.parents = reachable_labeled_parents
-        # update the child_mapping
-        self._calculate_child_mapping()
+        return CommitGraph(reachable_labeled_parents,
+                copy.deepcopy(self.branches),
+                copy.deepcopy(self.tags))
 
     def _minimal_sha_one_digits(self):
         """ Calculate the minimal number of sha1 digits required to represent
