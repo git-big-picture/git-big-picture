@@ -72,6 +72,8 @@ And here is the reduced version:
     :height: 280px
     :width:  456px
 
+We also have a real world example from `cython <http://imgdump.zetatech.org/cython-big-picture.png>`_
+
 Dependencies
 ------------
 
