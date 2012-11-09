@@ -231,7 +231,7 @@ def main(opts, git_dir):
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
         sha_one_digits = None
-        graph._filter()
+        graph = graph._filter()
 
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 
