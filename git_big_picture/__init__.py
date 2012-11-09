@@ -19,4 +19,4 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-from main import CommitGraph
+from main import CommitGraph, graph_factory

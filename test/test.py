@@ -58,7 +58,8 @@ class TestGitTools(ut.TestCase):
         self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
         if debug:
             print self.testing_dir
-        gbp.git_tools.git_env = {'GIT_DIR' : "%s/.git" % self.testing_dir }
+        self.git_dir = "%s/.git" % self.testing_dir
+        self.git = gt.Git(self.git_dir)
         self.oldpwd = os.getcwd()
         os.chdir(self.testing_dir)
 
@@ -72,6 +73,10 @@ class TestGitTools(ut.TestCase):
             sh.rmtree(self.testing_dir)
         os.chdir(self.oldpwd)
 
+    @property
+    def graph(self):
+        return gbp.graph_factory(self.git_dir)
+
     def test_find_roots(self):
 
         def create_root(branch_name):
@@ -83,24 +88,22 @@ class TestGitTools(ut.TestCase):
 
         a = empty_commit('a')
         b = empty_commit('b')
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         self.assertEqual(graph._find_roots(), [a])
         c = create_root('C')
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         self.assertEqual(set(graph._find_roots()), set([a, c]))
         d = create_root('D')
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         self.assertEqual(set(graph._find_roots()), set([a, c, d]))
         e = create_root('E')
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         self.assertEqual(set(graph._find_roots()), set([a, c, d, e]))
 
     def filter_roots(self):
         a = empty_commit('a')
         b = empty_commit('b')
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter(roots=True)
         expected_parents = {
             a:set(),
@@ -124,8 +127,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git merge master')
         d = get_head_sha()
 
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         self.assertEqual(set(graph._find_merges()), set([d]))
         self.assertEqual(set(graph._find_bifurcations()), set([a]))
 
@@ -153,7 +155,7 @@ class TestGitTools(ut.TestCase):
             d:set((c, b)),
         }
 
-        actual_parents = gt.get_parent_map()
+        actual_parents = self.git.get_parent_map()
         self.assertEqual(actual_parents, expected_parents)
 
 
@@ -171,8 +173,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git branch one')
         b = empty_commit('B')
         c = empty_commit('C')
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter()
         expected_reduced_parents = {
             a:set(),
@@ -195,8 +196,7 @@ class TestGitTools(ut.TestCase):
         d = empty_commit('D')
         e = empty_commit('E')
         f = empty_commit('F')
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter()
         expected_reduced_parents = {
             b:set(),
@@ -223,8 +223,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git tag -m "tree-tag" tree-tag '+tree_hash)
         dispatch('git reset')
 
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter()
         expected_reduced_parents = {
             blob_hash:set(),
@@ -265,8 +264,7 @@ class TestGitTools(ut.TestCase):
         f = get_head_sha()
         dispatch('git branch -d topic')
 
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter()
         expected_reduced_parents = {
             d:set((a,)),
@@ -305,8 +303,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git checkout master')
         dispatch('git merge topic')
         f = get_head_sha()
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter()
         expected_reduced_parents = {
             b:set((a,)),
@@ -367,9 +364,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git checkout master')
         dispatch('git merge topic')
         f = get_head_sha()
-
-        (lb, rb, ab), (tags, ctags, nctags) = gt.get_mappings()
-        graph = gbp.CommitGraph(gt.get_parent_map(), ab, tags)
+        graph = self.graph
         filterd_graph = graph._filter()
         expected_reduced_parents = {
             m:set((j,)),
