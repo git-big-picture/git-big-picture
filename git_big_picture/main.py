@@ -20,6 +20,7 @@
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
+from git_big_picture.git_tools import Git
 
 import copy
 
@@ -27,6 +28,11 @@ VERSION = '0.9.0-dev'
 
 __docformat__ = "restructuredtext"
 
+def graph_factory(git_dir):
+    """ Create a CommitGraph object from a git_dir. """
+    git = Git(git_dir)
+    (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
+    return CommitGraph(git.get_parent_map(), ab, tags)
 
 class CommitGraph(object):
     """ Directed Acyclic Graph (DAG) git repository.
