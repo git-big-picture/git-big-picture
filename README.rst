@@ -262,6 +262,19 @@ which, incidentally, outputs Graphviz syntax too:
 
     $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
+TODO
+----
+
+* Unify into a single script/module
+* clean up the Graph API, public and private methods
+* Sanitize the git interface a bit more
+* Sanitize the test suite
+* Sanitize the filter API keyword args
+* Expose the other graph filter options
+* Fixup the documentation to match the current selection options
+* Add neagtion options
+* Add ability to configure stuff using git-config/ini-config
+
 Changelog
 ---------
 
