@@ -148,9 +148,9 @@ class CommitGraph(object):
         if roots:
             interesting.extend(self._find_roots())
         if merges:
-            interesting.extend(self._find_merges)
+            interesting.extend(self._find_merges())
         if bifurcations:
-            interesting.extend(self._find_bifurcations)
+            interesting.extend(self._find_bifurcations())
         if additional:
             interesting.extend(additional)
 
