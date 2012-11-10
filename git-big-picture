@@ -23,7 +23,7 @@
 
 import sys
 import os
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 import subprocess
 from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
@@ -45,41 +45,49 @@ _USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory
 parser = OptionParser(usage=_USAGE, version=VERSION)
 default_format = 'svg'
 
+format_group = OptionGroup(parser, "Format Options",
+        "Options to control output and format.")
 
 # output options
-parser.add_option('-p', '--plain',
+format_group.add_option('-p', '--plain',
         action='store_true', dest='plain',
         help='output lines suitable as input for dot')
-parser.add_option('-f', '--format',
+format_group.add_option('-f', '--format',
         action='store', type='string', dest='format',
         metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
-parser.add_option('-v', '--viewer',
+format_group.add_option('-v', '--viewer',
         action='store', type='string', dest='viewer',
         metavar='CMD', help='write image to tempfile and start specified viewer')
-parser.add_option('-o', '--out',
+format_group.add_option('-o', '--out',
         action='store', type='string', dest='outfile',
         metavar='FILE', help='write image to specified file')
 
+parser.add_option_group(format_group)
+
+filter_group = OptionGroup(parser, "Filter Options",
+        "Options to control commit/ref selection")
+
 # commit/ref selection -- filtering options
-parser.add_option('-a', '--all',
+filter_group.add_option('-a', '--all',
         action='store_true', dest='all_commits',
         help='include all commits (not just tags and branch heads)')
-parser.add_option('-r', '--roots',
+filter_group.add_option('-r', '--roots',
         action='store_true', dest='roots',
         help='show root commits')
-parser.add_option('-b', '--branches',
+filter_group.add_option('-b', '--branches',
         action='store_true', dest='branches',
         help='show commits pointed to by branches')
-parser.add_option('-t', '--tags',
+filter_group.add_option('-t', '--tags',
         action='store_true', dest='tags',
         help='show commits pointed to by tags')
-parser.add_option('-m', '--merges',
+filter_group.add_option('-m', '--merges',
         action='store_true', dest='merges',
         help='include merge commits')
-parser.add_option('-i', '--bifurcations',
+filter_group.add_option('-i', '--bifurcations',
         action='store_true', dest='bifurcations',
         help='include bifurcation commits')
 
+parser.add_option_group(filter_group)
 
 # miscellaneous options
 parser.add_option('--pstats',
