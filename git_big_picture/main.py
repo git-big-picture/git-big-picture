@@ -28,11 +28,13 @@ VERSION = '0.9.0-dev'
 
 __docformat__ = "restructuredtext"
 
+
 def graph_factory(git_dir):
     """ Create a CommitGraph object from a git_dir. """
     git = Git(git_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     return CommitGraph(git.get_parent_map(), ab, tags)
+
 
 class CommitGraph(object):
     """ Directed Acyclic Graph (DAG) git repository.

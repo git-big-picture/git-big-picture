@@ -29,15 +29,15 @@ from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
 import tempfile
 
-exit_codes = {"too_many_args"        : 1,
-              "dot_not_found"        : 2,
-              "problem_with_dot"     : 3,
-              "dot_terminated_early" : 4,
-              "not_write_to_file"    : 5,
-              "no_such_viewer"       : 6,
-              "plain_with_others"    : 7,
-              "no_options"           : 8,
-              "no_git"               : 9,
+exit_codes = {"too_many_args":         1,
+              "dot_not_found":         2,
+              "problem_with_dot":      3,
+              "dot_terminated_early":  4,
+              "not_write_to_file":     5,
+              "no_such_viewer":        6,
+              "plain_with_others":     7,
+              "no_options":            8,
+              "no_git":                9,
              }
 
 _USAGE = "%prog OPTIONS [<repo-directory>]"
@@ -57,7 +57,8 @@ format_group.add_option('-f', '--format',
         metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
 format_group.add_option('-v', '--viewer',
         action='store', type='string', dest='viewer',
-        metavar='CMD', help='write image to tempfile and start specified viewer')
+        metavar='CMD',
+        help='write image to tempfile and start specified viewer')
 format_group.add_option('-o', '--out',
         action='store', type='string', dest='outfile',
         metavar='FILE', help='write image to specified file')
@@ -92,9 +93,11 @@ parser.add_option_group(filter_group)
 # miscellaneous options
 parser.add_option('--pstats',
         action='store', type='string', dest='pstats_outfile',
-        metavar='FILE', help='run cProfile profiler writing pstats output to FILE')
+        metavar='FILE',
+        help='run cProfile profiler writing pstats output to FILE')
 
 opts, args = parser.parse_args()
+
 
 def barf(message, exit_code):
     """ Abort execution with error message and exit code.
@@ -111,6 +114,7 @@ def barf(message, exit_code):
     parser.print_usage()
     sys.exit(exit_code)
 
+
 def warn(message):
     """ Print a warning message.
 
@@ -121,6 +125,7 @@ def warn(message):
 
     """
     sys.stderr.write('warning: %s\n' % message)
+
 
 def parse_args(args):
     """ Parse arguments and get git_dir.
@@ -149,6 +154,7 @@ def parse_args(args):
         git_dir = os.path.join(repodir, git_dir)
     return git_dir
 
+
 def run_dot(output_format, dot_file_lines):
     """ Run the 'dot' utility.
 
@@ -165,8 +171,10 @@ def run_dot(output_format, dot_file_lines):
 
     """
     try:
-        p = subprocess.Popen(['dot', '-T'+output_format], stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(['dot', '-T' + output_format],
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
     except OSError, e:
         if e.errno == 2:
             barf("'dot' not found! Please install the Graphviz utility.",
@@ -183,6 +191,7 @@ def run_dot(output_format, dot_file_lines):
                 "The error from 'dot' was:\n>>>"
                 % p.returncode + err, exit_codes["dot_terminated_early"])
     return out
+
 
 def write_to_file(output_file, dot_output):
     """ Write the output from the 'dot' utility to file.
@@ -206,6 +215,7 @@ def write_to_file(output_file, dot_output):
     os.fsync(f.fileno())
     f.close()
 
+
 def show_in_viewer(output_file, viewer):
     """ Show the output of 'dot' utility in a viewer.
 
@@ -227,6 +237,7 @@ def show_in_viewer(output_file, viewer):
         barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
                 exit_codes["no_such_viewer"])
 
+
 def guess_format_from_filename(output_file):
     """ Guess the output format from the filename.
 
@@ -247,6 +258,7 @@ def guess_format_from_filename(output_file):
         return True, opts.outfile.split('.')[-1]
     else:
         return False, None
+
 
 def main(opts, git_dir):
     git = gt.Git(git_dir)
@@ -296,7 +308,8 @@ def main(opts, git_dir):
                 warn('Guessing format from filename: %s' % guess)
                 opts.format = guess
             else:
-                warn('Filename had no suffix, using default format: %s' % default_format)
+                warn('Filename had no suffix, using default format: %s' %
+                        default_format)
                 opts.format = default_format
                 opts.outfile += '.' + opts.format
         else:
@@ -309,11 +322,13 @@ def main(opts, git_dir):
         if opts.outfile:
             write_to_file(opts.outfile, dot_output)
         else:
-            opts.outfile = tempfile.NamedTemporaryFile(prefix='git-big-picture').name
+            opts.outfile = tempfile.NamedTemporaryFile(
+                    prefix='git-big-picture').name
             write_to_file(opts.outfile, dot_output)
         if opts.viewer:
             show_in_viewer(opts.outfile, opts.viewer)
-    else: # print raw SVG, PDF, ...
+    else:
+        # print raw SVG, PDF, ...
         print(dot_output)
 
 try:
