@@ -84,7 +84,7 @@ class TestGitTools(ut.TestCase):
 
         def create_root(branch_name):
             dispatch('git read-tree --empty')
-            new_tree = dispatch('git write-tree')
+            new_tree = dispatch('git write-tree').strip()
             new_commit = dispatch('git commit-tree %s -m empty' % new_tree).strip()
             dispatch('git branch %s %s' % (branch_name, new_commit))
             return new_commit
@@ -92,16 +92,16 @@ class TestGitTools(ut.TestCase):
         a = empty_commit('a')
         b = empty_commit('b')
         graph = self.graph
-        self.assertEqual(graph._find_roots(), [a])
+        self.assertEqual(graph.roots, [a])
         c = create_root('C')
         graph = self.graph
-        self.assertEqual(set(graph._find_roots()), set([a, c]))
+        self.assertEqual(set(graph.roots), set([a, c]))
         d = create_root('D')
         graph = self.graph
-        self.assertEqual(set(graph._find_roots()), set([a, c, d]))
+        self.assertEqual(set(graph.roots), set([a, c, d]))
         e = create_root('E')
         graph = self.graph
-        self.assertEqual(set(graph._find_roots()), set([a, c, d, e]))
+        self.assertEqual(set(graph.roots), set([a, c, d, e]))
 
     def filter_roots(self):
         a = empty_commit('a')
@@ -131,8 +131,8 @@ class TestGitTools(ut.TestCase):
         d = get_head_sha()
 
         graph = self.graph
-        self.assertEqual(set(graph._find_merges()), set([d]))
-        self.assertEqual(set(graph._find_bifurcations()), set([a]))
+        self.assertEqual(set(graph.merges), set([d]))
+        self.assertEqual(set(graph.bifurcations), set([a]))
 
 
     def test_get_parent_map(self):
