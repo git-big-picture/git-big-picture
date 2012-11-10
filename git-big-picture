@@ -77,7 +77,7 @@ parser.add_option('-m', '--merges',
         action='store_true', dest='merges',
         help='include merge commits')
 parser.add_option('-i', '--bifurcations',
-        action='store_true', dest='bifurcation',
+        action='store_true', dest='bifurcations',
         help='include bifurcation commits')
 
 
