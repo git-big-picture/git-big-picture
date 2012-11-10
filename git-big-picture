@@ -46,7 +46,7 @@ parser = OptionParser(usage=_USAGE, version=VERSION)
 default_format = 'svg'
 
 format_group = OptionGroup(parser, "Format Options",
-        "Options to control output and format.")
+        "Options to control output and format")
 
 # output options
 format_group.add_option('-p', '--plain',
