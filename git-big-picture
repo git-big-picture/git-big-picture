@@ -70,7 +70,7 @@ filter_group = OptionGroup(parser, "Filter Options",
 # commit/ref selection -- filtering options
 filter_group.add_option('-a', '--all',
         action='store_true', dest='all_commits',
-        help='include all commits (not just tags and branch heads)')
+        help='include all commits')
 filter_group.add_option('-r', '--roots',
         action='store_true', dest='roots',
         help='show root commits')
