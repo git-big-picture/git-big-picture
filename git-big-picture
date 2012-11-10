@@ -45,10 +45,6 @@ _USAGE = "%prog -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory
 parser = OptionParser(usage=_USAGE, version=VERSION)
 default_format = 'svg'
 
-# commit/ref selection
-parser.add_option('-a', '--all',
-        action='store_true', dest='all_commits',
-        help='include all commits (not just tags and branch heads)')
 
 # output options
 parser.add_option('-p', '--plain',
@@ -64,11 +60,26 @@ parser.add_option('-o', '--out',
         action='store', type='string', dest='outfile',
         metavar='FILE', help='write image to specified file')
 
-# filtering options
-
+# commit/ref selection -- filtering options
+parser.add_option('-a', '--all',
+        action='store_true', dest='all_commits',
+        help='include all commits (not just tags and branch heads)')
 parser.add_option('-r', '--roots',
         action='store_true', dest='roots',
         help='show root commits')
+parser.add_option('-b', '--branches',
+        action='store_true', dest='branches',
+        help='show commits pointed to by branches')
+parser.add_option('-t', '--tags',
+        action='store_true', dest='tags',
+        help='show commits pointed to by tags')
+parser.add_option('-m', '--merges',
+        action='store_true', dest='merges',
+        help='include merge commits')
+parser.add_option('-i', '--bifurcations',
+        action='store_true', dest='bifurcation',
+        help='include bifurcation commits')
+
 
 # miscellaneous options
 parser.add_option('--pstats',
@@ -237,7 +248,12 @@ def main(opts, git_dir):
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
         sha_one_digits = None
-        graph = graph._filter(roots=opts.roots)
+        graph = graph._filter(branches=opts.branches,
+                tags=opts.tags,
+                roots=opts.roots,
+                merges=opts.merges,
+                bifurcations=opts.bifurcations
+                )
         sha_one_digits = graph._minimal_sha_one_digits()
 
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
