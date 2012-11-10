@@ -39,12 +39,32 @@ class CommitGraph(object):
 
     Parameters
     ----------
-    parent_map : dict mapping SHA1 to list of SHA1
-        the parent map for the repository
-    branch_dict : dict mapping SHA1 to list of strings
+    parent_map : dict mapping SHA1s to list of SHA1s
+        the parent map
+    branch_dict : dict mapping SHA1s to list of strings
         the branches
-    tag_dict :
+    tag_dict : dict mapping SHA1s to list of strings
         the tags
+
+    Properties
+    ----------
+    roots : list of SHA1s
+        all root commits (the ones with no parents)
+    merges : list of SHA1s
+        all merge commits (the ones with multiple parents)
+    bifurcations : list SHA1s
+        all bifurcation commits (the ones with multiple children)
+
+    Attributes
+    ----------
+    parents : dict mapping SHA1s to list of SHA1s
+        the parent map
+    children : dict mapping SHA1s to list of SHA1s
+        the child map
+    branches : dict mapping SHA1s to list of strings
+        the branches
+    tags : dict mapping SHA1s to list of strings
+        tags
 
     """
     def __init__(self, parent_map, branch_dict, tag_dict):
@@ -90,15 +110,18 @@ class CommitGraph(object):
                 for p in self.parents[c]:
                     assert(c in self.children[p])
 
-    def _find_roots(self):
+    @property
+    def roots(self):
         """ Find all root commits. """
         return [sha for sha, parents in self.parents.items() if not parents]
 
-    def _find_merges(self):
+    @property
+    def merges(self):
         return [sha for sha, parents in self.parents.items()
                 if len(parents) > 1]
 
-    def _find_bifurcations(self):
+    @property
+    def bifurcations(self):
         return [sha for sha, children in self.children.items()
                 if len(children) > 1]
 
@@ -146,11 +169,11 @@ class CommitGraph(object):
         if tags:
             interesting.extend(self.tags.keys())
         if roots:
-            interesting.extend(self._find_roots())
+            interesting.extend(self.roots)
         if merges:
-            interesting.extend(self._find_merges())
+            interesting.extend(self.merges)
         if bifurcations:
-            interesting.extend(self._find_bifurcations())
+            interesting.extend(self.bifurcations)
         if additional:
             interesting.extend(additional)
 

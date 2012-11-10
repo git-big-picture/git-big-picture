@@ -266,7 +266,6 @@ TODO
 ----
 
 * Unify into a single script/module
-* clean up the Graph API, public and private methods
 * Sanitize the git interface a bit more
 * Sanitize the test suite
 * Sanitize the filter API keyword args
