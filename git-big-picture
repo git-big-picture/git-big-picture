@@ -29,6 +29,27 @@ from git_big_picture.main import VERSION, CommitGraph
 import git_big_picture.git_tools as gt
 import tempfile
 
+# settings and defaults
+BRANCHES     = 'branches'
+TAGS         = 'tags'
+ROOTS        = 'roots'
+MERGES       = 'merges'
+BIFURCATIONS = 'bifurcations'
+FILTER_SETTINGS = [
+        BRANCHES,
+        TAGS,
+        ROOTS,
+        MERGES,
+        BIFURCATIONS,
+        ]
+FILTER_DEFAULTS = {
+        BRANCHES:     True,
+        TAGS:         True,
+        ROOTS:        True,
+        MERGES:       False,
+        BIFURCATIONS: False,
+        }
+
 exit_codes = {"too_many_args":         1,
               "dot_not_found":         2,
               "problem_with_dot":      3,
