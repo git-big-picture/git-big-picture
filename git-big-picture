@@ -154,7 +154,6 @@ def barf(message, exit_code):
 
     """
     sys.stderr.write('fatal: %s\n' % message)
-    parser.print_usage()
     sys.exit(exit_code)
 
 
