@@ -313,6 +313,24 @@ def guess_format_from_filename(output_file):
 
 
 def parse_filter_options(opts):
+    """ Extract and check the filtering options from the command line 'opts'.
+
+    Checks that not both the option and it's neagtion were found. The return
+    dict contains one entry for each setting. This entry can be True to signal
+    the option was found, False to signale the negation was found and None to
+    signal that neither was found.
+
+    Parameters
+    ----------
+    opts : dict
+        options dict from cmdline
+
+    Returns
+    -------
+    cmdline_settings : dict
+        the settings dict
+
+    """
     cmdline_settings = {}
     for setting in FILTER_SETTINGS:
         positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
@@ -330,6 +348,8 @@ def parse_filter_options(opts):
 
 def set_settings(settings, defaults, conf, cli):
     """ Extract the value for setting in order.
+
+    If any of the 'containers' are None, it will be skipped.
 
     Parameters
     ----------
