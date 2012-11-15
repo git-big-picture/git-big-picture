@@ -168,6 +168,16 @@ def warn(message):
     """
     sys.stderr.write('warning: %s\n' % message)
 
+def debug(message):
+    """ Print a debug message.
+
+    Parameters
+    ----------
+    message : string
+        the debug message
+
+    """
+    sys.stdout.write('debug:   %s\n' % message)
 
 def parse_args(args):
     """ Parse arguments and get git_dir.
