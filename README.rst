@@ -270,7 +270,6 @@ TODO
 * Sanitize the test suite
 * Sanitize the filter API keyword args
 * Fixup the documentation to match the current selection options
-* Add neagtion options
 * Add ability to configure stuff using git-config/ini-config
 * --abbrev switch
 * --debug and ability to debug
