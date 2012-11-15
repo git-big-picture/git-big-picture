@@ -59,6 +59,7 @@ exit_codes = {"too_many_args":         1,
               "plain_with_others":     7,
               "no_options":            8,
               "no_git":                9,
+              "mutually_exclusive":   10,
              }
 
 _USAGE = "%prog OPTIONS [<repo-directory>]"
@@ -312,7 +313,70 @@ def guess_format_from_filename(output_file):
         return False, None
 
 
+def parse_filter_options(opts):
+    cmdline_settings = {}
+    for setting in FILTER_SETTINGS:
+        positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
+        if positive is not None and negative is not None:
+            barf("'%s' and '%s' are mutually exclusive" %
+                    ('--' + setting, '--no-' + setting),
+                    exit_codes['mutually_exclusive'])
+        elif positive is not None:
+            cmdline_settings[setting] = True
+        elif negative is not None:
+            cmdline_settings[setting] = False
+        else:
+            cmdline_settings[setting] = None
+    return cmdline_settings
+
+def set_settings(settings, defaults, conf, cli):
+    """ Extract the value for setting in order.
+
+    Parameters
+    ----------
+    setting : list of str
+        the settings to look for
+    defaults : dict
+        defaults
+    conf : dict
+        configuration file
+    cli : dict like
+        command line settings
+
+    Returns
+    -------
+    val : str
+        an appropriate value for setting
+
+    """
+    order = [('defaults',          defaults),
+             ('conf file',         conf),
+             ('command line args', cli)]
+    output = {}
+    for setting in settings:
+        prev, val, prev_val = None, None, None
+        for desc, container in order:
+            if container is None:
+                continue
+            if container[setting] is not None:
+                prev_val, val = val, container[setting]
+                if prev_val is not None:
+                    debug("Value for '%s' found in '%s', overrides setting from '%s': '%s'"
+                            % (setting, desc, prev, val))
+                else:
+                    debug("Value for '%s' found in '%s': '%s'"
+                            % (setting, desc, val))
+            prev = desc
+        if val is None:
+            debug("No value for '%s' found anywhere" % setting)
+        output[setting] = val
+    return output
+
+
 def main(opts, git_dir):
+    cmdline_settings = parse_filter_options(opts)
+    filter_settings = set_settings(FILTER_SETTINGS,
+            FILTER_DEFAULTS, None, cmdline_settings)
     git = gt.Git(git_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     graph = CommitGraph(git.get_parent_map(), ab, tags)
@@ -320,12 +384,7 @@ def main(opts, git_dir):
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
         sha_one_digits = None
-        graph = graph._filter(branches=opts.branches,
-                tags=opts.tags,
-                roots=opts.roots,
-                merges=opts.merges,
-                bifurcations=opts.bifurcations
-                )
+        graph = graph._filter(**filter_settings)
         sha_one_digits = graph._minimal_sha_one_digits()
 
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
