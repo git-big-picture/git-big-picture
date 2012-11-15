@@ -38,7 +38,7 @@ The *reduced* graph of *interesting* commits would be:
 
 .. code::
 
-          I---K---M
+          H---J---M
          /
     A---B---F
          \ /
