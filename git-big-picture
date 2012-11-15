@@ -93,21 +93,42 @@ filter_group = OptionGroup(parser, "Filter Options",
 filter_group.add_option('-a', '--all',
         action='store_true', dest='all_commits',
         help='include all commits')
-filter_group.add_option('-r', '--roots',
-        action='store_true', dest='roots',
-        help='show root commits')
+
+
 filter_group.add_option('-b', '--branches',
         action='store_true', dest='branches',
         help='show commits pointed to by branches')
+filter_group.add_option('-B', '--no-branches',
+        action='store_true', dest='no_branches',
+        help='do not show commits pointed to by branches')
+
 filter_group.add_option('-t', '--tags',
         action='store_true', dest='tags',
         help='show commits pointed to by tags')
+filter_group.add_option('-T', '--no-tags',
+        action='store_true', dest='no_tags',
+        help='do not show commits pointed to by tags')
+
+filter_group.add_option('-r', '--roots',
+        action='store_true', dest='roots',
+        help='show root commits')
+filter_group.add_option('-R', '--no-roots',
+        action='store_true', dest='no_roots',
+        help='do not show root commits')
+
 filter_group.add_option('-m', '--merges',
         action='store_true', dest='merges',
         help='include merge commits')
+filter_group.add_option('-M', '--no-merges',
+        action='store_true', dest='no_merges',
+        help='do not include merge commits')
+
 filter_group.add_option('-i', '--bifurcations',
         action='store_true', dest='bifurcations',
         help='include bifurcation commits')
+filter_group.add_option('-I', '--no-bifurcations',
+        action='store_true', dest='no_bifurcations',
+        help='do not include bifurcation commits')
 
 parser.add_option_group(filter_group)
 
