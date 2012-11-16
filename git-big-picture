@@ -74,9 +74,9 @@ DEBUG = False
 DEFAULT_FORMAT = 'svg'
 
 USAGE = "%prog OPTIONS [<repo-directory>]"
-parser = optparse.OptionParser(usage=USAGE, version=VERSION)
+PARSER = optparse.OptionParser(usage=USAGE, version=__version__)
 
-format_group = optparse.OptionGroup(parser, "Format Options",
+format_group = optparse.OptionGroup(PARSER, "Format Options",
         "Options to control output and format")
 
 # output options
@@ -94,9 +94,9 @@ format_group.add_option('-o', '--out',
         action='store', type='string', dest='outfile',
         metavar='FILE', help='write image to specified file')
 
-parser.add_option_group(format_group)
+PARSER.add_option_group(format_group)
 
-filter_group = optparse.OptionGroup(parser, "Filter Options",
+filter_group = optparse.OptionGroup(PARSER, "Filter Options",
         "Options to control commit/ref selection")
 
 # commit/ref selection -- filtering options
@@ -140,15 +140,16 @@ filter_group.add_option('-I', '--no-bifurcations',
         action='store_true', dest='no_bifurcations',
         help='do not include bifurcation commits')
 
-parser.add_option_group(filter_group)
+PARSER.add_option_group(filter_group)
 
 # miscellaneous options
-parser.add_option('--pstats',
+PARSER.add_option('--pstats',
         action='store', type='string', dest='pstats_outfile',
         metavar='FILE',
         help='run cProfile profiler writing pstats output to FILE')
 
-parser.add_option('-d', '--debug',
+PARSER.add_option('-d', '--debug',
+
         action='store_true', dest='debug',
         help='activate debug output')
 
@@ -848,7 +849,7 @@ def main(opts, git_dir):
 
 if __name__ == '__main__':
 
-    opts, args = parser.parse_args()
+    opts, args = PARSER.parse_args()
 
     if opts.debug is not None:
         DEBUG = True
