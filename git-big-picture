@@ -23,13 +23,13 @@
 
 from __future__ import print_function
 
-import sys
-import os
 import copy
 import optparse
-import subprocess
-import tempfile
+import os
 import re
+import subprocess
+import sys
+import tempfile
 
 VERSION = '0.9.0-dev'
 __docformat__ = "restructuredtext"
