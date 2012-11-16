@@ -267,7 +267,6 @@ TODO
 
 * Sanitize the git interface a bit more
 * Sanitize the test suite
-* Sanitize the filter API keyword args
 * Fixup the documentation to match the current selection options
 * Add ability to configure stuff using git-config/ini-config
 * --abbrev switch
