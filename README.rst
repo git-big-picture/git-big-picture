@@ -265,7 +265,6 @@ which, incidentally, outputs Graphviz syntax too:
 TODO
 ----
 
-* Unify into a single script/module
 * Sanitize the git interface a bit more
 * Sanitize the test suite
 * Sanitize the filter API keyword args
