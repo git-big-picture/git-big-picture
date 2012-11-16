@@ -199,7 +199,15 @@ class TestGitTools(ut.TestCase):
         e = empty_commit('E')
         f = empty_commit('F')
         graph = self.graph
+        # use the defaults
         filterd_graph = graph._filter()
+        expected_reduced_parents = {
+            a:set(),
+            b:set((a,)),
+            f:set((b,)),
+        }
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        filterd_graph = graph._filter(roots=False)
         expected_reduced_parents = {
             b:set(),
             f:set((b,)),
