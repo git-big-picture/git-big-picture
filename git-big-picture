@@ -196,7 +196,7 @@ def debug(message):
     if DEBUG:
         sys.stdout.write('debug:   %s\n' % message)
 
-def parse_args(args):
+def parse_variable_args(args):
     """ Parse arguments and get git_dir.
 
     Parameters
@@ -864,7 +864,7 @@ if __name__ == '__main__':
         barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
                 EXIT_CODES["no_git"])
 
-    git_dir = parse_args(args)
+    git_dir = parse_variable_args(args)
 
     if opts.pstats_outfile is not None:
         import cProfile
