@@ -64,6 +64,8 @@ exit_codes = {"too_many_args":         1,
 
 _USAGE = "%prog OPTIONS [<repo-directory>]"
 
+DEBUG = False
+
 parser = OptionParser(usage=_USAGE, version=VERSION)
 default_format = 'svg'
 
@@ -139,6 +141,10 @@ parser.add_option('--pstats',
         metavar='FILE',
         help='run cProfile profiler writing pstats output to FILE')
 
+parser.add_option('-d', '--debug',
+        action='store_true', dest='debug',
+        help='activate debug output')
+
 opts, args = parser.parse_args()
 
 
@@ -177,7 +183,8 @@ def debug(message):
         the debug message
 
     """
-    sys.stdout.write('debug:   %s\n' % message)
+    if DEBUG:
+        sys.stdout.write('debug:   %s\n' % message)
 
 def parse_args(args):
     """ Parse arguments and get git_dir.
@@ -460,6 +467,9 @@ def main(opts, git_dir):
     else:
         # print raw SVG, PDF, ...
         print(dot_output)
+
+if opts.debug is not None:
+    DEBUG = True
 
 try:
     gt.get_command_output(['git', '--help'])
