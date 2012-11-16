@@ -21,13 +21,18 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
+from __future__ import print_function
+
+import copy
+import optparse
 import os
-from optparse import OptionParser, OptionGroup
+import re
 import subprocess
-from git_big_picture.main import VERSION, CommitGraph
-import git_big_picture.git_tools as gt
+import sys
 import tempfile
+
+__version__ = '0.9.0-dev'
+__docformat__ = "restructuredtext"
 
 # settings and defaults
 BRANCHES     = 'branches'
@@ -62,91 +67,96 @@ EXIT_CODES = {"too_many_args":         1,
               "mutually_exclusive":   10,
              }
 
-_USAGE = "%prog OPTIONS [<repo-directory>]"
+sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
 DEBUG = False
 
-parser = OptionParser(usage=_USAGE, version=VERSION)
-default_format = 'svg'
+DEFAULT_FORMAT = 'svg'
 
-format_group = OptionGroup(parser, "Format Options",
-        "Options to control output and format")
+USAGE = "%prog OPTIONS [<repo-directory>]"
 
-# output options
-format_group.add_option('-p', '--plain',
-        action='store_true', dest='plain',
-        help='output lines suitable as input for dot')
-format_group.add_option('-f', '--format',
-        action='store', type='string', dest='format',
-        metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
-format_group.add_option('-v', '--viewer',
-        action='store', type='string', dest='viewer',
-        metavar='CMD',
-        help='write image to tempfile and start specified viewer')
-format_group.add_option('-o', '--out',
-        action='store', type='string', dest='outfile',
-        metavar='FILE', help='write image to specified file')
+def create_parser():
+    parser = optparse.OptionParser(usage=USAGE, version=__version__)
+    format_group = optparse.OptionGroup(parser, "Format Options",
+            "Options to control output and format")
 
-parser.add_option_group(format_group)
+    # output options
+    format_group.add_option('-p', '--plain',
+            action='store_true', dest='plain',
+            help='output lines suitable as input for dot')
+    format_group.add_option('-f', '--format',
+            action='store', type='string', dest='format',
+            metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+    format_group.add_option('-v', '--viewer',
+            action='store', type='string', dest='viewer',
+            metavar='CMD',
+            help='write image to tempfile and start specified viewer')
+    format_group.add_option('-o', '--out',
+            action='store', type='string', dest='outfile',
+            metavar='FILE', help='write image to specified file')
 
-filter_group = OptionGroup(parser, "Filter Options",
-        "Options to control commit/ref selection")
+    parser.add_option_group(format_group)
 
-# commit/ref selection -- filtering options
-filter_group.add_option('-a', '--all',
-        action='store_true', dest='all_commits',
-        help='include all commits')
+    filter_group = optparse.OptionGroup(parser, "Filter Options",
+            "Options to control commit/ref selection")
+
+    # commit/ref selection -- filtering options
+    filter_group.add_option('-a', '--all',
+            action='store_true', dest='all_commits',
+            help='include all commits')
 
 
-filter_group.add_option('-b', '--branches',
-        action='store_true', dest='branches',
-        help='show commits pointed to by branches')
-filter_group.add_option('-B', '--no-branches',
-        action='store_true', dest='no_branches',
-        help='do not show commits pointed to by branches')
+    filter_group.add_option('-b', '--branches',
+            action='store_true', dest='branches',
+            help='show commits pointed to by branches')
+    filter_group.add_option('-B', '--no-branches',
+            action='store_true', dest='no_branches',
+            help='do not show commits pointed to by branches')
 
-filter_group.add_option('-t', '--tags',
-        action='store_true', dest='tags',
-        help='show commits pointed to by tags')
-filter_group.add_option('-T', '--no-tags',
-        action='store_true', dest='no_tags',
-        help='do not show commits pointed to by tags')
+    filter_group.add_option('-t', '--tags',
+            action='store_true', dest='tags',
+            help='show commits pointed to by tags')
+    filter_group.add_option('-T', '--no-tags',
+            action='store_true', dest='no_tags',
+            help='do not show commits pointed to by tags')
 
-filter_group.add_option('-r', '--roots',
-        action='store_true', dest='roots',
-        help='show root commits')
-filter_group.add_option('-R', '--no-roots',
-        action='store_true', dest='no_roots',
-        help='do not show root commits')
+    filter_group.add_option('-r', '--roots',
+            action='store_true', dest='roots',
+            help='show root commits')
+    filter_group.add_option('-R', '--no-roots',
+            action='store_true', dest='no_roots',
+            help='do not show root commits')
 
-filter_group.add_option('-m', '--merges',
-        action='store_true', dest='merges',
-        help='include merge commits')
-filter_group.add_option('-M', '--no-merges',
-        action='store_true', dest='no_merges',
-        help='do not include merge commits')
+    filter_group.add_option('-m', '--merges',
+            action='store_true', dest='merges',
+            help='include merge commits')
+    filter_group.add_option('-M', '--no-merges',
+            action='store_true', dest='no_merges',
+            help='do not include merge commits')
 
-filter_group.add_option('-i', '--bifurcations',
-        action='store_true', dest='bifurcations',
-        help='include bifurcation commits')
-filter_group.add_option('-I', '--no-bifurcations',
-        action='store_true', dest='no_bifurcations',
-        help='do not include bifurcation commits')
+    filter_group.add_option('-i', '--bifurcations',
+            action='store_true', dest='bifurcations',
+            help='include bifurcation commits')
+    filter_group.add_option('-I', '--no-bifurcations',
+            action='store_true', dest='no_bifurcations',
+            help='do not include bifurcation commits')
 
-parser.add_option_group(filter_group)
+    parser.add_option_group(filter_group)
 
-# miscellaneous options
-parser.add_option('--pstats',
-        action='store', type='string', dest='pstats_outfile',
-        metavar='FILE',
-        help='run cProfile profiler writing pstats output to FILE')
+    # miscellaneous options
+    parser.add_option('--pstats',
+            action='store', type='string', dest='pstats_outfile',
+            metavar='FILE',
+            help='run cProfile profiler writing pstats output to FILE')
 
-parser.add_option('-d', '--debug',
-        action='store_true', dest='debug',
-        help='activate debug output')
+    parser.add_option('-d', '--debug',
 
-opts, args = parser.parse_args()
+            action='store_true', dest='debug',
+            help='activate debug output')
 
+    return parser
+
+PARSER = create_parser()
 
 def barf(message, exit_code):
     """ Abort execution with error message and exit code.
@@ -206,7 +216,7 @@ def parse_args(args):
         repodir = args[0]
     else:
         repodir = os.getcwd()
-    git_dir = gt.get_command_output(['git', 'rev-parse', '--git-dir'],
+    git_dir = get_command_output(['git', 'rev-parse', '--git-dir'],
                                     cwd=repodir).rstrip()
     if not git_dir.startswith(os.path.sep):
         # Prepend full path if we got relative one
@@ -399,11 +409,384 @@ def set_settings(settings, defaults, conf, cli):
     return output
 
 
+def get_command_output(command_list, cwd=None, git_env=None):
+    """ Execute arbitrary commands.
+
+    Parameters
+    ----------
+    command_list : list of strings
+        the command and its arguments
+    cwd : string
+        current working directory to execute command in
+    git_env : dict
+        the git envirnoment, if any
+
+    Returns
+    -------
+    output : string
+        the raw output of the command executed
+    """
+
+    p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, env=git_env, cwd=cwd)
+    load = p.stdout.read()
+    p.wait()
+    if p.returncode:
+        err = p.stderr.read()
+        err = '\n'.join(('> ' + e) for e in err.split('\n'))
+        raise Exception('Stderr:\n%s\nReturn code %d from command "%s"' \
+            % (err, p.returncode, ' '.join(command_list)))
+    return load
+
+
+class Git(object):
+
+    def __init__(self, git_dir):
+
+        self.git_env = {'GIT_DIR': git_dir}
+
+    def get_mappings(self):
+        """ Get mappings for all refs.
+
+        This is implemented using a single call to 'git for-each-ref'. Note
+        that it can handle non commit tags too and retruns these
+
+        Returns
+        -------
+        (lbranches, rbranches, abranches), (tags, ctags, nctags)
+
+        lbranches : dict mapping strings to sets of strings
+            mapping of commit sha1s to local branch names
+        rbranches : dict mapping strings to sets of strings
+            mapping of commit sha1s to remote branch names
+        abranches : dict mapping strings to sets of strings
+            mapping of commit sha1s to all branch names
+        tags : dict mapping strings to sets of strings
+            mapping of object sha1s to tag names
+        ctags : dict mapping sha1s to sets of strings
+            mapping of commits sha1s to tag names
+        nctags : dict mapping sha1s to sets of strings
+            mapping of non-commit sha1s to sets of strings
+        """
+
+        output = get_command_output(['git', 'for-each-ref',
+            "--format=['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']"]
+            , git_env=self.git_env).splitlines()
+        lbranch_prefix = 'refs/heads/'
+        rbranch_prefix = 'refs/remotes/'
+        tag_prefix = 'refs/tags/'
+        lbranches = dict()
+        rbranches = dict()
+        abranches = dict()
+        tags = dict()
+        ctags = dict()
+        nctags = dict()
+        def add_to_dict(dic, sha1, name):
+            if sha1 not in dic:
+                dic[sha1] = set()
+            dic[sha1].add(name)
+
+        for ref_info in output:
+            sha1, tag_sha1, ref_type, name = eval(ref_info)
+            if ref_type not in ['commit', 'tag']:
+                continue
+            elif name.startswith(lbranch_prefix):
+                add_to_dict(lbranches, sha1, name.replace(lbranch_prefix, ''))
+                add_to_dict(abranches, sha1, name.replace(lbranch_prefix, ''))
+            elif name.startswith(rbranch_prefix):
+                add_to_dict(rbranches, sha1, name.replace(rbranch_prefix, ''))
+                add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
+            elif name.startswith(tag_prefix):
+                # recusively dereference until we find a non-tag object
+                sha1 = get_command_output(['git', 'rev-parse',
+                    name+'^{}']).splitlines()[0]
+                # determine object type and to respective dict
+                obj_type = get_command_output(['git', 'cat-file', '-t',
+                    sha1]).splitlines()[0]
+                if obj_type in ['blob', 'tree']:
+                    add_to_dict(nctags, sha1, name.replace(tag_prefix, ''))
+                else:
+                    add_to_dict(ctags, sha1, name.replace(tag_prefix, ''))
+                add_to_dict(tags, sha1, name.replace(tag_prefix, ''))
+
+        return (lbranches, rbranches, abranches), (tags, ctags, nctags)
+
+    def get_parent_map(self):
+        """ Get a mapping of children to parents.
+
+        Returns
+        -------
+        parents : dict mapping strings to sets of strings
+            mapping of children sha1s to parents sha1
+        """
+
+        parents = {}
+        p = subprocess.Popen(['git', 'rev-list', '--all', '--parents'],
+                stdout=subprocess.PIPE, env=self.git_env)
+        output = p.communicate()[0]
+        for line in output.split('\n'):
+            sha_ones = [e.group(0) for e in re.finditer(sha1_pattern, line)]
+            count = len(sha_ones)
+            if count > 1:
+                parents[sha_ones[0]] = set(sha_ones[1:])
+            elif count == 1:
+                parents[sha_ones[0]] = set()
+        return parents
+
+
+def graph_factory(git_dir):
+    """ Create a CommitGraph object from a git_dir. """
+    git = Git(git_dir)
+    (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
+    return CommitGraph(git.get_parent_map(), ab, tags)
+
+
+class CommitGraph(object):
+    """ Directed Acyclic Graph (DAG) git repository.
+
+    Parameters
+    ----------
+    parent_map : dict mapping SHA1s to list of SHA1s
+        the parent map
+    branch_dict : dict mapping SHA1s to list of strings
+        the branches
+    tag_dict : dict mapping SHA1s to list of strings
+        the tags
+
+    Properties
+    ----------
+    roots : list of SHA1s
+        all root commits (the ones with no parents)
+    merges : list of SHA1s
+        all merge commits (the ones with multiple parents)
+    bifurcations : list SHA1s
+        all bifurcation commits (the ones with multiple children)
+
+    Attributes
+    ----------
+    parents : dict mapping SHA1s to list of SHA1s
+        the parent map
+    children : dict mapping SHA1s to list of SHA1s
+        the child map
+    branches : dict mapping SHA1s to list of strings
+        the branches
+    tags : dict mapping SHA1s to list of strings
+        tags
+
+    """
+    def __init__(self, parent_map, branch_dict, tag_dict):
+        self.parents = parent_map
+        self.branches = branch_dict
+        self.tags = tag_dict
+        self.dotdot = set()
+
+        self.children = {}
+        self._calculate_child_mapping()
+        self._verify_child_mapping()
+
+    def _has_label(self, sha_one):
+        """ Check if a sha1 is pointed to by a ref.
+
+        Parameters
+        ----------
+        sha_one : string
+        """
+
+        return sha_one in self.branches \
+            or sha_one in self.tags
+
+    def _calculate_child_mapping(self):
+        """ Populate the self.children dict, using self.parents. """
+        for sha_one, parent_sha_ones in self.parents.items():
+            for p in parent_sha_ones:
+                if p not in self.children:
+                    self.children[p] = set()
+                self.children[p].add(sha_one)
+            if sha_one not in self.children:
+                self.children[sha_one] = set()
+
+    def _verify_child_mapping(self):
+        """ Ensure that self.parents and self.children represent the same DAG.
+        """
+        for sha_one, pars in self.parents.items():
+            for p in pars:
+                for c in self.children[p]:
+                    assert(p in self.parents[c])
+        for sha_one, chs in self.children.items():
+            for c in chs:
+                for p in self.parents[c]:
+                    assert(c in self.children[p])
+
+    @property
+    def roots(self):
+        """ Find all root commits. """
+        return [sha for sha, parents in self.parents.items() if not parents]
+
+    @property
+    def merges(self):
+        return [sha for sha, parents in self.parents.items()
+                if len(parents) > 1]
+
+    @property
+    def bifurcations(self):
+        return [sha for sha, children in self.children.items()
+                if len(children) > 1]
+
+    def _filter(self,
+            branches=True,
+            tags=True,
+            roots=False,
+            merges=False,
+            bifurcations=False,
+            additional=None):
+        """ Filter the commmit graph.
+
+        Remove, or 'filter' the unwanted commits from the DAG. This will modify
+        self.parents and when done re-calculate self.children. Keyword
+        arguments can be used to specify 'interesting' commits
+
+        Generate a reachability graph for 'interesting' commits. This will
+        generate a graph of all interesting commits, with edges pointing to all
+        reachable 'interesting' parents.
+
+        Parameters
+        ----------
+        branches : bool
+            include commits being pointed to by branches
+        tags : bool
+            include commits being pointed to by tags
+        roots : bool
+            include root commits
+        merges : bool
+            include merge commits
+        bifurcations : bool
+            include bifurcation commits
+        additional : list of SHA1 sums
+            any additional commits to include
+
+        Returns
+        -------
+        commit_graph : CommitGraph
+            the filtered graph
+
+        """
+        interesting = []
+        if branches:
+            interesting.extend(self.branches.keys())
+        if tags:
+            interesting.extend(self.tags.keys())
+        if roots:
+            interesting.extend(self.roots)
+        if merges:
+            interesting.extend(self.merges)
+        if bifurcations:
+            interesting.extend(self.bifurcations)
+        if additional:
+            interesting.extend(additional)
+
+        reachable_interesting_parents = dict()
+        # for everything that we are interested in
+        for commit_i in interesting:
+            # Handle tags pointing to non-commits
+            if commit_i in self.parents:
+                to_visit = list(self.parents[commit_i])
+            else:
+                to_visit = list()
+            # create the set of seen commits
+            seen = set()
+            # initialise the parents for this commit_i
+            reachable_interesting_parents[commit_i] = set()
+            # iterate through to_visit list, i.e. go searching in the graph
+            for commit_j in to_visit:
+                # we have already been here
+                if commit_j in seen:
+                    continue
+                else:
+                    seen.add(commit_j)
+                    if commit_j in interesting:
+                        # is interesting, add and stop
+                        reachable_interesting_parents[commit_i].add(commit_j)
+                    else:
+                        # is not interesting, keep searching
+                        to_visit.extend(self.parents[commit_j])
+
+        return CommitGraph(reachable_interesting_parents,
+                copy.deepcopy(self.branches),
+                copy.deepcopy(self.tags))
+
+    def _minimal_sha_one_digits(self):
+        """ Calculate the minimal number of sha1 digits required to represent
+        all commits unambiguously. """
+        key_count = len(self.parents)
+        for digit_count in xrange(7, 40):
+            if len(set(e[0:digit_count] for e in self.parents.keys())) == key_count:
+                return digit_count
+        return 40
+
+    def _generate_dot_file(self, sha_ones_on_labels, sha_one_digits=None):
+        """ Generate graphviz input.
+
+        Parameters
+        ----------
+        sha_ones_on_labels : boolean
+            if True show sha1 (or minimal) on labels in addition to ref names
+        sha_one_digits : int
+            number of digits to use for showing sha1
+
+        Returns
+        -------
+        dot_file_lines : list of strings
+            lines of the graphviz input
+        """
+
+        def format_sha_one(sha_one):
+            """ Shorten sha1 if required. """
+            if (sha_one_digits is None) or (sha_one_digits == 40):
+                return sha_one
+            else:
+                return sha_one[0:sha_one_digits]
+
+        def label_gen():
+            keys = set(self.branches.keys()).union(set(self.tags.keys()))
+            for k in keys:
+                labels = []
+                case = 0
+                if k in self.tags:
+                    case = case + 1
+                    map(labels.append, sorted(self.tags[k]))
+                if k in self.branches:
+                    case = case + 2
+                    map(labels.append, sorted(self.branches[k]))
+                # http://www.graphviz.org/doc/info/colors.html
+                color = "/pastel13/%d" % case
+                yield (k, labels, color)
+
+        dot_file_lines = ['digraph {']
+        for sha_one, labels, color in label_gen():
+            dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
+                'ref':sha_one,
+                'label':'\\n'.join(labels \
+                    + (sha_ones_on_labels and [format_sha_one(sha_one),] or list())),
+                'color':color})
+        for sha_one in self.dotdot:
+            dot_file_lines.append('\t"%(ref)s"[label="..."];' % {'ref':sha_one})
+        if (sha_one_digits is not None) and (sha_one_digits != 40):
+            for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
+                dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
+                    'ref':sha_one,
+                    'label':format_sha_one(sha_one)})
+        for child, self.parents in self.parents.items():
+            for p in self.parents:
+                dot_file_lines.append('\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p})
+        dot_file_lines.append('}')
+        return dot_file_lines
+
+
 def main(opts, git_dir):
     cmdline_settings = parse_filter_options(opts)
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS, None, cmdline_settings)
-    git = gt.Git(git_dir)
+    git = Git(git_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     graph = CommitGraph(git.get_parent_map(), ab, tags)
     if opts.all_commits:
@@ -446,12 +829,12 @@ def main(opts, git_dir):
                 opts.format = guess
             else:
                 warn('Filename had no suffix, using default format: %s' %
-                        default_format)
-                opts.format = default_format
+                        DEFAULT_FORMAT)
+                opts.format = DEFAULT_FORMAT
                 opts.outfile += '.' + opts.format
         else:
-            warn('Using default format: %s' % default_format)
-            opts.format = default_format
+            warn('Using default format: %s' % DEFAULT_FORMAT)
+            opts.format = DEFAULT_FORMAT
     # run the 'dot' utility
     dot_output = run_dot(opts.format, dot_file_lines)
     # create outfile and possibly view that or a temporary file in viewer
@@ -468,19 +851,23 @@ def main(opts, git_dir):
         # print raw SVG, PDF, ...
         print(dot_output)
 
-if opts.debug is not None:
-    DEBUG = True
+if __name__ == '__main__':
 
-try:
-    gt.get_command_output(['git', '--help'])
-except Exception, e:
-    barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
-            EXIT_CODES["no_git"])
+    opts, args = PARSER.parse_args()
 
-git_dir = parse_args(args)
+    if opts.debug is not None:
+        DEBUG = True
 
-if opts.pstats_outfile is not None:
-    import cProfile
-    cProfile.run('main(opts, git_dir)', opts.pstats_outfile)
-else:
-    main(opts, git_dir)
+    try:
+        get_command_output(['git', '--help'])
+    except Exception, e:
+        barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
+                EXIT_CODES["no_git"])
+
+    git_dir = parse_args(args)
+
+    if opts.pstats_outfile is not None:
+        import cProfile
+        cProfile.run('main(opts, git_dir)', opts.pstats_outfile)
+    else:
+        main(opts, git_dir)
