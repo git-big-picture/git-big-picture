@@ -25,7 +25,6 @@ import tempfile as tf
 import shutil as sh
 import unittest as ut
 import git_big_picture as gbp
-import git_big_picture.git_tools as gt
 import shlex
 
 debug=False
@@ -34,7 +33,7 @@ debug=False
 # the test script... ugly.
 
 def dispatch(command_string):
-    return gt.get_command_output(shlex.split(command_string))
+    return gbp.get_command_output(shlex.split(command_string))
 
 def tag(sha1, tag_name):
     dispatch('git tag %s %s' % (tag_name, sha1))
@@ -62,7 +61,7 @@ class TestGitTools(ut.TestCase):
         if debug:
             print self.testing_dir
         self.git_dir = "%s/.git" % self.testing_dir
-        self.git = gt.Git(self.git_dir)
+        self.git = gbp.Git(self.git_dir)
         self.oldpwd = os.getcwd()
         os.chdir(self.testing_dir)
 
