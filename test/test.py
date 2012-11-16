@@ -106,7 +106,7 @@ class TestGitTools(ut.TestCase):
         a = empty_commit('a')
         b = empty_commit('b')
         graph = self.graph
-        filterd_graph = graph._filter(roots=True)
+        filterd_graph = graph.filter(roots=True)
         expected_parents = {
             a:set(),
             b:set((a,)),
@@ -176,7 +176,7 @@ class TestGitTools(ut.TestCase):
         b = empty_commit('B')
         c = empty_commit('C')
         graph = self.graph
-        filterd_graph = graph._filter()
+        filterd_graph = graph.filter()
         expected_reduced_parents = {
             a:set(),
             c:set((a,)),
@@ -200,20 +200,20 @@ class TestGitTools(ut.TestCase):
         f = empty_commit('F')
         graph = self.graph
         # use the defaults
-        filterd_graph = graph._filter()
+        filterd_graph = graph.filter()
         expected_reduced_parents = {
             a:set(),
             b:set((a,)),
             f:set((b,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
-        filterd_graph = graph._filter(roots=False)
+        filterd_graph = graph.filter(roots=False)
         expected_reduced_parents = {
             b:set(),
             f:set((b,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
-        filterd_graph = graph._filter(tags=False)
+        filterd_graph = graph.filter(tags=False)
         expected_reduced_parents = {
             a:set(),
             f:set((a,)),
@@ -240,7 +240,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git reset')
 
         graph = self.graph
-        filterd_graph = graph._filter()
+        filterd_graph = graph.filter()
         expected_reduced_parents = {
             blob_hash:set(),
             tree_hash:set(),
@@ -281,7 +281,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git branch -d topic')
 
         graph = self.graph
-        filterd_graph = graph._filter()
+        filterd_graph = graph.filter()
         expected_reduced_parents = {
             d:set((a,)),
             a:set(),
@@ -320,7 +320,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git merge topic')
         f = get_head_sha()
         graph = self.graph
-        filterd_graph = graph._filter()
+        filterd_graph = graph.filter()
         expected_reduced_parents = {
             b:set((a,)),
             a:set(),
@@ -381,7 +381,7 @@ class TestGitTools(ut.TestCase):
         dispatch('git merge topic')
         f = get_head_sha()
         graph = self.graph
-        filterd_graph = graph._filter()
+        filterd_graph = graph.filter()
         expected_reduced_parents = {
             m:set((j,)),
             j:set((h,)),

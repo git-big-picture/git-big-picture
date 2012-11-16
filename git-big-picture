@@ -626,7 +626,7 @@ class CommitGraph(object):
         return [sha for sha, children in self.children.items()
                 if len(children) > 1]
 
-    def _filter(self,
+    def filter(self,
             branches=FILTER_DEFAULTS[BRANCHES],
             tags=FILTER_DEFAULTS[TAGS],
             roots=FILTER_DEFAULTS[ROOTS],
@@ -787,7 +787,7 @@ def main(opts, git_dir):
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
         sha_one_digits = None
-        graph = graph._filter(**filter_settings)
+        graph = graph.filter(**filter_settings)
         sha_one_digits = graph._minimal_sha_one_digits()
 
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
