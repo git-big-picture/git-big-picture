@@ -213,6 +213,12 @@ class TestGitTools(ut.TestCase):
             f:set((b,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        filterd_graph = graph._filter(tags=False)
+        expected_reduced_parents = {
+            a:set(),
+            f:set((a,)),
+        }
+        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_no_commit_tags(self):
         """ Test for tree-tag and a blob-tag.
