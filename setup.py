@@ -21,7 +21,7 @@
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 from setuptools import setup
-from git_big_picture.main import VERSION
+from git_big_picture import __version__ as VERSION
 
 
 setup(name = 'git-big-picture',
@@ -30,7 +30,7 @@ setup(name = 'git-big-picture',
     description = 'Visualize git repositories.',
     url = 'http://git.goodpoint.de/?p=git-big-picture.git;a=summary',
     license = 'GPL v3 or later',
-    packages = ['git_big_picture'],
+    modules = ['git_big_picture'],
     scripts = ['git-big-picture'],
     test_suite = 'nose.collector',
 )
