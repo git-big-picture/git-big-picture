@@ -26,7 +26,7 @@ from __future__ import print_function
 import sys
 import os
 import copy
-from optparse import OptionParser, OptionGroup
+import optparse
 import subprocess
 import tempfile
 import re
@@ -75,9 +75,9 @@ DEBUG = False
 
 default_format = 'svg'
 
-parser = OptionParser(usage=_USAGE, version=VERSION)
+parser = optparse.OptionParser(usage=_USAGE, version=VERSION)
 
-format_group = OptionGroup(parser, "Format Options",
+format_group = optparse.OptionGroup(parser, "Format Options",
         "Options to control output and format")
 
 # output options
@@ -97,7 +97,7 @@ format_group.add_option('-o', '--out',
 
 parser.add_option_group(format_group)
 
-filter_group = OptionGroup(parser, "Filter Options",
+filter_group = optparse.OptionGroup(parser, "Filter Options",
         "Options to control commit/ref selection")
 
 # commit/ref selection -- filtering options
@@ -152,8 +152,6 @@ parser.add_option('--pstats',
 parser.add_option('-d', '--debug',
         action='store_true', dest='debug',
         help='activate debug output')
-
-parser = OptionParser(usage=_USAGE, version=VERSION)
 
 
 def barf(message, exit_code):
