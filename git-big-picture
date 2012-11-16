@@ -475,16 +475,10 @@ class Git(object):
         lbranch_prefix = 'refs/heads/'
         rbranch_prefix = 'refs/remotes/'
         tag_prefix = 'refs/tags/'
-        lbranches = dict()
-        rbranches = dict()
-        abranches = dict()
-        tags = dict()
-        ctags = dict()
-        nctags = dict()
+        lbranches, rbranches, abranches = {}, {}, {}
+        tags, ctags, nctags = {}, {}, {}
         def add_to_dict(dic, sha1, name):
-            if sha1 not in dic:
-                dic[sha1] = set()
-            dic[sha1].add(name)
+            dic.setdefault(sha1, set()).add(name)
 
         for ref_info in output:
             sha1, tag_sha1, ref_type, name = eval(ref_info)
