@@ -50,7 +50,7 @@ FILTER_DEFAULTS = {
         BIFURCATIONS: False,
         }
 
-exit_codes = {"too_many_args":         1,
+EXIT_CODES = {"too_many_args":         1,
               "dot_not_found":         2,
               "problem_with_dot":      3,
               "dot_terminated_early":  4,
@@ -201,7 +201,7 @@ def parse_args(args):
 
     """
     if len(args) > 1:
-        barf('Too many arguments: %s' % args, exit_codes["too_many_args"])
+        barf('Too many arguments: %s' % args, EXIT_CODES["too_many_args"])
     elif len(args) == 1:
         repodir = args[0]
     else:
@@ -237,10 +237,10 @@ def run_dot(output_format, dot_file_lines):
     except OSError, e:
         if e.errno == 2:
             barf("'dot' not found! Please install the Graphviz utility.",
-                    exit_codes["dot_not_found"])
+                    EXIT_CODES["dot_not_found"])
         else:
             barf("A problem occured calling 'dot -T%s'" % output_format,
-                    exit_codes["problem_with_dot"])
+                    EXIT_CODES["problem_with_dot"])
 
     # send dot input, automatically receive and store output and error
     out, err = p.communicate(input='\n'.join(dot_file_lines))
@@ -248,7 +248,7 @@ def run_dot(output_format, dot_file_lines):
         barf("'dot' terminated prematurely with error code %d;\n"
                 "probably you specified an invalid format, see 'man dot'.\n"
                 "The error from 'dot' was:\n>>>"
-                % p.returncode + err, exit_codes["dot_terminated_early"])
+                % p.returncode + err, EXIT_CODES["dot_terminated_early"])
     return out
 
 
@@ -268,7 +268,7 @@ def write_to_file(output_file, dot_output):
     except IOError, e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),
-                exit_codes["not_write_to_file"])
+                EXIT_CODES["not_write_to_file"])
     f.write(dot_output)
     f.flush()
     os.fsync(f.fileno())
@@ -294,7 +294,7 @@ def show_in_viewer(output_file, viewer):
         subprocess.call([viewer, output_file])
     except OSError, e:
         barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
-                exit_codes["no_such_viewer"])
+                EXIT_CODES["no_such_viewer"])
 
 
 def guess_format_from_filename(output_file):
@@ -344,7 +344,7 @@ def parse_filter_options(opts):
         if positive is not None and negative is not None:
             barf("'%s' and '%s' are mutually exclusive" %
                     ('--' + setting, '--no-' + setting),
-                    exit_codes['mutually_exclusive'])
+                    EXIT_CODES['mutually_exclusive'])
         elif positive is not None:
             cmdline_settings[setting] = True
         elif negative is not None:
@@ -418,9 +418,9 @@ def main(opts, git_dir):
     # option -p|--plain is mutually exclusive with all other output options
     if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
         barf("Option '-p|--plain' is incompatible with other output options.",
-                exit_codes["plain_with_others"])
+                EXIT_CODES["plain_with_others"])
     elif not any([opts.plain, opts.format, opts.viewer, opts.outfile]):
-        barf("Must provide and output option.", exit_codes["no_options"])
+        barf("Must provide and output option.", EXIT_CODES["no_options"])
     # if plain just print dot input to stdout
     if opts.plain:
         for line in dot_file_lines:
@@ -475,7 +475,7 @@ try:
     gt.get_command_output(['git', '--help'])
 except Exception, e:
     barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
-            exit_codes["no_git"])
+            EXIT_CODES["no_git"])
 
 git_dir = parse_args(args)
 
