@@ -627,11 +627,11 @@ class CommitGraph(object):
                 if len(children) > 1]
 
     def _filter(self,
-            branches=True,
-            tags=True,
-            roots=False,
-            merges=False,
-            bifurcations=False,
+            branches=FILTER_DEFAULTS[BRANCHES],
+            tags=FILTER_DEFAULTS[TAGS],
+            roots=FILTER_DEFAULTS[ROOTS],
+            merges=FILTER_DEFAULTS[MERGES],
+            bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
             additional=None):
         """ Filter the commmit graph.
 
