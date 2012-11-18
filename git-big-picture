@@ -34,7 +34,26 @@ import tempfile
 __version__ = '0.9.0-dev'
 __docformat__ = "restructuredtext"
 
-# settings and defaults
+## settings and defaults
+# format settings
+PLAIN    = 'plain'
+FORMAT   = 'format'
+VIEWER   = 'viewer'
+OUT_FILE = 'outfile'
+OUTPUT_SETTINGS = [
+        PLAIN,
+        FORMAT,
+        VIEWER,
+        OUT_FILE,
+        ]
+OUTPUT_DEFAULTS = {
+        PLAIN:    False,
+        FORMAT:   'svg',
+        VIEWER:   False,
+        OUT_FILE: False,
+        }
+
+# filter settings
 BRANCHES     = 'branches'
 TAGS         = 'tags'
 ROOTS        = 'roots'
@@ -71,13 +90,11 @@ sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
 DEBUG = False
 
-DEFAULT_FORMAT = 'svg'
-
 USAGE = "%prog OPTIONS [<repo-directory>]"
 
 def create_parser():
     parser = optparse.OptionParser(usage=USAGE, version=__version__)
-    format_group = optparse.OptionGroup(parser, "Format Options",
+    format_group = optparse.OptionGroup(parser, "Output Options",
             "Options to control output and format")
 
     # output options
@@ -328,6 +345,15 @@ def guess_format_from_filename(output_file):
     else:
         return False, None
 
+def parse_output_options(opts):
+    cmdline_settings = {}
+    for setting in OUTPUT_SETTINGS:
+        val = getattr(opts, setting)
+        if val is not None:
+            cmdline_settings[setting] = val
+        else:
+            cmdline_settings[setting] = False
+    return cmdline_settings
 
 def parse_filter_options(opts):
     """ Extract and check the filtering options from the command line 'opts'.
@@ -397,8 +423,8 @@ def set_settings(settings, defaults, conf, cli):
             if container[setting] is not None:
                 prev_val, val = val, container[setting]
                 if prev_val is not None:
-                    debug("Value for '%s' found in '%s', overrides setting from '%s': '%s'"
-                            % (setting, desc, prev, val))
+                    debug("Value for '%s' found in '%s', overrides setting '%s' from '%s': '%s'"
+                            % (setting, desc, prev_val, prev, val))
                 else:
                     debug("Value for '%s' found in '%s': '%s'"
                             % (setting, desc, val))
@@ -777,9 +803,10 @@ class CommitGraph(object):
 
 
 def main(opts, git_dir):
-    cmdline_settings = parse_filter_options(opts)
+    output_settings = set_settings(OUTPUT_SETTINGS,
+            OUTPUT_DEFAULTS, None, parse_output_options(opts))
     filter_settings = set_settings(FILTER_SETTINGS,
-            FILTER_DEFAULTS, None, cmdline_settings)
+            FILTER_DEFAULTS, None, parse_filter_options(opts))
     git = Git(git_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     graph = CommitGraph(git.get_parent_map(), ab, tags)
@@ -793,54 +820,61 @@ def main(opts, git_dir):
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 
     # option -p|--plain is mutually exclusive with all other output options
-    if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
+    if output_settings[PLAIN] and any([
+        output_settings[FORMAT],
+        output_settings[VIEWER],
+        output_settings[OUT_FILE]]):
         barf("Option '-p|--plain' is incompatible with other output options.",
                 EXIT_CODES["plain_with_others"])
-    elif not any([opts.plain, opts.format, opts.viewer, opts.outfile]):
+    elif not any([
+        output_settings[PLAIN],
+        output_settings[FORMAT],
+        output_settings[VIEWER],
+        output_settings[OUT_FILE]]):
         barf("Must provide and output option.", EXIT_CODES["no_options"])
     # if plain just print dot input to stdout
-    if opts.plain:
+    if output_settings[PLAIN]:
         for line in dot_file_lines:
             print(line)
         return
     # check for format mismatch between -f and -o
-    if opts.format and opts.outfile:
-        (has_suffix, guess) = guess_format_from_filename(opts.outfile)
-        if opts.format != guess and guess is not None:
+    if output_settings[FORMAT] and output_settings[OUT_FILE]:
+        (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
+        if output_settings[FORMAT] != guess and guess is not None:
             warn("Format mismatch: '%s'(-f|--format)"
                     "vs. '%s'(filename), will use: "
-                    "'%s'" % (opts.format, guess, guess))
-            opts.format = guess
+                    "'%s'" % (output_settings[FORMAT], guess, guess))
+            output_settings[FORMAT] = guess
         if guess is None:
-            warn('Filename had no suffix, using format: %s' % opts.format)
-            opts.outfile += '.' + opts.format
+            warn('Filename had no suffix, using format: %s' % output_settings[FORMAT])
+            output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
     # guess format from outfile and use default if not possible or given
-    if not opts.format:
-        if opts.outfile:
-            (has_suffix, guess) = guess_format_from_filename(opts.outfile)
+    if not output_settings[FORMAT]:
+        if output_settings[OUT_FILE]:
+            (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
             if has_suffix:
                 warn('Guessing format from filename: %s' % guess)
-                opts.format = guess
+                output_settings[FORMAT] = guess
             else:
                 warn('Filename had no suffix, using default format: %s' %
-                        DEFAULT_FORMAT)
-                opts.format = DEFAULT_FORMAT
-                opts.outfile += '.' + opts.format
+                        OUTPUT_DEFAULTS[FORMAT])
+                output_settings[FORMAT] = OUTPUT_DEFAULTS[FORMAT]
+                output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
         else:
-            warn('Using default format: %s' % DEFAULT_FORMAT)
-            opts.format = DEFAULT_FORMAT
+            warn('Using default format: %s' % OUTPUT_DEFAULTS[FORMAT])
+            output_settings[FORMAT] = OUTPUT_DEFAULTS[FORMAT]
     # run the 'dot' utility
-    dot_output = run_dot(opts.format, dot_file_lines)
+    dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
     # create outfile and possibly view that or a temporary file in viewer
-    if opts.viewer or opts.outfile:
-        if opts.outfile:
-            write_to_file(opts.outfile, dot_output)
+    if output_settings[VIEWER] or output_settings[OUT_FILE]:
+        if output_settings[OUT_FILE]:
+            write_to_file(output_settings[OUT_FILE], dot_output)
         else:
-            opts.outfile = tempfile.NamedTemporaryFile(
+            output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
                     prefix='git-big-picture').name
-            write_to_file(opts.outfile, dot_output)
-        if opts.viewer:
-            show_in_viewer(opts.outfile, opts.viewer)
+            write_to_file(output_settings[OUT_FILE], dot_output)
+        if output_settings[VIEWER]:
+            show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
     else:
         # print raw SVG, PDF, ...
         print(dot_output)
