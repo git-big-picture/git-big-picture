@@ -423,8 +423,8 @@ def set_settings(settings, defaults, conf, cli):
             if container[setting] is not None:
                 prev_val, val = val, container[setting]
                 if prev_val is not None:
-                    debug("Value for '%s' found in '%s', overrides setting from '%s': '%s'"
-                            % (setting, desc, prev, val))
+                    debug("Value for '%s' found in '%s', overrides setting '%s' from '%s': '%s'"
+                            % (setting, desc, prev_val, prev, val))
                 else:
                     debug("Value for '%s' found in '%s': '%s'"
                             % (setting, desc, val))
