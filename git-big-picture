@@ -39,7 +39,7 @@ __docformat__ = "restructuredtext"
 PLAIN    = 'plain'
 FORMAT   = 'format'
 VIEWER   = 'viewer'
-OUT_FILE = 'out'
+OUT_FILE = 'outfile'
 OUTPUT_SETTINGS = [
         PLAIN,
         FORMAT,
@@ -352,7 +352,7 @@ def parse_output_options(opts):
         if val is not None:
             cmdline_settings[setting] = val
         else:
-            cmdline_settings[seetting] = False
+            cmdline_settings[setting] = False
     return cmdline_settings
 
 def parse_filter_options(opts):
