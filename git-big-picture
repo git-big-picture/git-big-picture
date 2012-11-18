@@ -77,7 +77,7 @@ USAGE = "%prog OPTIONS [<repo-directory>]"
 
 def create_parser():
     parser = optparse.OptionParser(usage=USAGE, version=__version__)
-    format_group = optparse.OptionGroup(parser, "Format Options",
+    format_group = optparse.OptionGroup(parser, "Output Options",
             "Options to control output and format")
 
     # output options
