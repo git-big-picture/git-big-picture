@@ -351,7 +351,7 @@ def parse_output_options(opts):
         val = getattr(opts, setting)
         if val is not None:
             cmdline_settings[setting] = val
-        else
+        else:
             cmdline_settings[seetting] False
     return cmdline_settings
 
@@ -803,9 +803,8 @@ class CommitGraph(object):
 
 
 def main(opts, git_dir):
-    cmdline_settings = parse_filter_options(opts)
     filter_settings = set_settings(FILTER_SETTINGS,
-            FILTER_DEFAULTS, None, cmdline_settings)
+            FILTER_DEFAULTS, None, parse_filter_options(opts))
     git = Git(git_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     graph = CommitGraph(git.get_parent_map(), ab, tags)
