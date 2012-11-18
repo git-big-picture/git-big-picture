@@ -352,7 +352,7 @@ def parse_output_options(opts):
         if val is not None:
             cmdline_settings[setting] = val
         else:
-            cmdline_settings[seetting] False
+            cmdline_settings[seetting] = False
     return cmdline_settings
 
 def parse_filter_options(opts):
