@@ -345,6 +345,16 @@ def guess_format_from_filename(output_file):
     else:
         return False, None
 
+def parse_output_options(opts):
+    cmdline_settings = {}
+    for setting in OUTPUT_SETTINGS:
+        val = getattr(opts, setting)
+        if val is not None:
+            cmdline_settings[setting] = val
+        else
+            cmdline_settings[seetting] False
+    return cmdline_settings
+
 def parse_filter_options(opts):
     """ Extract and check the filtering options from the command line 'opts'.
 
