@@ -36,21 +36,21 @@ __docformat__ = "restructuredtext"
 
 ## settings and defaults
 # format settings
-PLAIN  = 'plain'
-FORMAT = 'format'
-VIEWER = 'viewer'
-OUT    = 'out'
+PLAIN    = 'plain'
+FORMAT   = 'format'
+VIEWER   = 'viewer'
+OUT_FILE = 'out'
 OUTPUT_SETTINGS = [
         PLAIN,
         FORMAT,
         VIEWER,
-        OUT,
+        OUT_FILE,
         ]
 OUTPUT_DEFAULTS = {
-        PLAIN:  False,
-        FORMAT: 'svg',
-        VIEWER: None,
-        OUT:    None,
+        PLAIN:    False,
+        FORMAT:   'svg',
+        VIEWER:   False,
+        OUT_FILE: False,
         }
 
 # filter settings
