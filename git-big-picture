@@ -803,6 +803,8 @@ class CommitGraph(object):
 
 
 def main(opts, git_dir):
+    output_settings = set_settings(OUTPUT_SETTINGS,
+            OUTPUT_DEFAULTS, None, parse_output_options(opts))
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS, None, parse_filter_options(opts))
     git = Git(git_dir)
@@ -818,54 +820,61 @@ def main(opts, git_dir):
     dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
 
     # option -p|--plain is mutually exclusive with all other output options
-    if opts.plain and any([opts.format, opts.viewer, opts.outfile]):
+    if output_settings[PLAIN] and any([
+        output_settings[FORMAT],
+        output_settings[VIEWER],
+        output_settings[OUT_FILE]]):
         barf("Option '-p|--plain' is incompatible with other output options.",
                 EXIT_CODES["plain_with_others"])
-    elif not any([opts.plain, opts.format, opts.viewer, opts.outfile]):
+    elif not any([
+        output_settings[PLAIN],
+        output_settings[FORMAT],
+        output_settings[VIEWER],
+        output_settings[OUT_FILE]]):
         barf("Must provide and output option.", EXIT_CODES["no_options"])
     # if plain just print dot input to stdout
-    if opts.plain:
+    if output_settings[PLAIN]:
         for line in dot_file_lines:
             print(line)
         return
     # check for format mismatch between -f and -o
-    if opts.format and opts.outfile:
-        (has_suffix, guess) = guess_format_from_filename(opts.outfile)
-        if opts.format != guess and guess is not None:
+    if output_settings[FORMAT] and output_settings[OUT_FILE]:
+        (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
+        if output_settings[FORMAT] != guess and guess is not None:
             warn("Format mismatch: '%s'(-f|--format)"
                     "vs. '%s'(filename), will use: "
-                    "'%s'" % (opts.format, guess, guess))
-            opts.format = guess
+                    "'%s'" % (output_settings[FORMAT], guess, guess))
+            output_settings[FORMAT] = guess
         if guess is None:
-            warn('Filename had no suffix, using format: %s' % opts.format)
-            opts.outfile += '.' + opts.format
+            warn('Filename had no suffix, using format: %s' % output_settings[FORMAT])
+            output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
     # guess format from outfile and use default if not possible or given
-    if not opts.format:
-        if opts.outfile:
-            (has_suffix, guess) = guess_format_from_filename(opts.outfile)
+    if not output_settings[FORMAT]:
+        if output_settings[OUT_FILE]:
+            (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
             if has_suffix:
                 warn('Guessing format from filename: %s' % guess)
-                opts.format = guess
+                output_settings[FORMAT] = guess
             else:
                 warn('Filename had no suffix, using default format: %s' %
                         OUTPUT_DEFAULTS[FORMAT])
-                opts.format = OUTPUT_DEFAULTS[FORMAT]
-                opts.outfile += '.' + opts.format
+                output_settings[FORMAT] = OUTPUT_DEFAULTS[FORMAT]
+                output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
         else:
             warn('Using default format: %s' % OUTPUT_DEFAULTS[FORMAT])
-            opts.format = OUTPUT_DEFAULTS[FORMAT]
+            output_settings[FORMAT] = OUTPUT_DEFAULTS[FORMAT]
     # run the 'dot' utility
-    dot_output = run_dot(opts.format, dot_file_lines)
+    dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
     # create outfile and possibly view that or a temporary file in viewer
-    if opts.viewer or opts.outfile:
-        if opts.outfile:
-            write_to_file(opts.outfile, dot_output)
+    if output_settings[VIEWER] or output_settings[OUT_FILE]:
+        if output_settings[OUT_FILE]:
+            write_to_file(output_settings[OUT_FILE], dot_output)
         else:
-            opts.outfile = tempfile.NamedTemporaryFile(
+            output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
                     prefix='git-big-picture').name
-            write_to_file(opts.outfile, dot_output)
-        if opts.viewer:
-            show_in_viewer(opts.outfile, opts.viewer)
+            write_to_file(output_settings[OUT_FILE], dot_output)
+        if output_settings[VIEWER]:
+            show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
     else:
         # print raw SVG, PDF, ...
         print(dot_output)
