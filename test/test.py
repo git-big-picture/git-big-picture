@@ -32,22 +32,28 @@ debug=False
 # The only reason these global commands work, is because we change the cwd of
 # the test script... ugly.
 
+
 def dispatch(command_string):
     return gbp.get_command_output(shlex.split(command_string))
+
 
 def tag(sha1, tag_name):
     dispatch('git tag %s %s' % (tag_name, sha1))
 
+
 def get_head_sha():
     return dispatch('git rev-parse HEAD').rstrip()
+
 
 def empty_commit(mess):
     dispatch('git commit --allow-empty -m %s' % mess)
     return get_head_sha()
 
+
 def print_dict(dict_):
-    for (k,v) in dict_.iteritems():
-        print k,v
+    for (k, v) in dict_.iteritems():
+        print k, v
+
 
 class TestGitTools(ut.TestCase):
 
@@ -82,7 +88,8 @@ class TestGitTools(ut.TestCase):
         def create_root(branch_name):
             dispatch('git read-tree --empty')
             new_tree = dispatch('git write-tree').strip()
-            new_commit = dispatch('git commit-tree %s -m empty' % new_tree).strip()
+            new_commit = dispatch('git commit-tree %s -m empty' %
+                    new_tree).strip()
             dispatch('git branch %s %s' % (branch_name, new_commit))
             return new_commit
 
@@ -106,8 +113,8 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter(roots=True)
         expected_parents = {
-            a:set(),
-            b:set((a,)),
+            a: set(),
+            b: set((a,)),
         }
         self.assertEqual(expected_parents, filterd_graph.parents)
 
@@ -131,7 +138,6 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(set(graph.merges), set([d]))
         self.assertEqual(set(graph.bifurcations), set([a]))
 
-
     def test_get_parent_map(self):
         """ Check get_parent_map() works:
 
@@ -149,14 +155,13 @@ class TestGitTools(ut.TestCase):
         d = get_head_sha()
 
         expected_parents = {
-            a:set(),
-            b:set((a,)),
-            c:set((a,)),
-            d:set((c, b)),
+            a: set(),
+            b: set((a,)),
+            c: set((a,)),
+            d: set((c, b)),
         }
         self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(),
                 expected_parents)
-
 
     def test_filter_one(self):
         """ Remove a single commit from between two commits.
@@ -175,8 +180,8 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            a:set(),
-            c:set((a,)),
+            a: set(),
+            c: set((a,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -199,21 +204,21 @@ class TestGitTools(ut.TestCase):
         # use the defaults
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            a:set(),
-            b:set((a,)),
-            f:set((b,)),
+            a: set(),
+            b: set((a,)),
+            f: set((b,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
         filterd_graph = graph.filter(roots=False)
         expected_reduced_parents = {
-            b:set(),
-            f:set((b,)),
+            b: set(),
+            f: set((b,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
         filterd_graph = graph.filter(tags=False)
         expected_reduced_parents = {
-            a:set(),
-            f:set((a,)),
+            a: set(),
+            f: set((a,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -222,26 +227,26 @@ class TestGitTools(ut.TestCase):
         """
 
         a = empty_commit('A')
-        f = open('foo','w')
+        f = open('foo', 'w')
         f.writelines('bar')
         f.close()
         blob_hash = dispatch('git hash-object -w foo').rstrip()
-        dispatch('git tag -m "blob-tag" blob-tag '+blob_hash)
+        dispatch('git tag -m "blob-tag" blob-tag ' + blob_hash)
         os.mkdir('baz')
-        f = open('baz/foo','w')
+        f = open('baz/foo', 'w')
         f.writelines('bar')
         f.close()
         dispatch('git add baz/foo')
         tree_hash = dispatch('git write-tree --prefix=baz').rstrip()
-        dispatch('git tag -m "tree-tag" tree-tag '+tree_hash)
+        dispatch('git tag -m "tree-tag" tree-tag ' + tree_hash)
         dispatch('git reset')
 
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            blob_hash:set(),
-            tree_hash:set(),
-            a:set(),
+            blob_hash: set(),
+            tree_hash: set(),
+            a: set(),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -280,9 +285,9 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            d:set((a,)),
-            a:set(),
-            f:set((a, d,)),
+            d: set((a,)),
+            a: set(),
+            f: set((a, d,)),
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -319,10 +324,10 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            b:set((a,)),
-            a:set(),
-            f:set((p, b,)),
-            p:set((b,)),
+            b: set((a,)),
+            a: set(),
+            f: set((p, b,)),
+            p: set((b,)),
         }
         print "a", a
         print "b", b
@@ -380,13 +385,13 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            m:set((j,)),
-            j:set((h,)),
-            h:set((b,)),
-            b:set((a,)),
-            a:set(),
-            f:set((p, b,)),
-            p:set((b,)),
+            m: set((j,)),
+            j: set((h,)),
+            h: set((b,)),
+            b: set((a,)),
+            a: set(),
+            f: set((p, b,)),
+            p: set((b,)),
         }
         print_dict(expected_reduced_parents)
         print_dict(graph.parents)
