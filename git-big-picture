@@ -13,7 +13,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# git-big-piture is distributed in the hope that it will be useful,
+# git-big-picture is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -356,9 +356,9 @@ def parse_output_options(opts):
 def parse_filter_options(opts):
     """ Extract and check the filtering options from the command line 'opts'.
 
-    Checks that not both the option and it's neagtion were found. The return
+    Checks that not both the option and it's negation were found. The return
     dict contains one entry for each setting. This entry can be True to signal
-    the option was found, False to signale the negation was found and None to
+    the option was found, False to signal the negation was found and None to
     signal that neither was found.
 
     Parameters
@@ -444,7 +444,7 @@ def get_command_output(command_list, cwd=None, git_env=None):
     cwd : string
         current working directory to execute command in
     git_env : dict
-        the git envirnoment, if any
+        the git environment, if any
 
     Returns
     -------
@@ -484,7 +484,7 @@ class Git(object):
         """ Get mappings for all refs.
 
         This is implemented using a single call to 'git for-each-ref'. Note
-        that it can handle non commit tags too and retruns these
+        that it can handle non commit tags too and returns these
 
         Returns
         -------
@@ -663,7 +663,7 @@ class CommitGraph(object):
             merges=FILTER_DEFAULTS[MERGES],
             bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
             additional=None):
-        """ Filter the commmit graph.
+        """ Filter the commit graph.
 
         Remove, or 'filter' the unwanted commits from the DAG. This will modify
         self.parents and when done re-calculate self.children. Keyword

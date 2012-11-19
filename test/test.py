@@ -12,7 +12,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# git-big-piture is distributed in the hope that it will be useful,
+# git-big-picture is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -184,7 +184,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_filter_with_tags(self):
-        """ Remove three commits and root commmit
+        """ Remove three commits and root commit
 
             A---B---C---D---E---F
                 |               |
