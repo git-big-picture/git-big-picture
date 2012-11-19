@@ -648,11 +648,13 @@ class CommitGraph(object):
 
     @property
     def merges(self):
+        """ Find all merge commits. """
         return [sha for sha, parents in self.parents.items()
                 if len(parents) > 1]
 
     @property
     def bifurcations(self):
+        """ Find all bifurcations. """
         return [sha for sha, children in self.children.items()
                 if len(children) > 1]
 
