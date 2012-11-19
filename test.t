@@ -36,4 +36,12 @@
   fatal: Must provide and output option. Try '-h' for more information
   [8]
 
+# run plain
+
+  $ git-big-picture -p
+  digraph {
+  \t"[0-9a-f]{40}"[label="master", color="/pastel13/2", style=filled]; (re) (esc)
+  }
+
+
 # vim: set syntax=sh :
