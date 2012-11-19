@@ -808,7 +808,8 @@ class CommitGraph(object):
         return dot_file_lines
 
 
-def main(opts, repo_dir):
+def main(opts, args):
+    repo_dir = parse_variable_args(args)
     output_settings = set_settings(OUTPUT_SETTINGS,
             OUTPUT_DEFAULTS, None, parse_output_options(opts))
     filter_settings = set_settings(FILTER_SETTINGS,
@@ -898,10 +899,8 @@ if __name__ == '__main__':
         barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
                 EXIT_CODES["no_git"])
 
-    repo_dir = parse_variable_args(args)
-
     if opts.pstats_outfile is not None:
         import cProfile
-        cProfile.run('main(opts, repo_dir)', opts.pstats_outfile)
+        cProfile.run('main(opts, args)', opts.pstats_outfile)
     else:
-        main(opts, repo_dir)
+        main(opts, args)
