@@ -92,6 +92,7 @@ DEBUG = False
 
 USAGE = "%prog OPTIONS [<repo-directory>]"
 
+
 def create_parser():
     parser = optparse.OptionParser(usage=USAGE, version=__version__)
     format_group = optparse.OptionGroup(parser, "Output Options",
@@ -121,7 +122,6 @@ def create_parser():
     filter_group.add_option('-a', '--all',
             action='store_true', dest='all_commits',
             help='include all commits')
-
 
     filter_group.add_option('-b', '--branches',
             action='store_true', dest='branches',
@@ -175,6 +175,7 @@ def create_parser():
 
 PARSER = create_parser()
 
+
 def barf(message, exit_code):
     """ Abort execution with error message and exit code.
 
@@ -201,6 +202,7 @@ def warn(message):
     """
     sys.stderr.write('warning: %s\n' % message)
 
+
 def debug(message):
     """ Print a debug message.
 
@@ -212,6 +214,7 @@ def debug(message):
     """
     if DEBUG:
         sys.stdout.write('debug:   %s\n' % message)
+
 
 def parse_variable_args(args):
     """ Parse arguments and get git_dir.
@@ -345,6 +348,7 @@ def guess_format_from_filename(output_file):
     else:
         return False, None
 
+
 def parse_output_options(opts):
     cmdline_settings = {}
     for setting in OUTPUT_SETTINGS:
@@ -354,6 +358,7 @@ def parse_output_options(opts):
         else:
             cmdline_settings[setting] = False
     return cmdline_settings
+
 
 def parse_filter_options(opts):
     """ Extract and check the filtering options from the command line 'opts'.
@@ -388,6 +393,7 @@ def parse_filter_options(opts):
         else:
             cmdline_settings[setting] = None
     return cmdline_settings
+
 
 def set_settings(settings, defaults, conf, cli):
     """ Extract the value for setting in order.
@@ -460,7 +466,7 @@ def get_command_output(command_list, cwd=None, git_env=None):
     if p.returncode:
         err = p.stderr.read()
         err = '\n'.join(('> ' + e) for e in err.split('\n'))
-        raise Exception('Stderr:\n%s\nReturn code %d from command "%s"' \
+        raise Exception('Stderr:\n%s\nReturn code %d from command "%s"'
             % (err, p.returncode, ' '.join(command_list)))
     return load
 
@@ -503,6 +509,7 @@ class Git(object):
         tag_prefix = 'refs/tags/'
         lbranches, rbranches, abranches = {}, {}, {}
         tags, ctags, nctags = {}, {}, {}
+
         def add_to_dict(dic, sha1, name):
             dic.setdefault(sha1, set()).add(name)
 
@@ -519,7 +526,7 @@ class Git(object):
             elif name.startswith(tag_prefix):
                 # recusively dereference until we find a non-tag object
                 sha1 = get_command_output(['git', 'rev-parse',
-                    name+'^{}']).splitlines()[0]
+                    name + '^{}']).splitlines()[0]
                 # determine object type and to respective dict
                 obj_type = get_command_output(['git', 'cat-file', '-t',
                     sha1]).splitlines()[0]
