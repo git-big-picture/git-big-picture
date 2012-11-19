@@ -80,7 +80,7 @@ Dependencies
 * Python 2.6 (2.5 will not work, 2.7 may work)
 * Git (1.7.1 works)
 * Graphviz utility
-* Nosetest (only for running tests)
+* Nosetest and Cram (only for running tests)
 
 Installation
 ------------
