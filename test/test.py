@@ -60,8 +60,6 @@ class TestGitTools(ut.TestCase):
         self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
         if debug:
             print self.testing_dir
-        self.git_dir = "%s/.git" % self.testing_dir
-        self.git = gbp.Git(self.git_dir)
         self.oldpwd = os.getcwd()
         os.chdir(self.testing_dir)
 
@@ -77,7 +75,7 @@ class TestGitTools(ut.TestCase):
 
     @property
     def graph(self):
-        return gbp.graph_factory(self.git_dir)
+        return gbp.graph_factory(self.testing_dir)
 
     def test_find_roots(self):
 
@@ -156,9 +154,8 @@ class TestGitTools(ut.TestCase):
             c:set((a,)),
             d:set((c, b)),
         }
-
-        actual_parents = self.git.get_parent_map()
-        self.assertEqual(actual_parents, expected_parents)
+        self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(),
+                expected_parents)
 
 
     def test_filter_one(self):

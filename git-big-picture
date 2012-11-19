@@ -873,12 +873,11 @@ def main(opts, repo_dir):
     dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
     # create outfile and possibly view that or a temporary file in viewer
     if output_settings[VIEWER] or output_settings[OUT_FILE]:
-        if output_settings[OUT_FILE]:
-            write_to_file(output_settings[OUT_FILE], dot_output)
-        else:
+        # no output file requested, create a temporary one
+        if not output_settings[OUT_FILE]:
             output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
                     prefix='git-big-picture').name
-            write_to_file(output_settings[OUT_FILE], dot_output)
+        write_to_file(output_settings[OUT_FILE], dot_output)
         if output_settings[VIEWER]:
             show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
     else:
