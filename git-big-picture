@@ -889,6 +889,7 @@ if __name__ == '__main__':
 
     if opts.debug is not None:
         DEBUG = True
+        debug('Activate bebug')
 
     try:
         get_command_output(['git', '--help'])
