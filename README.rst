@@ -218,17 +218,11 @@ graph, and stores this PDF in a file called ``visualization.pdf``.
 Testing
 -------
 
-Run the Python based test-suite with:
+The Python code is tested with `nose <https://nose.readthedocs.org/en/latest/>`_
 
 .. code:: shell
 
-    $ ./setup.py test
-
-Or alternatively use ``nosetests`` directly:
-
-.. code:: shell
-
-    $ nosetests
+    $ ./test.py
 
 The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
