@@ -27,6 +27,7 @@ import copy
 import optparse
 import os
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -217,7 +218,7 @@ def debug(message):
 
 
 def parse_variable_args(args):
-    """ Parse arguments and get git_dir.
+    """ Parse arguments and get repo_dir.
 
     Parameters
     ----------
@@ -226,22 +227,13 @@ def parse_variable_args(args):
 
     Returns
     -------
-    git_dir : path
-        full path to the $GIT_DIR
+    repo_dir : path
+        path to the repo_dir
 
     """
     if len(args) > 1:
         barf('Too many arguments: %s' % args, EXIT_CODES["too_many_args"])
-    elif len(args) == 1:
-        repodir = args[0]
-    else:
-        repodir = os.getcwd()
-    git_dir = get_command_output(['git', 'rev-parse', '--git-dir'],
-                                    cwd=repodir).rstrip()
-    if not git_dir.startswith(os.path.sep):
-        # Prepend full path if we got relative one
-        git_dir = os.path.join(repodir, git_dir)
-    return git_dir
+    return args[0] if len(args) == 1 else os.getcwd()
 
 
 def run_dot(output_format, dot_file_lines):
@@ -458,7 +450,6 @@ def get_command_output(command_list, cwd=None, git_env=None):
     output : string
         the raw output of the command executed
     """
-
     p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, env=git_env, cwd=cwd)
     load = p.stdout.read()
@@ -473,9 +464,13 @@ def get_command_output(command_list, cwd=None, git_env=None):
 
 class Git(object):
 
-    def __init__(self, git_dir):
+    def __init__(self, repo_dir):
 
-        self.git_env = {'GIT_DIR': git_dir}
+        self.repo_dir = repo_dir
+
+    def __call__(self, command):
+        return get_command_output(shlex.split(command),
+                cwd=self.repo_dir).splitlines()
 
     def get_mappings(self):
         """ Get mappings for all refs.
@@ -501,9 +496,7 @@ class Git(object):
             mapping of non-commit sha1s to sets of strings
         """
 
-        output = get_command_output(['git', 'for-each-ref',
-            "--format=['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']"]
-            , git_env=self.git_env).splitlines()
+        output = self("git for-each-ref --format=\"['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']\"")
         lbranch_prefix = 'refs/heads/'
         rbranch_prefix = 'refs/remotes/'
         tag_prefix = 'refs/tags/'
@@ -525,11 +518,9 @@ class Git(object):
                 add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
             elif name.startswith(tag_prefix):
                 # recusively dereference until we find a non-tag object
-                sha1 = get_command_output(['git', 'rev-parse',
-                    name + '^{}']).splitlines()[0]
+                sha1 = self('git rev-parse %s^{}' % name)[0]
                 # determine object type and to respective dict
-                obj_type = get_command_output(['git', 'cat-file', '-t',
-                    sha1]).splitlines()[0]
+                obj_type = self('git cat-file -t %s' % sha1)[0]
                 if obj_type in ['blob', 'tree']:
                     add_to_dict(nctags, sha1, name.replace(tag_prefix, ''))
                 else:
@@ -548,10 +539,8 @@ class Git(object):
         """
 
         parents = {}
-        p = subprocess.Popen(['git', 'rev-list', '--all', '--parents'],
-                stdout=subprocess.PIPE, env=self.git_env)
-        output = p.communicate()[0]
-        for line in output.split('\n'):
+        lines = self('git rev-list --all --parents')
+        for line in lines:
             sha_ones = [e.group(0) for e in re.finditer(sha1_pattern, line)]
             count = len(sha_ones)
             if count > 1:
@@ -561,9 +550,9 @@ class Git(object):
         return parents
 
 
-def graph_factory(git_dir):
+def graph_factory(repo_dir):
     """ Create a CommitGraph object from a git_dir. """
-    git = Git(git_dir)
+    git = Git(repo_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     return CommitGraph(git.get_parent_map(), ab, tags)
 
@@ -809,12 +798,12 @@ class CommitGraph(object):
         return dot_file_lines
 
 
-def main(opts, git_dir):
+def main(opts, repo_dir):
     output_settings = set_settings(OUTPUT_SETTINGS,
             OUTPUT_DEFAULTS, None, parse_output_options(opts))
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS, None, parse_filter_options(opts))
-    git = Git(git_dir)
+    git = Git(repo_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     graph = CommitGraph(git.get_parent_map(), ab, tags)
     if opts.all_commits:
@@ -899,10 +888,10 @@ if __name__ == '__main__':
         barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
                 EXIT_CODES["no_git"])
 
-    git_dir = parse_variable_args(args)
+    repo_dir = parse_variable_args(args)
 
     if opts.pstats_outfile is not None:
         import cProfile
-        cProfile.run('main(opts, git_dir)', opts.pstats_outfile)
+        cProfile.run('main(opts, repo_dir)', opts.pstats_outfile)
     else:
-        main(opts, git_dir)
+        main(opts, repo_dir)
