@@ -1,4 +1,5 @@
 #!/usr/bin/env cram
+# vim: set syntax=sh :
 
 # This file is part of git-big-picture
 #
@@ -17,20 +18,20 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-# Cram (http://pypi.python.org/pypi/cram) tests for git-big-picture
+Cram (http://pypi.python.org/pypi/cram) tests for git-big-picture
 
-# No repo
+No repo
 
   $ git-big-picture
   fatal: '/tmp/cramtests-.{6}/test.t' is probably not a Git repository (re)
   [10]
 
-# create a fake repo
+create a fake repo
 
   $ git init -q
   $ git commit -q --allow-empty -m "foo"
 
-# run without options
+run without options
 
   $ git-big-picture .
   fatal: Must provide and output option. Try '-h' for more information
@@ -38,10 +39,9 @@
 
 # run plain
 
-  $ git-big-picture -p
-  digraph {
-  \t"[0-9a-f]{40}"[label="master", color="/pastel13/2", style=filled]; (re) (esc)
-  }
+#  $ git-big-picture -p
+#  digraph {
+#  \t"[0-9a-f]{40}"[label="master", color="/pastel13/2", style=filled]; (re) (esc)
+#  }
 
 
-# vim: set syntax=sh :
