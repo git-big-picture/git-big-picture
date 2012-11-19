@@ -480,6 +480,21 @@ class Git(object):
         return get_command_output(shlex.split(command),
                 cwd=self.repo_dir).splitlines()
 
+    def config(self, settings):
+        config_settings = {}
+        for setting in settings:
+            try:
+                val = self('git config big-picture.%s' % setting)[0]
+            except Exception:
+                val = None
+            if val is None:
+                config_settings[setting] = None
+            elif val.lower() in ['1', 'yes', 'true', 'on']:
+                config_settings[setting] = True
+            elif val.lower() in ['0', 'no', 'false', 'off']:
+                config_settings[setting] = False
+        return config_settings
+
     def get_mappings(self):
         """ Get mappings for all refs.
 
@@ -810,11 +825,15 @@ class CommitGraph(object):
 
 def main(opts, args):
     repo_dir = parse_variable_args(args)
-    output_settings = set_settings(OUTPUT_SETTINGS,
-            OUTPUT_DEFAULTS, None, parse_output_options(opts))
-    filter_settings = set_settings(FILTER_SETTINGS,
-            FILTER_DEFAULTS, None, parse_filter_options(opts))
     git = Git(repo_dir)
+    output_settings = set_settings(OUTPUT_SETTINGS,
+            OUTPUT_DEFAULTS,
+            None,
+            parse_output_options(opts))
+    filter_settings = set_settings(FILTER_SETTINGS,
+            FILTER_DEFAULTS,
+            git.config(FILTER_SETTINGS),
+            parse_filter_options(opts))
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
     graph = CommitGraph(git.get_parent_map(), ab, tags)
     if opts.all_commits:
