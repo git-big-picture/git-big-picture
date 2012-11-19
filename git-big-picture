@@ -838,7 +838,8 @@ def main(opts, args):
         output_settings[FORMAT],
         output_settings[VIEWER],
         output_settings[OUT_FILE]]):
-        barf("Must provide and output option.", EXIT_CODES["no_options"])
+        barf("Must provide and output option. Try '-h' for more information",
+                EXIT_CODES["no_options"])
     # if plain just print dot input to stdout
     if output_settings[PLAIN]:
         for line in dot_file_lines:
