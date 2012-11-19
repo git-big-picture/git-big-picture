@@ -30,8 +30,6 @@ create a fake repo and export vars
 
   $ git init -q
   $ git commit -q --allow-empty -m "foo"
-
-
   $ export outfile='file.svg'
   $ export viewer='true'
   $ export stats_file='stats'
