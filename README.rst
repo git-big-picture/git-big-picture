@@ -230,12 +230,11 @@ Or alternatively use ``nosetests`` directly:
 
     $ nosetests
 
-Also there are some basic calls to the cli. There are not checked against
-predefined out though.
+The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
 .. code:: shell
 
-    $ ./test-cli.sh
+    $ ./test.cram
 
 Profiling
 ---------
