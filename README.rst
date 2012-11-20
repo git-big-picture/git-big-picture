@@ -257,6 +257,38 @@ Manually pipe the Graphviz commands to the ``dot`` utility:
 
     $ git-big-picture --graphviz ~/git-repo | dot -Tpng -o graph.png
 
+Using Filter Options
+....................
+
+The three options ``--branches`` ``--tags`` and ``--roots`` are active by
+default. You can use the negation switches to turn them off. These use the
+uppercase equivalent of the short option and the prefix ``no-`` for the long
+option. For example: ``-B | --no-branches`` to deactivate showing branches.
+
+Show all interesting commits, by showing also merges and bifurcations:
+
+.. code:: shell
+
+    $ git-big-picture -i -m
+
+Show only roots (deactivate branches and tags):
+
+.. code:: shell
+
+    $ git-big-picture -B -T
+
+Show merges and branches only (deactivate tags):
+
+.. code:: shell
+
+    $ git-big-picture -m -T
+
+Show all commits:
+
+.. code:: shell
+
+    $ git-big-picture -a
+
 Testing
 -------
 
