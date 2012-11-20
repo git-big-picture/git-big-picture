@@ -406,9 +406,9 @@ TODO
 Changelog
 ---------
 
-* v0.9.0 - XXXX-XX-XX
+* v0.9.0 - 2012-11-20
 
-  * rstify readme
+  * rst-ify readme
   * Fix long standing bug in graph search algorithm
   * Fix long standing conversion from tabbed to 4-spaces
   * Overhaul and refactor the test-suite
@@ -416,6 +416,7 @@ Changelog
   * Add ability to find root-, merge- and bifurcation-commits
   * Overhaul command line interface with new options
   * Add command line interface tests using Cram
+  * Overhaul documentation to reflect changes
 
 * v0.8.0 - 2012-11-05
 
