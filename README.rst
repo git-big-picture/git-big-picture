@@ -141,18 +141,45 @@ Usage
 .. code:: shell
 
     $ ./git-big-picture --help
-    Usage: git-big-picture -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]
+    Usage: git-big-picture OPTIONS [<repo-directory>]
 
     Options:
     --version             show program's version number and exit
     -h, --help            show this help message and exit
-    -a, --all             include all commits (not just tags and branch heads)
-    -p, --plain           output lines suitable as input for dot
-    -f FMT, --format=FMT  set output format [svg, png, ps, pdf, ...]
-    -v CMD, --viewer=CMD  write image to tempfile and start specified viewer
-    -o FILE, --out=FILE   write image to specified file
     --pstats=FILE         run cProfile profiler writing pstats output to FILE
+    -d, --debug           activate debug output
 
+    Output Options:
+        Options to control output and format
+
+        -f FMT, --format=FMT
+                            set output format [svg, png, ps, pdf, ...]
+        -g, --graphviz      output lines suitable as input for dot/graphviz
+        -G, --no-graphviz   disable dot/graphviz output
+        -p, --processed     output the dot processed, binary data
+        -P, --no-processed  disable binary output
+        -v CMD, --viewer=CMD
+                            write image to tempfile and start specified viewer
+        -V, --no-viewer     disable starting viewer
+        -o FILE, --outfile=FILE
+                            write image to specified file
+        -O, --no-outfile    disable writing image to file
+
+    Filter Options:
+        Options to control commit/ref selection
+
+        -a, --all           include all commits
+        -b, --branches      show commits pointed to by branches
+        -B, --no-branches   do not show commits pointed to by branches
+        -t, --tags          show commits pointed to by tags
+        -T, --no-tags       do not show commits pointed to by tags
+        -r, --roots         show root commits
+        -R, --no-roots      do not show root commits
+        -m, --merges        include merge commits
+        -M, --no-merges     do not include merge commits
+        -i, --bifurcations  include bifurcation commits
+        -I, --no-bifurcations
+                            do not include bifurcation commits
 
 Usage Examples
 --------------
