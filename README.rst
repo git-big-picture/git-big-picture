@@ -355,7 +355,7 @@ Changelog
   * Fix long standing bug in graph search algorithm
   * Fix long standing conversion from tabbed to 4-spaces
   * Overhaul and refactor the test-suite
-  * Remove old '--some' crufy code
+  * Remove old ``--some`` crufy code and option
   * Add ability to find root-, merge- and bifurcation-commits
   * Overhaul command line interface with new options
 
