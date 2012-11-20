@@ -1,10 +1,12 @@
 git-big-picture
 ===============
 
-Git-big-picture is a visualization for Git repositories. You can think of it as
-a filter that removes uninteresting commits from a DAG modelling a Git
-repository and thereby exposes the big picture: the hierarchy of tags and
-branches.
+``git-big-picture`` is a visualization tool for Git repositories. You can think
+of it as a filter that removes uninteresting commits from a DAG modelling a Git
+repository and thereby exposes the big picture: for example the hierarchy of
+tags and branches. ``git-big-picture`` supports conveniece output options and
+can filter different classes of commits. It uses the Graphviz utility to render
+images that are pleasing to the eye.
 
 A Small Example
 ---------------
@@ -58,7 +60,7 @@ But since the commits would be labeled with their refs, it would look more like
 Screenshots
 -----------
 
-Git-big-picture can output nice images.
+Courtesy of Graphviz, ``git-big-picture`` can output nice images.
 
 Here is the original repository from the example above:
 
