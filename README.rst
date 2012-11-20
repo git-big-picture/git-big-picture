@@ -76,6 +76,7 @@ We also have a real world examples from:
 
 * `cython <http://imgdump.zetatech.org/cython-big-picture.png>`_
 * `PyMVPA <http://imgdump.zetatech.org/pymvpa-big-picture.png>`_
+* `bloscpack <http://imgdump.zetatech.org/bloscpack-big-picture.png>`_
 
 Dependencies
 ------------
