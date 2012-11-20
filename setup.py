@@ -30,6 +30,5 @@ setup(name = 'git-big-picture',
     description = 'Visualize git repositories.',
     url = 'http://git.goodpoint.de/?p=git-big-picture.git;a=summary',
     license = 'GPL v3 or later',
-    modules = ['git_big_picture'],
     scripts = ['git-big-picture'],
 )

@@ -89,16 +89,43 @@ Just run it straight from a clone or download:
 
 .. code:: shell
 
-    $ git clone git://git.goodpoint.de/git-big-picture.git
+    $ git clone git://github.com/esc/git-big-picture.git
     $ cd git-big-picture
     $ ./git-big-picture --help
 
-Alternatively, use the standard ``setup.py`` script to install it system wide.
+    $ wget https://raw.github.com/esc/git-big-picture/master/git-big-picture
+    $ ./git-big-picture -h
+
+Alternatively, use the standard ``setup.py`` script to install it system wide
+or just for the user.
 
 .. code:: shell
 
     $ ./setup.py install
     (may need root privileges)
+    $ ./setup.py install --user
+
+Git Integration
+---------------
+
+You can easily integrate this script as a regular Git command, by making the
+script ``git-big-picture`` available on the ``$PATH``. For instance: using
+``./setup.py install`` method, as described above should do the trick.
+Alternatively symlink or copy ``git-big-picture`` into a directory listed in
+your ``$PATH``, for example ``$HOME/bin``.
+
+You may then use ``git big-picture`` (w/o the first dash) as you would any other Git command:
+
+.. code:: shell
+
+    $ git big-picture -h
+
+Or create an alias:
+
+.. code:: shell
+
+    $ git config --global alias.bp big-picture
+    $ git bp -h
 
 Internals
 ---------
@@ -113,61 +140,96 @@ Usage
 
 .. code:: shell
 
-    $ ./git-big-picture --help
-    Usage: git-big-picture -p | [-f <format>] [-v <viewer>] [-o <outfile>] [<repo-directory>]
+    $ git-big-picture --help
+    Usage: git-big-picture OPTIONS [<repo-directory>]
 
     Options:
     --version             show program's version number and exit
     -h, --help            show this help message and exit
-    -a, --all             include all commits (not just tags and branch heads)
-    -p, --plain           output lines suitable as input for dot
-    -f FMT, --format=FMT  set output format [svg, png, ps, pdf, ...]
-    -v CMD, --viewer=CMD  write image to tempfile and start specified viewer
-    -o FILE, --out=FILE   write image to specified file
     --pstats=FILE         run cProfile profiler writing pstats output to FILE
+    -d, --debug           activate debug output
 
+    Output Options:
+        Options to control output and format
+
+        -f FMT, --format=FMT
+                            set output format [svg, png, ps, pdf, ...]
+        -g, --graphviz      output lines suitable as input for dot/graphviz
+        -G, --no-graphviz   disable dot/graphviz output
+        -p, --processed     output the dot processed, binary data
+        -P, --no-processed  disable binary output
+        -v CMD, --viewer=CMD
+                            write image to tempfile and start specified viewer
+        -V, --no-viewer     disable starting viewer
+        -o FILE, --outfile=FILE
+                            write image to specified file
+        -O, --no-outfile    disable writing image to file
+
+    Filter Options:
+        Options to control commit/ref selection
+
+        -a, --all           include all commits
+        -b, --branches      show commits pointed to by branches
+        -B, --no-branches   do not show commits pointed to by branches
+        -t, --tags          show commits pointed to by tags
+        -T, --no-tags       do not show commits pointed to by tags
+        -r, --roots         show root commits
+        -R, --no-roots      do not show root commits
+        -m, --merges        include merge commits
+        -M, --no-merges     do not include merge commits
+        -i, --bifurcations  include bifurcation commits
+        -I, --no-bifurcations
+                            do not include bifurcation commits
 
 Usage Examples
 --------------
+
+There are two releated groups of options, the output and the filter options.
+Output options govern the output and format produced by the tool. Filter
+options govern which commits to include when calculating the reduced graph.
+
+Using Output Options
+....................
 
 Output Graphviz syntax:
 
 .. code:: shell
 
-    $ ./git-big-picture -p
+    $ git-big-picture -g
 
 Output raw Graphviz output (i.e. the image)
 
 .. code:: shell
 
-    $ ./git-big-picture -f svg
+    $ git-big-picture -p
 
 Generate PNG version of current Git repository and save to ``our-project.png``:
 
 .. code:: shell
 
-    $ ./git-big-picture -o our-project.png
+    $ git-big-picture -o our-project.png
 
 If you specify the format and a filename with extension, the filename extension will
 be used:
 
 .. code:: shell
 
-    $ ./git-big-picture -f svg -o our-project.png
-    warning: Format mismatch: 'svg'(-f|--format)vs. 'png'(filename), will use: 'png'
+    $ git-big-picture -f svg -o our-project.png
+    $ ls
+    our-project.png
 
 If you don't have an extension, you could still specify a format:
 
 .. code:: shell
 
-    $ ./git-big-picture -f pdf -o our-project
+    $ git-big-picture -f pdf -o our-project
     warning: Filename had no suffix, using format: pdf
 
 Otherwise the default format SVG is used:
 
 .. code:: shell
 
-    ./git-big-picture -o our-project
+    git-big-picture -o our-project
     warning: Filename had no suffix, using default format: svg
 
 Generate SVG (default format) graph of the repository in ``~/git-repo`` and view the
@@ -175,45 +237,57 @@ result in firefox:
 
 .. code:: shell
 
-    $ ./git-big-picture -v firefox ~/git-repo/
+    $ git-big-picture -v firefox ~/git-repo/
 
 If you would like to use an alternative viewer, specify viewer and its format:
 
 .. code:: shell
 
-    $ ./git-big-picture -f pdf -v xpdf
+    $ git-big-picture -f pdf -v xpdf
 
 You can also open the viewer automatically on the output file:
 
 .. code:: shell
 
-    $ ./git-big-picture -v xpdf -o our-project.pdf
+    $ git-big-picture -v xpdf -o our-project.pdf
 
 Manually pipe the Graphviz commands to the ``dot`` utility:
 
 .. code:: shell
 
-    $ ./git-big-picture --plain ~/git-repo | dot -Tpng -o graph.png
+    $ git-big-picture --graphviz ~/git-repo | dot -Tpng -o graph.png
 
-Without any output options, the script will print its usage and exit.
+Using Filter Options
+....................
 
+The three options ``--branches`` ``--tags`` and ``--roots`` are active by
+default. You can use the negation switches to turn them off. These use the
+uppercase equivalent of the short option and the prefix ``no-`` for the long
+option. For example: ``-B | --no-branches`` to deactivate showing branches.
 
-Git Integration
----------------
-
-You can easily integrate this script as a regular Git command, by making the
-script ``git-big-picture`` available on the ``$PATH``. For instance: using
-``./setup.py install`` method as described above should do the trick. Alternatively symlink
-``git-big-picture`` into a directory listed in your ``$PATH``, for example ``$HOME/bin``.
-
-You may then use ``git big-picture`` (w/o the first dash) as you would any other Git command:
+Show all interesting commits, by showing also merges and bifurcations:
 
 .. code:: shell
 
-    $ git big-picture -f pdf -v xpdf -o visualization.pdf
+    $ git-big-picture -i -m
 
-This will present you with a PDF viewer displaying your project's
-graph, and stores this PDF in a file called ``visualization.pdf``.
+Show only roots (deactivate branches and tags):
+
+.. code:: shell
+
+    $ git-big-picture -B -T
+
+Show merges and branches only (deactivate tags):
+
+.. code:: shell
+
+    $ git-big-picture -m -T
+
+Show all commits:
+
+.. code:: shell
+
+    $ git-big-picture -a
 
 Testing
 -------
@@ -230,6 +304,16 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
     $ ./test.cram
 
+Debugging
+---------
+
+You can use the ``[-d | --debug]`` switch to debug:
+
+.. code:: shell
+
+    $ git-big-picture -d -v firefox
+
+
 Profiling
 ---------
 
@@ -240,7 +324,7 @@ Using ``--pstats``:
 
 .. code:: shell
 
-    $ ./git-big-picture --pstats=profile-stats -o graph.svg
+    $ git-big-picture --pstats=profile-stats -o graph.svg
 
 Profile the script with ``cProfile``
 
@@ -268,11 +352,12 @@ Changelog
 * v0.9.0 - XXXX-XX-XX
 
   * rstify readme
-  * Remove old 'some' crufy code
   * Fix long standing bug in graph search algorithm
   * Fix long standing conversion from tabbed to 4-spaces
   * Overhaul and refactor the test-suite
+  * Remove old '--some' crufy code
   * Add ability to find root-, merge- and bifurcation-commits
+  * Overhaul command line interface with new options
 
 * v0.8.0 - 2012-11-05
 
