@@ -875,14 +875,16 @@ def main(opts, args):
         return
     # check for format mismatch between -f and -o
     if output_settings[FORMAT] and output_settings[OUT_FILE]:
-        (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
+        (has_suffix, guess) = guess_format_from_filename(
+                output_settings[OUT_FILE])
         if output_settings[FORMAT] != guess and guess is not None:
             debug("Format mismatch: '%s'(-f|--format or default)"
                     "vs. '%s'(filename), will use: "
                     "'%s'" % (output_settings[FORMAT], guess, guess))
             output_settings[FORMAT] = guess
         if guess is None:
-            warn('Filename had no suffix, using format: %s' % output_settings[FORMAT])
+            warn('Filename had no suffix, using format: %s' %
+                    output_settings[FORMAT])
             output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
     # run the 'dot' utility
     dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
