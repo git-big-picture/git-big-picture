@@ -399,6 +399,7 @@ Changelog
   * Remove old ``--some`` crufy code and option
   * Add ability to find root-, merge- and bifurcation-commits
   * Overhaul command line interface with new options
+  * Add command line interface tests using Cram
 
 * v0.8.0 - 2012-11-05
 
