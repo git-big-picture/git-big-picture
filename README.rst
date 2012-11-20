@@ -272,6 +272,16 @@ The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
     $ ./test.cram
 
+Debugging
+---------
+
+You can use the ``[-d | --debug]`` switch to debug:
+
+.. code:: shell
+
+    $ ./git-big-picture -d -v firefox
+
+
 Profiling
 ---------
 
