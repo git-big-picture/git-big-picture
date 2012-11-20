@@ -140,7 +140,7 @@ Usage
 
 .. code:: shell
 
-    $ ./git-big-picture --help
+    $ git-big-picture --help
     Usage: git-big-picture OPTIONS [<repo-directory>]
 
     Options:
@@ -195,26 +195,26 @@ Output Graphviz syntax:
 
 .. code:: shell
 
-    $ ./git-big-picture -g
+    $ git-big-picture -g
 
 Output raw Graphviz output (i.e. the image)
 
 .. code:: shell
 
-    $ ./git-big-picture -p
+    $ git-big-picture -p
 
 Generate PNG version of current Git repository and save to ``our-project.png``:
 
 .. code:: shell
 
-    $ ./git-big-picture -o our-project.png
+    $ git-big-picture -o our-project.png
 
 If you specify the format and a filename with extension, the filename extension will
 be used:
 
 .. code:: shell
 
-    $ ./git-big-picture -f svg -o our-project.png
+    $ git-big-picture -f svg -o our-project.png
     $ ls
     our-project.png
 
@@ -222,14 +222,14 @@ If you don't have an extension, you could still specify a format:
 
 .. code:: shell
 
-    $ ./git-big-picture -f pdf -o our-project
+    $ git-big-picture -f pdf -o our-project
     warning: Filename had no suffix, using format: pdf
 
 Otherwise the default format SVG is used:
 
 .. code:: shell
 
-    ./git-big-picture -o our-project
+    git-big-picture -o our-project
     warning: Filename had no suffix, using default format: svg
 
 Generate SVG (default format) graph of the repository in ``~/git-repo`` and view the
@@ -237,25 +237,25 @@ result in firefox:
 
 .. code:: shell
 
-    $ ./git-big-picture -v firefox ~/git-repo/
+    $ git-big-picture -v firefox ~/git-repo/
 
 If you would like to use an alternative viewer, specify viewer and its format:
 
 .. code:: shell
 
-    $ ./git-big-picture -f pdf -v xpdf
+    $ git-big-picture -f pdf -v xpdf
 
 You can also open the viewer automatically on the output file:
 
 .. code:: shell
 
-    $ ./git-big-picture -v xpdf -o our-project.pdf
+    $ git-big-picture -v xpdf -o our-project.pdf
 
 Manually pipe the Graphviz commands to the ``dot`` utility:
 
 .. code:: shell
 
-    $ ./git-big-picture --graphviz ~/git-repo | dot -Tpng -o graph.png
+    $ git-big-picture --graphviz ~/git-repo | dot -Tpng -o graph.png
 
 Testing
 -------
@@ -279,7 +279,7 @@ You can use the ``[-d | --debug]`` switch to debug:
 
 .. code:: shell
 
-    $ ./git-big-picture -d -v firefox
+    $ git-big-picture -d -v firefox
 
 
 Profiling
@@ -292,7 +292,7 @@ Using ``--pstats``:
 
 .. code:: shell
 
-    $ ./git-big-picture --pstats=profile-stats -o graph.svg
+    $ git-big-picture --pstats=profile-stats -o graph.svg
 
 Profile the script with ``cProfile``
 
