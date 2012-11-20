@@ -43,16 +43,16 @@ FORMAT    = 'format'
 VIEWER    = 'viewer'
 OUT_FILE  = 'outfile'
 OUTPUT_SETTINGS = [
+        FORMAT,
         GRAPHVIZ,
         PROCESSED,
-        FORMAT,
         VIEWER,
         OUT_FILE,
         ]
 OUTPUT_DEFAULTS = {
+        FORMAT:    'svg',
         GRAPHVIZ:  False,
         PROCESSED: False,
-        FORMAT:    'svg',
         VIEWER:    False,
         OUT_FILE:  False,
         }
@@ -104,22 +104,38 @@ def create_parser():
             "Options to control output and format")
 
     # output options
-    format_group.add_option('-g', '--graphviz',
-            action='store_true', dest='graphviz',
-            help='output lines suitable as input for dot/graphviz')
-    format_group.add_option('-p', '--processed',
-            action='store_true', dest='processed',
-            help='output the dot processed, binary data')
     format_group.add_option('-f', '--format',
             action='store', type='string', dest='format',
             metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+
+    format_group.add_option('-g', '--graphviz',
+            action='store_true', dest='graphviz',
+            help='output lines suitable as input for dot/graphviz')
+    format_group.add_option('-G', '--no-graphviz',
+            action='store_true', dest='no_graphviz',
+            help='disable dot/graphviz output')
+
+    format_group.add_option('-p', '--processed',
+            action='store_true', dest='processed',
+            help='output the dot processed, binary data')
+    format_group.add_option('-P', '--no-processed',
+            action='store_true', dest='no_processed',
+            help='disable binary output')
+
     format_group.add_option('-v', '--viewer',
             action='store', type='string', dest='viewer',
             metavar='CMD',
             help='write image to tempfile and start specified viewer')
+    format_group.add_option('-V', '--no-viewer',
+            action='store_true', dest='no_viewer',
+            help='disable starting viewer')
+
     format_group.add_option('-o', '--out',
             action='store', type='string', dest='outfile',
             metavar='FILE', help='write image to specified file')
+    format_group.add_option('-O', '--no-out',
+            action='store_true', dest='no_outfile',
+            help='disable writing image to file')
 
     parser.add_option_group(format_group)
 
@@ -350,12 +366,21 @@ def guess_format_from_filename(output_file):
 
 def parse_output_options(opts):
     cmdline_settings = {}
-    for setting in OUTPUT_SETTINGS:
-        val = getattr(opts, setting)
-        if val is not None:
-            cmdline_settings[setting] = val
+    for setting in OUTPUT_SETTINGS[1:]:
+        positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
+        print(setting, positive, negative)
+        if positive is not None and negative is not None:
+            barf("'%s' and '%s' are mutually exclusive" %
+                    ('--' + setting, '--no-' + setting),
+                    EXIT_CODES['mutually_exclusive'])
+        if positive is not None:
+            cmdline_settings[setting] = positive
+        elif negative is not None:
+            cmdline_settings[setting] = False
         else:
             cmdline_settings[setting] = None
+    val = getattr(opts, FORMAT)
+    cmdline_settings[FORMAT] = val if val is not None else None
     return cmdline_settings
 
 
@@ -836,6 +861,7 @@ def main(opts, args):
             OUTPUT_DEFAULTS,
             git.config(OUTPUT_SETTINGS),
             parse_output_options(opts))
+    print(output_settings)
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS,
             git.config(FILTER_SETTINGS),
@@ -907,7 +933,7 @@ if __name__ == '__main__':
 
     if opts.debug is not None:
         DEBUG = True
-        debug('Activate bebug')
+        debug('Activate debug')
 
     try:
         get_command_output(['git', '--help'])
