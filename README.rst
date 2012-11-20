@@ -289,6 +289,44 @@ Show all commits:
 
     $ git-big-picture -a
 
+Configuration
+-------------
+
+The standard ``git config`` infrastructre can be used to configure
+``git-big-picture``. Most of the command line arguments can be configured in a
+``big-picture`` section. For example to configure ``firefox`` as a viewer
+
+.. code:: shell
+
+    $ git config --global big-picture.viewer firefox
+
+Will create the following section and entry in your ``~/.gitconfig``:
+
+.. code:: ini
+
+    [big-picture]
+        viewer = firefox
+
+
+The command line negation arguments can be used to disable a setting configured
+via the command line. For example, if you have configured the ``viewer`` above
+and try to use the ``-g | --graphviz`` switch, you will get the following
+error:
+
+.. code:: shell
+
+    $ git-big-picture -g
+    fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
+
+... since you already have a viewer configured. In this case, use the negation
+option ``-V | --no-viewer`` to disable the ``viewer`` setting from the config
+file:
+
+.. code:: shell
+
+    $ git-big-picture -g -V
+
+
 Testing
 -------
 
