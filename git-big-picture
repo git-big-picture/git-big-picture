@@ -884,21 +884,6 @@ def main(opts, args):
         if guess is None:
             warn('Filename had no suffix, using format: %s' % output_settings[FORMAT])
             output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
-    # guess format from outfile and use default if not possible or given
-    if not output_settings[FORMAT]:
-        if output_settings[OUT_FILE]:
-            (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
-            if has_suffix:
-                warn('Guessing format from filename: %s' % guess)
-                output_settings[FORMAT] = guess
-            else:
-                warn('Filename had no suffix, using default format: %s' %
-                        OUTPUT_DEFAULTS[FORMAT])
-                output_settings[FORMAT] = OUTPUT_DEFAULTS[FORMAT]
-                output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
-        else:
-            warn('Using default format: %s' % OUTPUT_DEFAULTS[FORMAT])
-            output_settings[FORMAT] = OUTPUT_DEFAULTS[FORMAT]
     # run the 'dot' utility
     dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
     # create outfile and possibly view that or a temporary file in viewer
