@@ -184,17 +184,24 @@ Usage
 Usage Examples
 --------------
 
+There are two releated groups of options, the output and the filter options.
+Output options govern the output and format produced by the tool. Filter
+options govern which commits to include when calculating the reduced graph.
+
+Using Output Options
+....................
+
 Output Graphviz syntax:
 
 .. code:: shell
 
-    $ ./git-big-picture -p
+    $ ./git-big-picture -g
 
 Output raw Graphviz output (i.e. the image)
 
 .. code:: shell
 
-    $ ./git-big-picture -f svg
+    $ ./git-big-picture -p
 
 Generate PNG version of current Git repository and save to ``our-project.png``:
 
@@ -208,7 +215,8 @@ be used:
 .. code:: shell
 
     $ ./git-big-picture -f svg -o our-project.png
-    warning: Format mismatch: 'svg'(-f|--format)vs. 'png'(filename), will use: 'png'
+    $ ls
+    our-project.png
 
 If you don't have an extension, you could still specify a format:
 
@@ -247,11 +255,7 @@ Manually pipe the Graphviz commands to the ``dot`` utility:
 
 .. code:: shell
 
-    $ ./git-big-picture --plain ~/git-repo | dot -Tpng -o graph.png
-
-Without any output options, the script will print its usage and exit.
-
-
+    $ ./git-big-picture --graphviz ~/git-repo | dot -Tpng -o graph.png
 
 Testing
 -------
