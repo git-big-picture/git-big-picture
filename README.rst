@@ -4,7 +4,7 @@ git-big-picture
 ``git-big-picture`` is a visualization tool for Git repositories. You can think
 of it as a filter that removes uninteresting commits from a DAG modelling a Git
 repository and thereby exposes the big picture: for example the hierarchy of
-tags and branches. ``git-big-picture`` supports conveniece output options and
+tags and branches. ``git-big-picture`` supports convenience output options and
 can filter different classes of commits. It uses the Graphviz utility to render
 images that are pleasing to the eye.
 
@@ -47,7 +47,7 @@ The *reduced* graph of *interesting* commits would be:
           P
 
 But since the commits would be labeled with their refs, it would look more like
-(within the limits of ascii art):
+(within the limits of ASCII art):
 
 .. code::
 
@@ -190,24 +190,12 @@ Usage
 Usage Examples
 --------------
 
-There are two releated groups of options, the output and the filter options.
+There are two related groups of options, the output and the filter options.
 Output options govern the output and format produced by the tool. Filter
 options govern which commits to include when calculating the reduced graph.
 
 Using Output Options
 ....................
-
-Output Graphviz syntax:
-
-.. code:: shell
-
-    $ git-big-picture -g
-
-Output raw Graphviz output (i.e. the image)
-
-.. code:: shell
-
-    $ git-big-picture -p
 
 Generate PNG version of current Git repository and save to ``our-project.png``:
 
@@ -215,14 +203,21 @@ Generate PNG version of current Git repository and save to ``our-project.png``:
 
     $ git-big-picture -o our-project.png
 
+Generate SVG (default format) image of the repository in ``~/git-repo`` and view the
+result in firefox:
+
+.. code:: shell
+
+    $ git-big-picture -v firefox ~/git-repo/
+
 If you specify the format and a filename with extension, the filename extension will
 be used:
 
 .. code:: shell
 
     $ git-big-picture -f svg -o our-project.png
-    $ ls
-    our-project.png
+    $ file our-project.png
+    our-project.png: PNG image data, 216 x 325, 8-bit/color RGB, non-interlaced
 
 If you don't have an extension, you could still specify a format:
 
@@ -238,13 +233,6 @@ Otherwise the default format SVG is used:
     git-big-picture -o our-project
     warning: Filename had no suffix, using default format: svg
 
-Generate SVG (default format) graph of the repository in ``~/git-repo`` and view the
-result in firefox:
-
-.. code:: shell
-
-    $ git-big-picture -v firefox ~/git-repo/
-
 If you would like to use an alternative viewer, specify viewer and its format:
 
 .. code:: shell
@@ -256,6 +244,28 @@ You can also open the viewer automatically on the output file:
 .. code:: shell
 
     $ git-big-picture -v xpdf -o our-project.pdf
+
+Output raw Graphviz syntax:
+
+.. code:: shell
+
+    $ git-big-picture -g
+
+Output raw Graphviz output (i.e. the image):
+
+.. code:: shell
+
+    $ git-big-picture -p
+
+Note however, that the options in the two examples above are both mutually
+exclusive and incompatible with other output options.
+
+.. code:: shell
+
+    $ git-big-picture -g -p
+    fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
+    $ git-big-picture -g -v firefox
+    fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
 
 Manually pipe the Graphviz commands to the ``dot`` utility:
 
@@ -271,7 +281,7 @@ default. You can use the negation switches to turn them off. These use the
 uppercase equivalent of the short option and the prefix ``no-`` for the long
 option. For example: ``-B | --no-branches`` to deactivate showing branches.
 
-Show all interesting commits, by showing also merges and bifurcations:
+Show all interesting commits, i.e. show also merges and bifurcations:
 
 .. code:: shell
 
@@ -298,9 +308,9 @@ Show all commits:
 Configuration
 -------------
 
-The standard ``git config`` infrastructre can be used to configure
+The standard ``git config`` infrastructure can be used to configure
 ``git-big-picture``. Most of the command line arguments can be configured in a
-``big-picture`` section. For example to configure ``firefox`` as a viewer
+``big-picture`` section. For example, to configure ``firefox`` as a viewer
 
 .. code:: shell
 
@@ -332,11 +342,10 @@ file:
 
     $ git-big-picture -g -V
 
-
 Testing
 -------
 
-The Python code is tested with `nose <https://nose.readthedocs.org/en/latest/>`_
+The Python code is tested with `nose <https://nose.readthedocs.org/en/latest/>`_:
 
 .. code:: shell
 
@@ -357,6 +366,8 @@ You can use the ``[-d | --debug]`` switch to debug:
 
     $ git-big-picture -d -v firefox
 
+Although debugging output is somewhat sparse...
+
 
 Profiling
 ---------
@@ -370,14 +381,17 @@ Using ``--pstats``:
 
     $ git-big-picture --pstats=profile-stats -o graph.svg
 
+... will write the profiler output to 
+
 Profile the script with ``cProfile``
 
 .. code:: shell
 
     $ python -m cProfile -o profile-stats git-big-picture -o graph.svg
 
-In either case, you can then use the excellent visualisation tool ``gprof2dot``
-which, incidentally, outputs Graphviz syntax too:
+In either case, you can then use the excellent visualisation tool `gprof2dot
+<http://code.google.com/p/jrfonseca/wiki/Gprof2Dot>`_ which, incidentally,
+uses Graphviz too:
 
 .. code:: shell
 
@@ -398,7 +412,7 @@ Changelog
   * Fix long standing bug in graph search algorithm
   * Fix long standing conversion from tabbed to 4-spaces
   * Overhaul and refactor the test-suite
-  * Remove old ``--some`` crufy code and option
+  * Remove old ``--some`` crufty code and option
   * Add ability to find root-, merge- and bifurcation-commits
   * Overhaul command line interface with new options
   * Add command line interface tests using Cram
