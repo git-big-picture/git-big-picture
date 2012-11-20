@@ -877,7 +877,7 @@ def main(opts, args):
     if output_settings[FORMAT] and output_settings[OUT_FILE]:
         (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
         if output_settings[FORMAT] != guess and guess is not None:
-            warn("Format mismatch: '%s'(-f|--format)"
+            debug("Format mismatch: '%s'(-f|--format or default)"
                     "vs. '%s'(filename), will use: "
                     "'%s'" % (output_settings[FORMAT], guess, guess))
             output_settings[FORMAT] = guess

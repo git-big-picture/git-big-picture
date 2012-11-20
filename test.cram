@@ -80,7 +80,6 @@ try wrong format
 mismatch format
 
   $ git-big-picture -f pdf -o $outfile
-  warning: Format mismatch: 'pdf'(-f|--format)vs. 'svg'(filename), will use: 'svg'
 
 try just filename
 
