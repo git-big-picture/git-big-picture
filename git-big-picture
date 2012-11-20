@@ -130,10 +130,10 @@ def create_parser():
             action='store_true', dest='no_viewer',
             help='disable starting viewer')
 
-    format_group.add_option('-o', '--out',
+    format_group.add_option('-o', '--outfile',
             action='store', type='string', dest='outfile',
             metavar='FILE', help='write image to specified file')
-    format_group.add_option('-O', '--no-out',
+    format_group.add_option('-O', '--no-outfile',
             action='store_true', dest='no_outfile',
             help='disable writing image to file')
 
