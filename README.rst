@@ -261,7 +261,6 @@ TODO
 * Sanitize the test suite
 * Fixup the documentation to match the current selection options
 * --abbrev switch
-* insert debugging statements
 
 Changelog
 ---------
