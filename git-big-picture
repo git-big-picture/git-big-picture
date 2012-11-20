@@ -861,6 +861,7 @@ class CommitGraph(object):
 
 def main(opts, args):
     repo_dir = parse_variable_args(args)
+    debug("The Git repository is at: '%s'" % repo_dir)
     graph = graph_factory(repo_dir)
     output_settings = set_settings(OUTPUT_SETTINGS,
             OUTPUT_DEFAULTS,
@@ -898,6 +899,7 @@ def main(opts, args):
                 EXIT_CODES["no_options"])
     # if plain just print dot input to stdout
     if output_settings[GRAPHVIZ]:
+        debug('Will now print dot format')
         for line in dot_file_lines:
             print(line)
         return
@@ -922,11 +924,16 @@ def main(opts, args):
         if not output_settings[OUT_FILE]:
             output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
                     prefix='git-big-picture').name
+            debug("Created temp file: '%s'" % output_settings[OUT_FILE])
+        debug("Writing to file: '%s'" % output_settings[OUT_FILE])
         write_to_file(output_settings[OUT_FILE], dot_output)
         if output_settings[VIEWER]:
+            debug("Will now open file in viewer: '%s'" %
+                    output_settings[VIEWER])
             show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
     elif output_settings[PROCESSED]:
-        # print raw SVG, PDF, ...
+        debug("Will now print dot processed output in format: '%s'" %
+                output_settings[FORMAT])
         print(dot_output)
 
 if __name__ == '__main__':
@@ -945,6 +952,7 @@ if __name__ == '__main__':
 
     if opts.pstats_outfile is not None:
         import cProfile
+        debug("Running in profiler, output is: '%s'" % opts.pstats_outfile)
         cProfile.run('main(opts, args)', opts.pstats_outfile)
     else:
         main(opts, args)
