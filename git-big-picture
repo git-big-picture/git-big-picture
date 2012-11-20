@@ -368,7 +368,6 @@ def parse_output_options(opts):
     cmdline_settings = {}
     for setting in OUTPUT_SETTINGS[1:]:
         positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
-        print(setting, positive, negative)
         if positive is not None and negative is not None:
             barf("'%s' and '%s' are mutually exclusive" %
                     ('--' + setting, '--no-' + setting),
@@ -863,7 +862,6 @@ def main(opts, args):
             OUTPUT_DEFAULTS,
             git.config(OUTPUT_SETTINGS),
             parse_output_options(opts))
-    print(output_settings)
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS,
             git.config(FILTER_SETTINGS),
