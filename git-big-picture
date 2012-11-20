@@ -524,6 +524,8 @@ class Git(object):
                 config_settings[setting] = True
             elif val.lower() in ['0', 'no', 'false', 'off']:
                 config_settings[setting] = False
+            else:
+                config_settings[setting] = val
         return config_settings
 
     def get_mappings(self):
