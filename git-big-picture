@@ -609,7 +609,7 @@ def graph_factory(repo_dir):
     """ Create a CommitGraph object from a git_dir. """
     git = Git(repo_dir)
     (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
-    return CommitGraph(git.get_parent_map(), ab, tags)
+    return CommitGraph(git.get_parent_map(), ab, tags, git=git)
 
 
 class CommitGraph(object):
@@ -643,17 +643,21 @@ class CommitGraph(object):
         the branches
     tags : dict mapping SHA1s to list of strings
         tags
+    git : Git
+        interface to dispatch commands to this repo
 
     """
-    def __init__(self, parent_map, branch_dict, tag_dict):
+    def __init__(self, parent_map, branch_dict, tag_dict, git=None):
         self.parents = parent_map
         self.branches = branch_dict
         self.tags = tag_dict
         self.dotdot = set()
+        self.git = git
 
         self.children = {}
         self._calculate_child_mapping()
         self._verify_child_mapping()
+
 
     def _has_label(self, sha_one):
         """ Check if a sha1 is pointed to by a ref.
@@ -857,17 +861,15 @@ class CommitGraph(object):
 
 def main(opts, args):
     repo_dir = parse_variable_args(args)
-    git = Git(repo_dir)
+    graph = graph_factory(repo_dir)
     output_settings = set_settings(OUTPUT_SETTINGS,
             OUTPUT_DEFAULTS,
-            git.config(OUTPUT_SETTINGS),
+            graph.git.config(OUTPUT_SETTINGS),
             parse_output_options(opts))
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS,
-            git.config(FILTER_SETTINGS),
+            graph.git.config(FILTER_SETTINGS),
             parse_filter_options(opts))
-    (lb, rb, ab), (tags, ctags, nctags) = git.get_mappings()
-    graph = CommitGraph(git.get_parent_map(), ab, tags)
     if opts.all_commits:
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
