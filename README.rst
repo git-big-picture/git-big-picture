@@ -89,16 +89,43 @@ Just run it straight from a clone or download:
 
 .. code:: shell
 
-    $ git clone git://git.goodpoint.de/git-big-picture.git
+    $ git clone git://github.com/esc/git-big-picture.git
     $ cd git-big-picture
     $ ./git-big-picture --help
 
-Alternatively, use the standard ``setup.py`` script to install it system wide.
+    $ wget https://raw.github.com/esc/git-big-picture/master/git-big-picture
+    $ ./git-big-picture -h
+
+Alternatively, use the standard ``setup.py`` script to install it system wide
+or just for the user.
 
 .. code:: shell
 
     $ ./setup.py install
     (may need root privileges)
+    $ ./setup.py install --user
+
+Git Integration
+---------------
+
+You can easily integrate this script as a regular Git command, by making the
+script ``git-big-picture`` available on the ``$PATH``. For instance: using
+``./setup.py install`` method, as described above should do the trick.
+Alternatively symlink or copy ``git-big-picture`` into a directory listed in
+your ``$PATH``, for example ``$HOME/bin``.
+
+You may then use ``git big-picture`` (w/o the first dash) as you would any other Git command:
+
+.. code:: shell
+
+    $ git big-picture -h
+
+Or create an alias:
+
+.. code:: shell
+
+    $ git config --global alias.bp big-picture
+    $ git bp -h
 
 Internals
 ---------
@@ -198,22 +225,6 @@ Manually pipe the Graphviz commands to the ``dot`` utility:
 Without any output options, the script will print its usage and exit.
 
 
-Git Integration
----------------
-
-You can easily integrate this script as a regular Git command, by making the
-script ``git-big-picture`` available on the ``$PATH``. For instance: using
-``./setup.py install`` method as described above should do the trick. Alternatively symlink
-``git-big-picture`` into a directory listed in your ``$PATH``, for example ``$HOME/bin``.
-
-You may then use ``git big-picture`` (w/o the first dash) as you would any other Git command:
-
-.. code:: shell
-
-    $ git big-picture -f pdf -v xpdf -o visualization.pdf
-
-This will present you with a PDF viewer displaying your project's
-graph, and stores this PDF in a file called ``visualization.pdf``.
 
 Testing
 -------
