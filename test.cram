@@ -30,7 +30,7 @@ create a fake repo and export vars
 
   $ git init -q
   $ git commit -q --allow-empty -m "foo"
-  $ export outfile='file.svg'
+  $ export outfile_svg='file.svg'
   $ export viewer='true'
   $ export stats_file='stats'
 
@@ -48,21 +48,27 @@ run without options
 #  }
 
 
-mix plain and others
+mix --graphiz and --processed and others
 
-  $ git-big-picture -p -f svg
-  fatal: Option '-p|--plain' is incompatible with other output options.
+  $ git-big-picture -p -g
+  fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
+  [7]
+  $ git-big-picture -g -v $viewer
+  fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
   $ git-big-picture -p -v $viewer
-  fatal: Option '-p|--plain' is incompatible with other output options.
+  fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
-  $ git-big-picture -p -o $outfile
-  fatal: Option '-p|--plain' is incompatible with other output options.
+  $ git-big-picture -g -o $outfile_svg
+  fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
+  [7]
+  $ git-big-picture -p -o $outfile_svg
+  fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
 
 try wrong format
 
-  $ git-big-picture -f foo
+  $ git-big-picture -p -f foo
   fatal: 'dot' terminated prematurely with error code 1;
   probably you specified an invalid format, see 'man dot'.
   The error from 'dot' was:
@@ -71,15 +77,30 @@ try wrong format
   [4]
 
 
-mismatch format
+mismatch format, filename takes precedence
 
-  $ git-big-picture -f pdf -o $outfile
-  warning: Format mismatch: 'pdf'(-f|--format)vs. 'svg'(filename), will use: 'svg'
+  $ git-big-picture -f pdf -o $outfile_svg
+  $ ls
+  file.svg
+  $ rm $outfile_svg
+  $ ls
 
 try just filename
 
-  $ git-big-picture -o $outfile
-  warning: Guessing format from filename: svg
+  $ git-big-picture -o $outfile_svg
+  $ ls $outfile_svg
+  file.svg
+  $ rm $outfile_svg
+  $ ls
+
+try using differnt format
+
+  $ git-big-picture -o file.pdf
+  $ ls file.pdf
+  file.pdf
+  $ rm file.pdf
+  $ ls
+
 
 try no such viewer
 
@@ -92,15 +113,32 @@ format but no extension
 
   $ git-big-picture -f svg -o file
   warning: Filename had no suffix, using format: svg
+  $ ls
+  file.svg
+  $ rm $outfile_svg
+  $ ls
 
 provide filename and viewer
 
-  $ git-big-picture -o $outfile -v $viewer
-  warning: Guessing format from filename: svg
+  $ git-big-picture -o $outfile_svg -v $viewer
+  $ ls
+  file.svg
+  $ rm $outfile_svg
+  $ ls
+
+provide filename and viewer and format
+
+  $ git-big-picture -f png -o file -v $viewer
+  warning: Filename had no suffix, using format: png
+  $ ls
+  file.png
+  $ rm file.png
+  $ ls
 
 try profiling
 
-  $ git-big-picture --pstats=$stats_file -o $outfile
-  warning: Guessing format from filename: svg
+  $ git-big-picture --pstats=$stats_file -o $outfile_svg
   $ ls $stats_file
   stats
+  $ rm $stats_file $outfile_svg
+  $ ls
