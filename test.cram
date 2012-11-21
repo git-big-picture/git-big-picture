@@ -37,7 +37,7 @@ create a fake repo and export vars
 run without options
 
   $ git-big-picture .
-  fatal: Must provide and output option. Try '-h' for more information
+  fatal: Must provide an output option. Try '-h' for more information
   [8]
 
 # run plain
