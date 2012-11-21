@@ -437,4 +437,6 @@ Authors/Contributors
 * Julius Plenz       <julius@plenz.com>
 * Valentin Haenel    <valentin.haenel@gmx.de>
 * Yaroslav Halchenko <debian@onerussian.com>
+* Chris West (Faux) <git@goeswhere.com>
+
 
