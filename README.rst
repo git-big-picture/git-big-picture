@@ -230,7 +230,7 @@ Otherwise the default format SVG is used:
 
 .. code:: console
 
-    git-big-picture -o our-project
+    $ git-big-picture -o our-project
     warning: Filename had no suffix, using default format: svg
 
 If you would like to use an alternative viewer, specify viewer and its format:
