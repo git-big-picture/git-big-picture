@@ -93,7 +93,7 @@ Installation
 
 Just run it straight from a clone or download:
 
-.. code:: shell
+.. code:: console
 
     $ git clone git://github.com/esc/git-big-picture.git
     $ cd git-big-picture
@@ -105,7 +105,7 @@ Just run it straight from a clone or download:
 Alternatively, use the standard ``setup.py`` script to install it system wide
 or just for the user.
 
-.. code:: shell
+.. code:: console
 
     $ ./setup.py install
     (may need root privileges)
@@ -122,13 +122,13 @@ your ``$PATH``, for example ``$HOME/bin``.
 
 You may then use ``git big-picture`` (w/o the first dash) as you would any other Git command:
 
-.. code:: shell
+.. code:: console
 
     $ git big-picture -h
 
 Or create an alias:
 
-.. code:: shell
+.. code:: console
 
     $ git config --global alias.bp big-picture
     $ git bp -h
@@ -144,7 +144,7 @@ and PDF. Check that Graphviz is installed by invoking: ``dot -V``.
 Usage
 -----
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture --help
     Usage: git-big-picture OPTIONS [<repo-directory>]
@@ -199,21 +199,21 @@ Using Output Options
 
 Generate PNG version of current Git repository and save to ``our-project.png``:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -o our-project.png
 
 Generate SVG (default format) image of the repository in ``~/git-repo`` and view the
 result in firefox:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -v firefox ~/git-repo/
 
 If you specify the format and a filename with extension, the filename extension will
 be used:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -f svg -o our-project.png
     $ file our-project.png
@@ -221,46 +221,46 @@ be used:
 
 If you don't have an extension, you could still specify a format:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -f pdf -o our-project
     warning: Filename had no suffix, using format: pdf
 
 Otherwise the default format SVG is used:
 
-.. code:: shell
+.. code:: console
 
     git-big-picture -o our-project
     warning: Filename had no suffix, using default format: svg
 
 If you would like to use an alternative viewer, specify viewer and its format:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -f pdf -v xpdf
 
 You can also open the viewer automatically on the output file:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -v xpdf -o our-project.pdf
 
 Output raw Graphviz syntax:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -g
 
 Output raw Graphviz output (i.e. the image):
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -p
 
 Note however, that the options in the two examples above are both mutually
 exclusive and incompatible with other output options.
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -g -p
     fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
@@ -269,7 +269,7 @@ exclusive and incompatible with other output options.
 
 Manually pipe the Graphviz commands to the ``dot`` utility:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture --graphviz ~/git-repo | dot -Tpng -o graph.png
 
@@ -283,25 +283,25 @@ option. For example: ``-B | --no-branches`` to deactivate showing branches.
 
 Show all interesting commits, i.e. show also merges and bifurcations:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -i -m
 
 Show only roots (deactivate branches and tags):
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -B -T
 
 Show merges and branches only (deactivate tags):
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -m -T
 
 Show all commits:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -a
 
@@ -312,7 +312,7 @@ The standard ``git config`` infrastructure can be used to configure
 ``git-big-picture``. Most of the command line arguments can be configured in a
 ``big-picture`` section. For example, to configure ``firefox`` as a viewer
 
-.. code:: shell
+.. code:: console
 
     $ git config --global big-picture.viewer firefox
 
@@ -329,7 +329,7 @@ via the command line. For example, if you have configured the ``viewer`` above
 and try to use the ``-g | --graphviz`` switch, you will get the following
 error:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -g
     fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
@@ -338,7 +338,7 @@ error:
 option ``-V | --no-viewer`` to disable the ``viewer`` setting from the config
 file:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -g -V
 
@@ -347,13 +347,13 @@ Testing
 
 The Python code is tested with `nose <https://nose.readthedocs.org/en/latest/>`_:
 
-.. code:: shell
+.. code:: console
 
     $ ./test.py
 
 The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
 
-.. code:: shell
+.. code:: console
 
     $ ./test.cram
 
@@ -362,7 +362,7 @@ Debugging
 
 You can use the ``[-d | --debug]`` switch to debug:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture -d -v firefox
 
@@ -377,7 +377,7 @@ option or using the Python module ``cProfile``:
 
 Using ``--pstats``:
 
-.. code:: shell
+.. code:: console
 
     $ git-big-picture --pstats=profile-stats -o graph.svg
 
@@ -385,7 +385,7 @@ Using ``--pstats``:
 
 Profile the script with ``cProfile``
 
-.. code:: shell
+.. code:: console
 
     $ python -m cProfile -o profile-stats git-big-picture -o graph.svg
 
@@ -393,7 +393,7 @@ In either case, you can then use the excellent visualisation tool `gprof2dot
 <http://code.google.com/p/jrfonseca/wiki/Gprof2Dot>`_ which, incidentally,
 uses Graphviz too:
 
-.. code:: shell
+.. code:: console
 
     $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
