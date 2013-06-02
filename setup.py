@@ -28,7 +28,7 @@ setup(name = 'git-big-picture',
     version = VERSION,
     author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
     description = 'Visualize git repositories.',
-    url = 'http://git.goodpoint.de/?p=git-big-picture.git;a=summary',
+    url = 'https://github.com/esc/git-big-picture',
     license = 'GPL v3 or later',
     scripts = ['git-big-picture'],
 )
