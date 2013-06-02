@@ -279,7 +279,7 @@ def run_dot(output_format, dot_file_lines):
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-    except OSError, e:
+    except OSError as e:
         if e.errno == 2:
             barf("'dot' not found! Please install the Graphviz utility.",
                     EXIT_CODES["dot_not_found"])
@@ -310,7 +310,7 @@ def write_to_file(output_file, dot_output):
     """
     try:
         f = open(output_file, 'w+b')
-    except IOError, e:
+    except IOError as e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),
                 EXIT_CODES["not_write_to_file"])
@@ -337,7 +337,7 @@ def show_in_viewer(output_file, viewer):
     """
     try:
         subprocess.call([viewer, output_file])
-    except OSError, e:
+    except OSError as e:
         barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
                 EXIT_CODES["no_such_viewer"])
 
@@ -946,7 +946,7 @@ if __name__ == '__main__':
 
     try:
         get_command_output(['git', '--help'])
-    except Exception, e:
+    except Exception as e:
         barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
                 EXIT_CODES["no_git"])
 
