@@ -825,7 +825,8 @@ class CommitGraph(object):
 
         def label_gen():
             keys = set(self.branches.keys()).union(set(self.tags.keys()))
-            for k in keys:
+            for k in (k for k in keys
+                      if k in self.parents or k in self.children):
                 labels = []
                 case = 0
                 if k in self.tags:

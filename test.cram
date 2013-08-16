@@ -142,3 +142,4 @@ try profiling
   stats
   $ rm $stats_file $outfile_svg
   $ ls
+
