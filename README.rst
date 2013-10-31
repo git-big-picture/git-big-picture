@@ -381,7 +381,7 @@ Using ``--pstats``:
 
     $ git-big-picture --pstats=profile-stats -o graph.svg
 
-... will write the profiler output to 
+... will write the profiler output to ``profile-stats``.
 
 Profile the script with ``cProfile``
 
