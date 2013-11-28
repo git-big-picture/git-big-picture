@@ -31,6 +31,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import commands
 
 __version__ = '0.10.2.dev0'
 __docformat__ = "restructuredtext"
@@ -824,6 +825,9 @@ class CommitGraph(object):
                 return sha_one
             else:
                 return sha_one[0:sha_one_digits]
+                
+        def format_label(sha_one):
+    	    return commands.getstatusoutput('git show --oneline ' + sha_one + ' | head -n 1')[1].replace('"', '').replace('\'', '').replace(' ', '\\n', 1)
 
         def label_gen():
             keys = set(self.branches.keys()).union(set(self.tags.keys()))
@@ -855,7 +859,7 @@ class CommitGraph(object):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
                 dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
                     'ref': sha_one,
-                    'label': format_sha_one(sha_one)})
+                    'label':format_label(sha_one)})
         for child, self.parents in self.parents.items():
             for p in self.parents:
                 dot_file_lines.append(
