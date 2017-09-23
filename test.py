@@ -331,13 +331,16 @@ class TestGitTools(ut.TestCase):
             f: set((p, b,)),
             p: set((b,)),
         }
-        print("a", a)
-        print("b", b)
-        print("p", p)
-        print("f", f)
-        print(dispatch("git log --oneline %s..%s" % (f, p)))
-        print_dict(expected_reduced_parents)
-        print_dict(graph.parents)
+        if debug:
+            print("a", a)
+            print("b", b)
+            print("p", p)
+            print("f", f)
+        out = dispatch("git log --oneline %s..%s" % (f, p))
+        if debug:
+            print(out)
+            print_dict(expected_reduced_parents)
+            print_dict(graph.parents)
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def more_realistic(self):
