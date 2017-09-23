@@ -20,6 +20,8 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import os
 import tempfile as tf
 import shutil as sh
@@ -51,8 +53,8 @@ def empty_commit(mess):
 
 
 def print_dict(dict_):
-    for (k, v) in dict_.iteritems():
-        print k, v
+    for (k, v) in dict_.items():
+        print(k, v)
 
 
 class TestGitTools(ut.TestCase):
@@ -65,7 +67,7 @@ class TestGitTools(ut.TestCase):
         """
         self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
         if debug:
-            print self.testing_dir
+            print(self.testing_dir)
         self.oldpwd = os.getcwd()
         os.chdir(self.testing_dir)
 
@@ -329,11 +331,11 @@ class TestGitTools(ut.TestCase):
             f: set((p, b,)),
             p: set((b,)),
         }
-        print "a", a
-        print "b", b
-        print "p", p
-        print "f", f
-        print dispatch("git log --oneline %s..%s" % (f, p))
+        print("a", a)
+        print("b", b)
+        print("p", p)
+        print("f", f)
+        print(dispatch("git log --oneline %s..%s" % (f, p)))
         print_dict(expected_reduced_parents)
         print_dict(graph.parents)
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
