@@ -31,4 +31,9 @@ setup(name = 'git-big-picture',
     url = 'https://github.com/esc/git-big-picture',
     license = 'GPL v3 or later',
     scripts = ['git-big-picture'],
+    classifiers=[
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+    ],
 )
