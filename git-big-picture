@@ -288,7 +288,7 @@ def run_dot(output_format, dot_file_lines):
                     EXIT_CODES["problem_with_dot"])
 
     # send dot input, automatically receive and store output and error
-    out, err = p.communicate(input='\n'.join(dot_file_lines))
+    out, err = p.communicate(input='\n'.join(dot_file_lines).encode('utf-8'))
     if p.returncode != 0:
         barf("'dot' terminated prematurely with error code %d;\n"
                 "probably you specified an invalid format, see 'man dot'.\n"
@@ -309,7 +309,7 @@ def write_to_file(output_file, dot_output):
 
     """
     try:
-        f = open(output_file, 'w+b')
+        f = open(output_file, 'w+')
     except IOError as e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),
@@ -831,10 +831,10 @@ class CommitGraph(object):
                 case = 0
                 if k in self.tags:
                     case = case + 1
-                    map(labels.append, sorted(self.tags[k]))
+                    labels.extend(sorted(self.tags[k]))
                 if k in self.branches:
                     case = case + 2
-                    map(labels.append, sorted(self.branches[k]))
+                    labels.extend(sorted(self.branches[k]))
                 # http://www.graphviz.org/doc/info/colors.html
                 color = "/pastel13/%d" % case
                 yield (k, labels, color)
