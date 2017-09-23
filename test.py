@@ -29,7 +29,7 @@ import unittest as ut
 import git_big_picture as gbp
 import shlex
 
-debug=False
+debug = False
 
 # The only reason these global commands work, is because we change the cwd of
 # the test script... ugly.
