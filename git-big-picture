@@ -294,7 +294,7 @@ def run_dot(output_format, dot_file_lines):
                 "probably you specified an invalid format, see 'man dot'.\n"
                 "The error from 'dot' was:\n>>>"
                 % p.returncode + err, EXIT_CODES["dot_terminated_early"])
-    return out
+    return out.decode('utf-8')
 
 
 def write_to_file(output_file, dot_output):
@@ -483,7 +483,9 @@ def get_command_output(command_list, cwd=None, git_env=None):
     """
     p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, env=git_env, cwd=cwd)
-    load = p.stdout.read()
+    load = p.stdout.read().decode('utf-8')
+    p.stdout.close()
+    p.stderr.close()
     p.wait()
     if p.returncode:
         err = p.stderr.read()
