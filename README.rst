@@ -83,7 +83,7 @@ We also have a real world examples from:
 Dependencies
 ------------
 
-* Python 2.6 or 2.7 (2.5 will not work, if you try it with 3.3 let us know)
+* Python 2.6, 2.7 (2.5 will not work), or Python 3.x
 * Git (1.7.1 works)
 * Graphviz utility
 * Nosetest and Cram (only for running tests)
@@ -406,6 +406,11 @@ TODO
 Changelog
 ---------
 
+* v0.10.0 - YYYY-MM-DD
+
+  * Suppot for Python 3
+  * Add Python classifiers to setup.py
+
 * v0.9.0 - 2012-11-20
 
   * rst-ify readme
@@ -437,6 +442,7 @@ Authors/Contributors
 * Julius Plenz       <julius@plenz.com>
 * Valentin Haenel    <valentin.haenel@gmx.de>
 * Yaroslav Halchenko <debian@onerussian.com>
-* Chris West (Faux) <git@goeswhere.com>
+* Chris West (Faux)  <git@goeswhere.com>
+* Antonio Valentino  <antonio.valentino@tiscali.it>
 
 
