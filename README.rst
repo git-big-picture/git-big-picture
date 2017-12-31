@@ -189,6 +189,10 @@ Usage
         -o FILE, --outfile=FILE
                             write image to specified file
         -O, --no-outfile    disable writing image to file
+        -w SECONDS, --wait=SECONDS
+                            keep the temporary file available for at least this
+                            many seconds
+        -W, --no-wait       remove temporary file immediately after viewer returns
 
     Filter Options:
         Options to control commit/ref selection

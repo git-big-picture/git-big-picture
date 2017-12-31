@@ -28,6 +28,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 
 __version__ = '0.10.2.dev0'
 __docformat__ = "restructuredtext"
@@ -39,12 +40,14 @@ PROCESSED = 'processed'
 FORMAT    = 'format'
 VIEWER    = 'viewer'
 OUT_FILE  = 'outfile'
+WAIT_TIME = 'wait'
 OUTPUT_SETTINGS = [
         FORMAT,
         GRAPHVIZ,
         PROCESSED,
         VIEWER,
         OUT_FILE,
+        WAIT_TIME,
         ]
 OUTPUT_DEFAULTS = {
         FORMAT:    'svg',
@@ -52,6 +55,7 @@ OUTPUT_DEFAULTS = {
         PROCESSED: False,
         VIEWER:    False,
         OUT_FILE:  False,
+        WAIT_TIME: 10,
         }
 
 # filter settings
@@ -143,6 +147,14 @@ def create_parser():
     format_group.add_option('-O', '--no-outfile',
             action='store_true', dest='no_outfile',
             help='disable writing image to file')
+
+    format_group.add_option('-w', '--wait',
+            action='store', type='float', dest='wait',
+            metavar='SECONDS',
+            help='keep the temporary file available for at least this many seconds')
+    format_group.add_option('-W', '--no-wait',
+            action='store_true', dest='no_wait',
+            help='remove temporary file immediately after viewer returns')
 
     parser.add_option_group(format_group)
 
@@ -954,17 +966,26 @@ def main(opts, args):
     # create outfile and possibly view that or a temporary file in viewer
     if output_settings[VIEWER] or output_settings[OUT_FILE]:
         # no output file requested, create a temporary one
+        temporary_file = None
         if not output_settings[OUT_FILE]:
-            output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
+            temporary_file = tempfile.NamedTemporaryFile(
                     prefix='git-big-picture',
-                    suffix='.' + output_settings[FORMAT]).name
+                    suffix='.' + output_settings[FORMAT])
+            output_settings[OUT_FILE] = temporary_file.name
             debug("Created temp file: '%s'" % output_settings[OUT_FILE])
         debug("Writing to file: '%s'" % output_settings[OUT_FILE])
         write_to_file(output_settings[OUT_FILE], dot_output)
         if output_settings[VIEWER]:
             debug("Will now open file in viewer: '%s'" %
                     output_settings[VIEWER])
+            if temporary_file is not None:
+                wait_until = time.time() + max(0, output_settings[WAIT_TIME])
             show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
+            if temporary_file is not None:
+                sleep_time = wait_until - time.time()
+                if sleep_time > 0:
+                    debug("Now sleeping for %0.1f seconds" % sleep_time)
+                    time.sleep(sleep_time)
     elif output_settings[PROCESSED]:
         debug("Will now print dot processed output in format: '%s'" %
                 output_settings[FORMAT])
