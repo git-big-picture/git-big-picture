@@ -551,7 +551,7 @@ class Git(object):
             mapping of non-commit sha1s to sets of strings
         """
 
-        output = self("git for-each-ref --format=\"['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']\"")
+        output = self("git for-each-ref --format=\"['%(objectname)', '%(*objectname)',  '%(objecttype)', '''%(refname)''']\"")
         lbranch_prefix = 'refs/heads/'
         rbranch_prefix = 'refs/remotes/'
         tag_prefix = 'refs/tags/'
