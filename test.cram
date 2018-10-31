@@ -20,6 +20,8 @@
 
 Cram (http://pypi.python.org/pypi/cram) tests for git-big-picture
 
+  $ alias git-big-picture=$TESTDIR/git-big-picture
+
 No repo
 
   $ git-big-picture
