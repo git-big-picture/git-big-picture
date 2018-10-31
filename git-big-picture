@@ -930,7 +930,8 @@ def main(opts, args):
         # no output file requested, create a temporary one
         if not output_settings[OUT_FILE]:
             output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
-                    prefix='git-big-picture').name
+                    prefix='git-big-picture',
+                    suffix='.' + output_settings[FORMAT]).name
             debug("Created temp file: '%s'" % output_settings[OUT_FILE])
         debug("Writing to file: '%s'" % output_settings[OUT_FILE])
         write_to_file(output_settings[OUT_FILE], dot_output)
