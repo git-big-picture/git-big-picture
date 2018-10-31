@@ -57,6 +57,13 @@ But since the commits would be labeled with their refs, it would look more like
             \     /
              topic
 
+Demo Video
+----------
+
+Chuwei Lu has made a youtube video showing how to use ``git-big-picture``:
+
+https://www.youtube.com/watch?v=H7w7JWSy3oc&feature=youtu.be
+
 Screenshots
 -----------
 
