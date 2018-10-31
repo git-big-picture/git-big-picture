@@ -191,11 +191,11 @@ def create_parser():
             help='run cProfile profiler writing pstats output to FILE')
 
     parser.add_option('-d', '--debug',
-
             action='store_true', dest='debug',
             help='activate debug output')
 
     return parser
+
 
 PARSER = create_parser()
 
@@ -288,13 +288,13 @@ def run_dot(output_format, dot_file_lines):
                     EXIT_CODES["problem_with_dot"])
 
     # send dot input, automatically receive and store output and error
-    out, err = p.communicate(input='\n'.join(dot_file_lines))
+    out, err = p.communicate(input='\n'.join(dot_file_lines).encode('utf-8'))
     if p.returncode != 0:
         barf("'dot' terminated prematurely with error code %d;\n"
                 "probably you specified an invalid format, see 'man dot'.\n"
                 "The error from 'dot' was:\n>>>"
                 % p.returncode + err, EXIT_CODES["dot_terminated_early"])
-    return out
+    return out.decode('utf-8')
 
 
 def write_to_file(output_file, dot_output):
@@ -309,7 +309,7 @@ def write_to_file(output_file, dot_output):
 
     """
     try:
-        f = open(output_file, 'w+b')
+        f = open(output_file, 'w+')
     except IOError as e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),
@@ -483,7 +483,9 @@ def get_command_output(command_list, cwd=None, git_env=None):
     """
     p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, env=git_env, cwd=cwd)
-    load = p.stdout.read()
+    load = p.stdout.read().decode('utf-8')
+    p.stdout.close()
+    p.stderr.close()
     p.wait()
     if p.returncode:
         err = p.stderr.read()
@@ -658,7 +660,6 @@ class CommitGraph(object):
         self._calculate_child_mapping()
         self._verify_child_mapping()
 
-
     def _has_label(self, sha_one):
         """ Check if a sha1 is pointed to by a ref.
 
@@ -795,7 +796,7 @@ class CommitGraph(object):
         """ Calculate the minimal number of sha1 digits required to represent
         all commits unambiguously. """
         key_count = len(self.parents)
-        for digit_count in xrange(7, 40):
+        for digit_count in range(7, 40):
             if len(set(e[0:digit_count] for e in self.parents.keys())) == key_count:
                 return digit_count
         return 40
@@ -831,10 +832,10 @@ class CommitGraph(object):
                 case = 0
                 if k in self.tags:
                     case = case + 1
-                    map(labels.append, sorted(self.tags[k]))
+                    labels.extend(sorted(self.tags[k]))
                 if k in self.branches:
                     case = case + 2
-                    map(labels.append, sorted(self.branches[k]))
+                    labels.extend(sorted(self.branches[k]))
                 # http://www.graphviz.org/doc/info/colors.html
                 color = "/pastel13/%d" % case
                 yield (k, labels, color)
@@ -842,20 +843,23 @@ class CommitGraph(object):
         dot_file_lines = ['digraph {']
         for sha_one, labels, color in label_gen():
             dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
-                'ref':sha_one,
-                'label':'\\n'.join(labels \
+                'ref': sha_one,
+                'label': '\\n'.join(labels
                     + (sha_ones_on_labels and [format_sha_one(sha_one),] or list())),
-                'color':color})
+                'color': color})
         for sha_one in self.dotdot:
-            dot_file_lines.append('\t"%(ref)s"[label="..."];' % {'ref':sha_one})
+            dot_file_lines.append(
+                '\t"%(ref)s"[label="..."];' % {'ref': sha_one})
         if (sha_one_digits is not None) and (sha_one_digits != 40):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
                 dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
-                    'ref':sha_one,
-                    'label':format_sha_one(sha_one)})
+                    'ref': sha_one,
+                    'label': format_sha_one(sha_one)})
         for child, self.parents in self.parents.items():
             for p in self.parents:
-                dot_file_lines.append('\t"%(source)s" -> "%(target)s";' % {'source':child, 'target':p})
+                dot_file_lines.append(
+                    '\t"%(source)s" -> "%(target)s";' % {'source': child,
+                                                         'target': p})
         dot_file_lines.append('}')
         return dot_file_lines
 
@@ -879,7 +883,9 @@ def main(opts, args):
         graph = graph.filter(**filter_settings)
         sha_one_digits = graph._minimal_sha_one_digits()
 
-    dot_file_lines = graph._generate_dot_file(sha_ones_on_labels=opts.all_commits, sha_one_digits=sha_one_digits)
+    dot_file_lines = graph._generate_dot_file(
+        sha_ones_on_labels=opts.all_commits,
+        sha_one_digits=sha_one_digits)
 
     if (output_settings[GRAPHVIZ] and output_settings[PROCESSED]):
         barf("Options '-g | --graphviz' and '-p | --processed' " +
@@ -936,6 +942,7 @@ def main(opts, args):
         debug("Will now print dot processed output in format: '%s'" %
                 output_settings[FORMAT])
         print(dot_output)
+
 
 if __name__ == '__main__':
 
