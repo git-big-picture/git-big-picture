@@ -83,9 +83,9 @@ And here is the reduced version:
 
 We also have a real world examples from:
 
-* `cython <http://imgdump.zetatech.org/cython-big-picture.png>`_
-* `PyMVPA <http://imgdump.zetatech.org/pymvpa-big-picture.png>`_
-* `bloscpack <http://imgdump.zetatech.org/bloscpack-big-picture.png>`_
+* `cython <https://raw.github.com/esc/git-big-picture/master/screenshots/cython-big-picture.png>`_
+* `PyMVPA <https://raw.github.com/esc/git-big-picture/master/screenshots/pymvpa-big-picture.png>`_
+* `bloscpack <https://raw.github.com/esc/git-big-picture/master/screenshots/bloscpack-big-picture.png>`_
 
 Dependencies
 ------------
