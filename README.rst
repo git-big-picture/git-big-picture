@@ -90,7 +90,7 @@ We also have a real world examples from:
 Dependencies
 ------------
 
-* Python 2.6, 2.7 (2.5 will not work), or Python 3.x
+* Python 2.7 or Python 3.x
 * Git (1.7.1 works)
 * Graphviz utility
 * Nosetest and Cram (only for running tests)
