@@ -292,9 +292,10 @@ def run_dot(output_format, dot_file_lines):
     if p.returncode != 0:
         barf("'dot' terminated prematurely with error code %d;\n"
                 "probably you specified an invalid format, see 'man dot'.\n"
-                "The error from 'dot' was:\n>>>"
-                % p.returncode + err, EXIT_CODES["dot_terminated_early"])
-    return out.decode('utf-8')
+                "The error from 'dot' was:\n"
+                ">>>%s" % (p.returncode, err.decode('utf-8')),
+             EXIT_CODES["dot_terminated_early"])
+    return out
 
 
 def write_to_file(output_file, dot_output):
@@ -309,7 +310,7 @@ def write_to_file(output_file, dot_output):
 
     """
     try:
-        f = open(output_file, 'w+')
+        f = open(output_file, 'wb+')
     except IOError as e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),

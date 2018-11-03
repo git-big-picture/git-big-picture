@@ -20,10 +20,12 @@
 
 Cram (http://pypi.python.org/pypi/cram) tests for git-big-picture
 
+  $ alias git-big-picture=$TESTDIR/git-big-picture
+
 No repo
 
   $ git-big-picture
-  fatal: '/tmp/cramtests-.{6}/test.cram' is probably not a Git repository (re)
+  fatal: '/tmp/cramtests-.{6,8}/test.cram' is probably not a Git repository (re)
   [10]
 
 create a fake repo and export vars
@@ -72,7 +74,7 @@ try wrong format
   fatal: 'dot' terminated prematurely with error code 1;
   probably you specified an invalid format, see 'man dot'.
   The error from 'dot' was:
-  >>>Format: "foo" not recognized. Use one of: canon cmap cmapx cmapx_np dot eps fig gd gd2 gif gv imap imap_np ismap jpe jpeg jpg pdf plain plain-ext png ps ps2 svg svgz tk vml vmlz vrml wbmp x11 xdot xlib
+  >>>Format: "foo" not recognized. Use one of: .*$ (re)
   
   [4]
 
@@ -106,7 +108,7 @@ try no such viewer
 
   $ git-big-picture -f svg -v foo
   fatal: Error calling viewer: 'foo':
-  >>>[Errno 2] No such file or directory
+  >>>\[Errno 2\] No such file or directory.*$ (re)
   [6]
 
 format but no extension

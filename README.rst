@@ -1,6 +1,9 @@
 git-big-picture
 ===============
 
+.. image:: https://travis-ci.org/esc/git-big-picture.svg?branch=master
+    :target: https://travis-ci.org/esc/git-big-picture
+
 ``git-big-picture`` is a visualization tool for Git repositories. You can think
 of it as a filter that removes uninteresting commits from a DAG modelling a Git
 repository and thereby exposes the big picture: for example the hierarchy of
@@ -90,7 +93,7 @@ We also have a real world examples from:
 Dependencies
 ------------
 
-* Python 2.6, 2.7 (2.5 will not work), or Python 3.x
+* Python 2.7 or Python 3.x
 * Git (1.7.1 works)
 * Graphviz utility
 * Nosetest and Cram (only for running tests)

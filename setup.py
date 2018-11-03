@@ -32,8 +32,10 @@ setup(name = 'git-big-picture',
     license = 'GPL v3 or later',
     scripts = ['git-big-picture'],
     classifiers=[
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
