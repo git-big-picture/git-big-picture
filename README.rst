@@ -1,6 +1,9 @@
 git-big-picture
 ===============
 
+.. image:: https://travis-ci.org/esc/git-big-picture.svg?branch=master
+    :target: https://travis-ci.org/esc/git-big-picture
+
 ``git-big-picture`` is a visualization tool for Git repositories. You can think
 of it as a filter that removes uninteresting commits from a DAG modelling a Git
 repository and thereby exposes the big picture: for example the hierarchy of
