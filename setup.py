@@ -23,11 +23,14 @@
 from setuptools import setup
 from git_big_picture import __version__ as VERSION
 
+with open('README.rst') as f:
+    long_description = f.read()
 
 setup(name = 'git-big-picture',
     version = VERSION,
     author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
-    description = 'Visualize git repositories.',
+    description = 'Git -- the big picture',
+    long_description=long_description,
     url = 'https://github.com/esc/git-big-picture',
     license = 'GPL v3 or later',
     scripts = ['git-big-picture'],
