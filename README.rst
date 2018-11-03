@@ -417,10 +417,14 @@ TODO
 Changelog
 ---------
 
-* v0.10.0 - YYYY-MM-DD
+* v0.10.0 - 2018-11-04
 
-  * Suppot for Python 3
+  * First release after 6 years
+  * Suppot for Python: 2.7, 3.4, 3.5, 3.6, 3.7
   * Add Python classifiers to setup.py
+  * Tempfile suffix now matches format
+  * Continuous integration via travis.ci
+  * Fixed installation instructions
 
 * v0.9.0 - 2012-11-20
 
