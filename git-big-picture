@@ -310,7 +310,7 @@ def write_to_file(output_file, dot_output):
 
     """
     try:
-        f = open(output_file, 'w+')
+        f = open(output_file, 'wb+')
     except IOError as e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),
