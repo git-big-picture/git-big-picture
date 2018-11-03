@@ -108,7 +108,7 @@ try no such viewer
 
   $ git-big-picture -f svg -v foo
   fatal: Error calling viewer: 'foo':
-  >>>[Errno 2] No such file or directory: 'foo': 'foo'
+  >>>\[Errno 2\] No such file or directory: .*$ (re)
   [6]
 
 format but no extension
