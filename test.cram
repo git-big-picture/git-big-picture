@@ -74,7 +74,7 @@ try wrong format
   fatal: 'dot' terminated prematurely with error code 1;
   probably you specified an invalid format, see 'man dot'.
   The error from 'dot' was:
-  >>>Format: "foo" not recognized. Use one of: canon cmap cmapx cmapx_np dot dot_json eps fig gd gd2 gif gv imap imap_np ismap jpe jpeg jpg json json0 mp pdf pic plain plain-ext png pov ps ps2 svg svgz tk vml vmlz vrml wbmp x11 xdot xdot1.2 xdot1.4 xdot_json xlib
+  >>>Format: "foo" not recognized. Use one of: .*$ (re)
   
   [4]
 
