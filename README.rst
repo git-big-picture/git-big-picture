@@ -101,7 +101,15 @@ Dependencies
 Installation
 ------------
 
-Just run it straight from a clone or download:
+As of ``v0.10.1`` you may install it from PyPi:
+
+https://pypi.org/project/git-big-picture/
+
+.. code:: console
+
+   $ pip install git-big-picture
+
+Alternatively, Just run it straight from a clone or download:
 
 .. code:: console
 
