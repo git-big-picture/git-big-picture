@@ -425,6 +425,10 @@ TODO
 Changelog
 ---------
 
+* v0.10.1 - 2018-11-04
+
+  * Fix PyPi release
+
 * v0.10.0 - 2018-11-04
 
   * First release after 6 years
