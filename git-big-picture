@@ -63,12 +63,14 @@ TAGS         = 'tags'
 ROOTS        = 'roots'
 MERGES       = 'merges'
 BIFURCATIONS = 'bifurcations'
+MESSAGES     = 'messages'
 FILTER_SETTINGS = [
         BRANCHES,
         TAGS,
         ROOTS,
         MERGES,
         BIFURCATIONS,
+        MESSAGES,
         ]
 FILTER_DEFAULTS = {
         BRANCHES:     True,
@@ -76,6 +78,7 @@ FILTER_DEFAULTS = {
         ROOTS:        True,
         MERGES:       False,
         BIFURCATIONS: False,
+        MESSAGES:     False,
         }
 
 EXIT_CODES = {"too_many_args":              1,
@@ -181,6 +184,13 @@ def create_parser():
     filter_group.add_option('-I', '--no-bifurcations',
             action='store_true', dest='no_bifurcations',
             help='do not include bifurcation commits')
+
+    filter_group.add_option('-c', '--commit-messages',
+            action='store_true', dest='messages',
+            help='include commit messages on labels')
+    filter_group.add_option('-C', '--no-commit-messages',
+            action='store_true', dest='no_messages',
+            help='do not include commit messages on labels')
 
     parser.add_option_group(filter_group)
 
@@ -717,6 +727,7 @@ class CommitGraph(object):
             roots=FILTER_DEFAULTS[ROOTS],
             merges=FILTER_DEFAULTS[MERGES],
             bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
+            messages=FILTER_DEFAULTS[MESSAGES],
             additional=None):
         """ Filter the commit graph.
 
@@ -740,6 +751,8 @@ class CommitGraph(object):
             include merge commits
         bifurcations : bool
             include bifurcation commits
+        messages : bool
+            ignored
         additional : list of SHA1 sums
             any additional commits to include
 
@@ -791,7 +804,8 @@ class CommitGraph(object):
 
         return CommitGraph(reachable_interesting_parents,
                 copy.deepcopy(self.branches),
-                copy.deepcopy(self.tags))
+                copy.deepcopy(self.tags),
+                self.git)
 
     def _minimal_sha_one_digits(self):
         """ Calculate the minimal number of sha1 digits required to represent
@@ -802,7 +816,7 @@ class CommitGraph(object):
                 return digit_count
         return 40
 
-    def _generate_dot_file(self, sha_ones_on_labels, sha_one_digits=None):
+    def _generate_dot_file(self, sha_ones_on_labels, with_commit_messages, sha_one_digits=None):
         """ Generate graphviz input.
 
         Parameters
@@ -825,6 +839,12 @@ class CommitGraph(object):
             else:
                 return sha_one[0:sha_one_digits]
 
+        def format_label(sha_one):
+            if with_commit_messages:
+                output = self.git('git log -n1 --oneline ' + sha_one)
+                return output[0].replace('"', '').replace('\'', '').replace(' ', '\\n', 1)
+            return format_sha_one(sha_one)
+
         def label_gen():
             keys = set(self.branches.keys()).union(set(self.tags.keys()))
             for k in (k for k in keys
@@ -846,7 +866,7 @@ class CommitGraph(object):
             dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
                 'ref': sha_one,
                 'label': '\\n'.join(labels
-                    + (sha_ones_on_labels and [format_sha_one(sha_one),] or list())),
+                    + ((with_commit_messages or sha_ones_on_labels) and [format_label(sha_one), ] or list())),
                 'color': color})
         for sha_one in self.dotdot:
             dot_file_lines.append(
@@ -855,7 +875,7 @@ class CommitGraph(object):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
                 dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
                     'ref': sha_one,
-                    'label': format_sha_one(sha_one)})
+                    'label': format_label(sha_one)})
         for child, self.parents in self.parents.items():
             for p in self.parents:
                 dot_file_lines.append(
@@ -886,6 +906,7 @@ def main(opts, args):
 
     dot_file_lines = graph._generate_dot_file(
         sha_ones_on_labels=opts.all_commits,
+        with_commit_messages=filter_settings['messages'],
         sha_one_digits=sha_one_digits)
 
     if (output_settings[GRAPHVIZ] and output_settings[PROCESSED]):
