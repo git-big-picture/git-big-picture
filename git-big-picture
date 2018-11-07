@@ -820,6 +820,8 @@ class CommitGraph(object):
         ----------
         sha_ones_on_labels : boolean
             if True show sha1 (or minimal) on labels in addition to ref names
+        with_commit_messages : boolean
+            if True the commit messages are displyed too
         sha_one_digits : int
             number of digits to use for showing sha1
 
