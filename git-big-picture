@@ -846,9 +846,11 @@ class CommitGraph(object):
 
         def format_label(sha_one):
             if with_commit_messages:
-                output = self.git('git log -n1 --oneline ' + sha_one)
-                return output[0].replace('"', '').replace('\'', '').replace(' ', '\\n', 1)
-            return format_sha_one(sha_one)
+                output = self.git('git log -1 --pretty=format:%s ' + sha_one)
+                message = output[0].replace('"', '').replace('\'', '')
+                return format_sha_one(sha_one) + '\n' + message
+            else:
+                return format_sha_one(sha_one)
 
         def label_gen():
             keys = set(self.branches.keys()).union(set(self.tags.keys()))
