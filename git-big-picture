@@ -727,7 +727,6 @@ class CommitGraph(object):
             roots=FILTER_DEFAULTS[ROOTS],
             merges=FILTER_DEFAULTS[MERGES],
             bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
-            messages=FILTER_DEFAULTS[MESSAGES],
             additional=None):
         """ Filter the commit graph.
 
@@ -751,8 +750,6 @@ class CommitGraph(object):
             include merge commits
         bifurcations : bool
             include bifurcation commits
-        messages : bool
-            ignored
         additional : list of SHA1 sums
             any additional commits to include
 
