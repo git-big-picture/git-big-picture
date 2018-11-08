@@ -63,14 +63,12 @@ TAGS         = 'tags'
 ROOTS        = 'roots'
 MERGES       = 'merges'
 BIFURCATIONS = 'bifurcations'
-MESSAGES     = 'messages'
 FILTER_SETTINGS = [
         BRANCHES,
         TAGS,
         ROOTS,
         MERGES,
         BIFURCATIONS,
-        MESSAGES,
         ]
 FILTER_DEFAULTS = {
         BRANCHES:     True,
@@ -78,8 +76,16 @@ FILTER_DEFAULTS = {
         ROOTS:        True,
         MERGES:       False,
         BIFURCATIONS: False,
-        MESSAGES:     False,
         }
+# annotation settings
+MESSAGES     = 'messages'
+ANNOTATION_SETTINGS = [
+        MESSAGES,
+]
+ANNOTATION_DEFAULTS = {
+        MESSAGES:     False,
+}
+
 
 EXIT_CODES = {"too_many_args":              1,
               "dot_not_found":              2,
@@ -394,8 +400,8 @@ def parse_output_options(opts):
     return cmdline_settings
 
 
-def parse_filter_options(opts):
-    """ Extract and check the filtering options from the command line 'opts'.
+def parse_filter_options(opts, SETTINGS):
+    """ Extract and check  options from the command line 'opts'.
 
     Checks that not both the option and it's negation were found. The return
     dict contains one entry for each setting. This entry can be True to signal
@@ -414,7 +420,7 @@ def parse_filter_options(opts):
 
     """
     cmdline_settings = {}
-    for setting in FILTER_SETTINGS:
+    for setting in SETTINGS:
         positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
         if positive is not None and negative is not None:
             barf("'%s' and '%s' are mutually exclusive" %
@@ -727,7 +733,6 @@ class CommitGraph(object):
             roots=FILTER_DEFAULTS[ROOTS],
             merges=FILTER_DEFAULTS[MERGES],
             bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
-            messages=FILTER_DEFAULTS[MESSAGES],
             additional=None):
         """ Filter the commit graph.
 
@@ -751,8 +756,6 @@ class CommitGraph(object):
             include merge commits
         bifurcations : bool
             include bifurcation commits
-        messages : bool
-            ignored
         additional : list of SHA1 sums
             any additional commits to include
 
@@ -823,6 +826,8 @@ class CommitGraph(object):
         ----------
         sha_ones_on_labels : boolean
             if True show sha1 (or minimal) on labels in addition to ref names
+        with_commit_messages : boolean
+            if True the commit messages are displyed too
         sha_one_digits : int
             number of digits to use for showing sha1
 
@@ -841,9 +846,11 @@ class CommitGraph(object):
 
         def format_label(sha_one):
             if with_commit_messages:
-                output = self.git('git log -n1 --oneline ' + sha_one)
-                return output[0].replace('"', '').replace('\'', '').replace(' ', '\\n', 1)
-            return format_sha_one(sha_one)
+                output = self.git('git log -1 --pretty=format:%s ' + sha_one)
+                message = output[0].replace('"', '').replace('\'', '')
+                return format_sha_one(sha_one) + '\n' + message
+            else:
+                return format_sha_one(sha_one)
 
         def label_gen():
             keys = set(self.branches.keys()).union(set(self.tags.keys()))
@@ -896,7 +903,11 @@ def main(opts, args):
     filter_settings = set_settings(FILTER_SETTINGS,
             FILTER_DEFAULTS,
             graph.git.config(FILTER_SETTINGS),
-            parse_filter_options(opts))
+            parse_filter_options(opts, FILTER_SETTINGS))
+    annotation_settings = set_settings(ANNOTATION_SETTINGS,
+            ANNOTATION_DEFAULTS,
+            graph.git.config(ANNOTATION_SETTINGS),
+            parse_filter_options(opts, ANNOTATION_SETTINGS))
     if opts.all_commits:
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
@@ -906,7 +917,7 @@ def main(opts, args):
 
     dot_file_lines = graph._generate_dot_file(
         sha_ones_on_labels=opts.all_commits,
-        with_commit_messages=filter_settings['messages'],
+        with_commit_messages=annotation_settings['messages'],
         sha_one_digits=sha_one_digits)
 
     if (output_settings[GRAPHVIZ] and output_settings[PROCESSED]):
