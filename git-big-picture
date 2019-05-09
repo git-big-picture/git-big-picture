@@ -58,24 +58,27 @@ OUTPUT_DEFAULTS = {
         }
 
 # filter settings
-BRANCHES     = 'branches'
-TAGS         = 'tags'
-ROOTS        = 'roots'
-MERGES       = 'merges'
-BIFURCATIONS = 'bifurcations'
+BRANCHES       = 'branches'
+TAGS           = 'tags'
+ROOTS          = 'roots'
+MERGES         = 'merges'
+BIFURCATIONS   = 'bifurcations'
+EXCLUSION_FILE = 'exclusionfile'
 FILTER_SETTINGS = [
         BRANCHES,
         TAGS,
         ROOTS,
         MERGES,
         BIFURCATIONS,
+        EXCLUSION_FILE,
         ]
 FILTER_DEFAULTS = {
-        BRANCHES:     True,
-        TAGS:         True,
-        ROOTS:        True,
-        MERGES:       False,
-        BIFURCATIONS: False,
+        BRANCHES:       True,
+        TAGS:           True,
+        ROOTS:          True,
+        MERGES:         False,
+        BIFURCATIONS:   False,
+        EXCLUSION_FILE: False,
         }
 # annotation settings
 MESSAGES     = 'messages'
@@ -197,6 +200,13 @@ def create_parser():
     filter_group.add_option('-C', '--no-commit-messages',
             action='store_true', dest='no_messages',
             help='do not include commit messages on labels')
+
+    filter_group.add_option('-x', '--exclusionfile',
+            action='store', type='string', dest='exclusionfile',
+            metavar='FILE', help='filter out matching branch/tag names from specified file lines')
+    filter_group.add_option('-X', '--no-exclusionfile',
+            action='store_true', dest='no_exclusionfile',
+            help='disable filter out file')
 
     parser.add_option_group(filter_group)
 
@@ -733,6 +743,7 @@ class CommitGraph(object):
             roots=FILTER_DEFAULTS[ROOTS],
             merges=FILTER_DEFAULTS[MERGES],
             bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
+            exclusionfile=FILTER_DEFAULTS[EXCLUSION_FILE],
             additional=None):
         """ Filter the commit graph.
 
@@ -765,11 +776,29 @@ class CommitGraph(object):
             the filtered graph
 
         """
+
+        exclusions = []
+        if exclusionfile:
+            with open(opts.exclusionfile) as f:
+                exclusions = f.readlines()
+            exclusions = [x.strip() for x in exclusions] 
+
+        def is_excluded(exclusions, labels):
+            for exclusion in exclusions:
+                for label in labels:
+                    if label.find(exclusion) > -1:
+                        return True
+            return False
+
         interesting = []
         if branches:
-            interesting.extend(self.branches.keys())
+            for k in self.branches.keys():
+                if not is_excluded(exclusions, self.branches[k]):
+                    interesting.append(k)
         if tags:
-            interesting.extend(self.tags.keys())
+            for k in self.tags.keys():
+                if not is_excluded(exclusions, self.tags[k]):
+                    interesting.append(k)
         if roots:
             interesting.extend(self.roots)
         if merges:
