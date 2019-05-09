@@ -121,7 +121,7 @@ def create_parser():
     # output options
     format_group.add_option('-f', '--format',
             action='store', type='string', dest='format',
-            metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+            metavar='FMT', help='set output format [svg, png, ps, pdf, json, jsonlt, ...]')
 
     format_group.add_option('--horizontal',
             action='store_true', dest='horizontal',
@@ -871,6 +871,47 @@ class CommitGraph(object):
                 return digit_count
         return 40
 
+    def format_sha_one(self, sha_one, sha_one_digits):
+        """ Shorten sha1 if required. """
+        if (sha_one_digits is None) or (sha_one_digits == 40):
+            return sha_one
+        else:
+            return sha_one[0:sha_one_digits]
+
+    def format_label(self, sha_one, with_commit_messages, sha_one_digits):
+        if with_commit_messages:
+            output = self.git('git log -1 --pretty=format:%s ' + sha_one)
+            message = output[0].replace('"', '').replace('\'', '')
+            return self.format_sha_one(sha_one, sha_one_digits) + '\n' + message
+        else:
+            return self.format_sha_one(sha_one, sha_one_digits)
+
+    def label_gen(self, isJsonLt):
+        keys = set(self.branches.keys()).union(set(self.tags.keys()))
+        for k in (k for k in keys
+                  if k in self.parents or k in self.children):
+            labels = []
+            case = 0
+            if k in self.tags:
+                case = case + 1
+                labels.extend(sorted(self.tags[k]))
+            if k in self.branches:
+                case = case + 2
+                labels.extend(sorted(self.branches[k]))
+            if isJsonLt:
+                if case == 0: 
+                    color = "white"
+                elif case == 1:
+                    color = "blue"
+                elif case == 2:
+                    color = "magenta"
+                else:
+                    color = "white"
+            else:
+                # http://www.graphviz.org/doc/info/colors.html
+                color = "/pastel13/%d" % case
+            yield (k, labels, color)
+
     def _generate_dot_file(self, horizontal, sha_ones_on_labels, with_commit_messages, sha_one_digits=None):
         """ Generate graphviz input.
 
@@ -889,45 +930,14 @@ class CommitGraph(object):
             lines of the graphviz input
         """
 
-        def format_sha_one(sha_one):
-            """ Shorten sha1 if required. """
-            if (sha_one_digits is None) or (sha_one_digits == 40):
-                return sha_one
-            else:
-                return sha_one[0:sha_one_digits]
-
-        def format_label(sha_one):
-            if with_commit_messages:
-                output = self.git('git log -1 --pretty=format:%s ' + sha_one)
-                message = output[0].replace('"', '').replace('\'', '')
-                return format_sha_one(sha_one) + '\n' + message
-            else:
-                return format_sha_one(sha_one)
-
-        def label_gen():
-            keys = set(self.branches.keys()).union(set(self.tags.keys()))
-            for k in (k for k in keys
-                      if k in self.parents or k in self.children):
-                labels = []
-                case = 0
-                if k in self.tags:
-                    case = case + 1
-                    labels.extend(sorted(self.tags[k]))
-                if k in self.branches:
-                    case = case + 2
-                    labels.extend(sorted(self.branches[k]))
-                # http://www.graphviz.org/doc/info/colors.html
-                color = "/pastel13/%d" % case
-                yield (k, labels, color)
-
         dot_file_lines = ['digraph {']
         if horizontal:
             dot_file_lines.append('\trankdir="LR";')
-        for sha_one, labels, color in label_gen():
+        for sha_one, labels, color in self.label_gen(False):
             dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
                 'ref': sha_one,
                 'label': '\\n'.join(labels
-                    + ((with_commit_messages or sha_ones_on_labels) and [format_label(sha_one), ] or list())),
+                    + ((with_commit_messages or sha_ones_on_labels) and [self.format_label(sha_one, with_commit_messages, sha_one_digits), ] or list())),
                 'color': color})
         for sha_one in self.dotdot:
             dot_file_lines.append(
@@ -936,7 +946,7 @@ class CommitGraph(object):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
                 dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
                     'ref': sha_one,
-                    'label': format_label(sha_one)})
+                    'label': self.format_label(sha_one, with_commit_messages, sha_one_digits)})
         for child, self.parents in self.parents.items():
             for p in self.parents:
                 dot_file_lines.append(
@@ -945,6 +955,72 @@ class CommitGraph(object):
         dot_file_lines.append('}')
         return dot_file_lines
 
+    def _generate_jsonlt_file(self, horizontal, sha_ones_on_labels, with_commit_messages, sha_one_digits=None):
+        """ Generate graphviz input.
+
+        Parameters
+        ----------
+        sha_ones_on_labels : boolean
+            if True show sha1 (or minimal) on labels in addition to ref names
+        with_commit_messages : boolean
+            if True the commit messages are displyed too
+        sha_one_digits : int
+            number of digits to use for showing sha1
+
+        Returns
+        -------
+        jsonlt_file_lines : json (light) lines
+        """
+
+        jsonlt_file_lines = ['{']
+
+        # options
+        jsonlt_file_lines.append('\t"options": {')
+        if horizontal:
+            jsonlt_file_lines.append('"orientation":"horizontal"')
+        else:
+            jsonlt_file_lines.append('"orientation":"vertical"')
+        jsonlt_file_lines.append('\t},')
+
+        # nodes
+        jsonlt_file_lines.append('\t"nodes": [')
+        coma = " "
+        for sha_one, labels, color in self.label_gen(True):
+            jsonlt_file_lines.append('\t\t%(coma)s{ "id":"%(ref)s", "label":"%(label)s", "color":"%(color)s", "style":"filled" }' % {
+                'coma': coma,
+                'ref': sha_one,
+                'label': '\\n'.join(labels
+                    + ((with_commit_messages or sha_ones_on_labels) and [self.format_label(sha_one, with_commit_messages, sha_one_digits), ] or list())),
+                'color': color})
+            coma = ","
+        for sha_one in self.dotdot:
+            jsonlt_file_lines.append(
+                    '\t\t%(coma)s{ "id":"%(ref)s", "label":"..." }' % { 'coma': coma, 'ref': sha_one})
+            coma = ","
+        if (sha_one_digits is not None) and (sha_one_digits != 40):
+            for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
+                jsonlt_file_lines.append('\t\t%(coma)s{ "id":"%(ref)s", "label":"%(label)s" }' % {
+                    'coma': coma,
+                    'ref': sha_one,
+                    'label': self.format_label(sha_one, with_commit_messages, sha_one_digits)})
+                coma = ","
+        jsonlt_file_lines.append('\t],')
+
+        # links
+        jsonlt_file_lines.append('\t"links": [')
+        coma = " "
+        for child, self.parents in self.parents.items():
+            for p in self.parents:
+                jsonlt_file_lines.append(
+                        '\t\t%(coma)s{ "nodeId1":"%(source)s", "nodeId2":"%(target)s" }' % {
+                            'coma': coma,
+                            'source': child,
+                            'target': p})
+                coma = ","
+        jsonlt_file_lines.append('\t]')
+
+        jsonlt_file_lines.append('}')
+        return jsonlt_file_lines
 
 def main(opts, args):
     repo_dir = parse_variable_args(args)
@@ -969,11 +1045,18 @@ def main(opts, args):
         graph = graph.filter(**filter_settings)
         sha_one_digits = graph._minimal_sha_one_digits()
 
-    dot_file_lines = graph._generate_dot_file(
-        horizontal=opts.horizontal,
-        sha_ones_on_labels=opts.all_commits,
-        with_commit_messages=annotation_settings['messages'],
-        sha_one_digits=sha_one_digits)
+    if output_settings[FORMAT] == "jsonlt":
+        dot_file_lines = graph._generate_jsonlt_file(
+            horizontal=opts.horizontal,
+            sha_ones_on_labels=opts.all_commits,
+            with_commit_messages=annotation_settings['messages'],
+            sha_one_digits=sha_one_digits)
+    else:
+        dot_file_lines = graph._generate_dot_file(
+            horizontal=opts.horizontal,
+            sha_ones_on_labels=opts.all_commits,
+            with_commit_messages=annotation_settings['messages'],
+            sha_one_digits=sha_one_digits)
 
     if (output_settings[GRAPHVIZ] and output_settings[PROCESSED]):
         barf("Options '-g | --graphviz' and '-p | --processed' " +
@@ -1012,7 +1095,10 @@ def main(opts, args):
                     output_settings[FORMAT])
             output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
     # run the 'dot' utility
-    dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
+    if output_settings[FORMAT] == "jsonlt":
+        dot_output = dot_file_lines
+    else:
+        dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
     # create outfile and possibly view that or a temporary file in viewer
     if output_settings[VIEWER] or output_settings[OUT_FILE]:
         # no output file requested, create a temporary one
