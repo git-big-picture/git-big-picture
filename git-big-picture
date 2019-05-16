@@ -64,6 +64,7 @@ ROOTS          = 'roots'
 MERGES         = 'merges'
 BIFURCATIONS   = 'bifurcations'
 EXCLUSION_FILE = 'exclusionfile'
+INCLUSION_FILE = 'inclusionfile'
 FILTER_SETTINGS = [
         BRANCHES,
         TAGS,
@@ -71,6 +72,7 @@ FILTER_SETTINGS = [
         MERGES,
         BIFURCATIONS,
         EXCLUSION_FILE,
+        INCLUSION_FILE,
         ]
 FILTER_DEFAULTS = {
         BRANCHES:       True,
@@ -79,6 +81,7 @@ FILTER_DEFAULTS = {
         MERGES:         False,
         BIFURCATIONS:   False,
         EXCLUSION_FILE: False,
+        INCLUSION_FILE: False,
         }
 # annotation settings
 MESSAGES     = 'messages'
@@ -207,6 +210,13 @@ def create_parser():
     filter_group.add_option('-X', '--no-exclusionfile',
             action='store_true', dest='no_exclusionfile',
             help='disable filter out file')
+
+    filter_group.add_option('-n', '--inclusionfile',
+            action='store', type='string', dest='inclusionfile',
+            metavar='FILE', help='only include matching branch/tag names from specified file lines')
+    filter_group.add_option('-N', '--no-inclusionfile',
+            action='store_true', dest='no_inclusionfile',
+            help='disable filter in file')
 
     parser.add_option_group(filter_group)
 
@@ -744,6 +754,7 @@ class CommitGraph(object):
             merges=FILTER_DEFAULTS[MERGES],
             bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
             exclusionfile=FILTER_DEFAULTS[EXCLUSION_FILE],
+            inclusionfile=FILTER_DEFAULTS[INCLUSION_FILE],
             additional=None):
         """ Filter the commit graph.
 
@@ -783,7 +794,13 @@ class CommitGraph(object):
                 exclusions = f.readlines()
             exclusions = [x.strip() for x in exclusions] 
 
-        def is_excluded(exclusions, labels):
+        inclusions = []
+        if inclusionfile:
+            with open(opts.inclusionfile) as f:
+                inclusions = f.readlines()
+            inclusions = [x.strip() for x in inclusions] 
+
+        def is_matching(exclusions, labels):
             for exclusion in exclusions:
                 for label in labels:
                     if label.find(exclusion) > -1:
@@ -793,12 +810,14 @@ class CommitGraph(object):
         interesting = []
         if branches:
             for k in self.branches.keys():
-                if not is_excluded(exclusions, self.branches[k]):
-                    interesting.append(k)
+                if not is_matching(exclusions, self.branches[k]):
+                    if len(inclusions) == 0 or is_matching(inclusions, self.branches[k]):
+                        interesting.append(k)
         if tags:
             for k in self.tags.keys():
-                if not is_excluded(exclusions, self.tags[k]):
-                    interesting.append(k)
+                if not is_matching(exclusions, self.tags[k]):
+                    if len(inclusions) == 0 or is_matching(inclusions, self.branches[k]):
+                        interesting.append(k)
         if roots:
             interesting.extend(self.roots)
         if merges:
