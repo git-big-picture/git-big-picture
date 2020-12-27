@@ -1,8 +1,8 @@
 git-big-picture
 ===============
 
-.. image:: https://travis-ci.org/esc/git-big-picture.svg?branch=master
-    :target: https://travis-ci.org/esc/git-big-picture
+.. image:: https://github.com/git-big-picture/git-big-picture/workflows/Tests/badge.svg
+    :target: https://github.com/git-big-picture/git-big-picture/actions
 
 ``git-big-picture`` is a visualization tool for Git repositories. You can think
 of it as a filter that removes uninteresting commits from a DAG modelling a Git
@@ -428,6 +428,7 @@ Changelog
 * Git ``HEAD``
 
   * Drop support for end-of-life versions of Python (2.7, 3.4, 3.5)
+  * Continuous integration via GitHub Actions
 
 * v0.10.1 - 2018-11-04
 
