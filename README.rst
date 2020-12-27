@@ -93,7 +93,7 @@ We also have a real world examples from:
 Dependencies
 ------------
 
-* Python 2.7 or Python 3.x
+* Python >=3.6
 * Git (1.7.1 works)
 * Graphviz utility
 * Nosetest and Cram (only for running tests)
@@ -424,6 +424,10 @@ TODO
 
 Changelog
 ---------
+
+* Git ``HEAD``
+
+  * Drop support for end-of-life versions of Python (2.7, 3.4, 3.5)
 
 * v0.10.1 - 2018-11-04
 
