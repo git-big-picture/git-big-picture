@@ -74,21 +74,21 @@ Courtesy of Graphviz, ``git-big-picture`` can output nice images.
 
 Here is the original repository from the example above:
 
-.. image:: https://raw.github.com/esc/git-big-picture/master/screenshots/before.png
+.. image:: https://raw.github.com/git-big-picture/git-big-picture/master/screenshots/before.png
     :height: 280px
     :width:  456px
 
 And here is the reduced version:
 
-.. image:: https://raw.github.com/esc/git-big-picture/master/screenshots/after.png
+.. image:: https://raw.github.com/git-big-picture/git-big-picture/master/screenshots/after.png
     :height: 280px
     :width:  456px
 
 We also have a real world examples from:
 
-* `cython <https://raw.github.com/esc/git-big-picture/master/screenshots/cython-big-picture.png>`_
-* `PyMVPA <https://raw.github.com/esc/git-big-picture/master/screenshots/pymvpa-big-picture.png>`_
-* `bloscpack <https://raw.github.com/esc/git-big-picture/master/screenshots/bloscpack-big-picture.png>`_
+* `cython <https://raw.github.com/git-big-picture/git-big-picture/master/screenshots/cython-big-picture.png>`_
+* `PyMVPA <https://raw.github.com/git-big-picture/git-big-picture/master/screenshots/pymvpa-big-picture.png>`_
+* `bloscpack <https://raw.github.com/git-big-picture/git-big-picture/master/screenshots/bloscpack-big-picture.png>`_
 
 Dependencies
 ------------
@@ -113,11 +113,11 @@ Alternatively, Just run it straight from a clone or download:
 
 .. code:: console
 
-    $ git clone git://github.com/esc/git-big-picture.git
+    $ git clone git://github.com/git-big-picture/git-big-picture.git
     $ cd git-big-picture
     $ ./git-big-picture --help
 
-    $ wget https://raw.github.com/esc/git-big-picture/master/git-big-picture
+    $ wget https://raw.github.com/git-big-picture/git-big-picture/master/git-big-picture
     $ chmod 755 git-big-picture 
     $ ./git-big-picture -h
 
