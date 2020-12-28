@@ -26,7 +26,7 @@ jobs:
     name: Tests
     strategy:
       matrix:
-        python-version: [3.6, 3.7]
+        python-version: [3.6, 3.9]  # no urgent need for: 3.7, 3.8
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2.3.4
