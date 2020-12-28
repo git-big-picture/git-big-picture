@@ -63,7 +63,7 @@ But since the commits would be labeled with their refs, it would look more like
 Demo Video
 ----------
 
-Chuwei Lu has made a youtube video showing how to use ``git-big-picture``:
+Chuwei Lu has made a YouTube video showing how to use ``git-big-picture``:
 
 https://www.youtube.com/watch?v=H7w7JWSy3oc&feature=youtu.be
 
@@ -101,7 +101,7 @@ Dependencies
 Installation
 ------------
 
-As of ``v0.10.1`` you may install it from PyPi:
+As of ``v0.10.1`` you may install it from PyPI:
 
 https://pypi.org/project/git-big-picture/
 
@@ -223,7 +223,7 @@ Generate PNG version of current Git repository and save to ``our-project.png``:
     $ git-big-picture -o our-project.png
 
 Generate SVG (default format) image of the repository in ``~/git-repo`` and view the
-result in firefox:
+result in Firefox:
 
 .. code:: console
 
@@ -432,12 +432,12 @@ Changelog
 
 * v0.10.1 - 2018-11-04
 
-  * Fix PyPi release
+  * Fix PyPI release
 
 * v0.10.0 - 2018-11-04
 
   * First release after 6 years
-  * Suppot for Python: 2.7, 3.4, 3.5, 3.6, 3.7
+  * Support for Python: 2.7, 3.4, 3.5, 3.6, 3.7
   * Add Python classifiers to setup.py
   * Tempfile suffix now matches format
   * Continuous integration via travis.ci
