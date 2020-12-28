@@ -427,6 +427,7 @@ Changelog
 
 * Git ``HEAD``
 
+  * Add support for Python 3.8 and 3.9
   * Drop support for end-of-life versions of Python (2.7, 3.4, 3.5)
   * Continuous integration via GitHub Actions
 
