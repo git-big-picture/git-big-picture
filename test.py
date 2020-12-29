@@ -39,7 +39,7 @@ def dispatch(command_string):
 
 
 def tag(sha1, tag_name):
-    dispatch('git tag %s %s' % (tag_name, sha1))
+    dispatch(f'git tag {tag_name} {sha1}')
 
 
 def get_head_sha():
@@ -91,7 +91,7 @@ class TestGitTools(ut.TestCase):
             new_tree = dispatch('git write-tree').strip()
             new_commit = dispatch('git commit-tree %s -m empty' %
                     new_tree).strip()
-            dispatch('git branch %s %s' % (branch_name, new_commit))
+            dispatch(f'git branch {branch_name} {new_commit}')
             return new_commit
 
         a = empty_commit('a')
@@ -335,7 +335,7 @@ class TestGitTools(ut.TestCase):
             print("b", b)
             print("p", p)
             print("f", f)
-        out = dispatch("git log --oneline %s..%s" % (f, p))
+        out = dispatch(f"git log --oneline {f}..{p}")
         if debug:
             print(out)
             print_dict(expected_reduced_parents)

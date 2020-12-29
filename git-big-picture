@@ -353,7 +353,7 @@ def show_in_viewer(output_file, viewer):
     try:
         subprocess.call([viewer, output_file])
     except OSError as e:
-        barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
+        barf(f"Error calling viewer: '{viewer}':\n>>>{e}",
                 EXIT_CODES["no_such_viewer"])
 
 
@@ -870,24 +870,17 @@ class CommitGraph:
         for sha_one, labels, color in label_gen():
             label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
                 format_label(sha_one), ] or list()))
-            dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
-                'ref': sha_one,
-                'label': label,
-                'color': color})
+            dot_file_lines.append(f'\t"{sha_one}"[label="{label}", color="{color}", style=filled];')
         for sha_one in self.dotdot:
             dot_file_lines.append(
-                '\t"%(ref)s"[label="..."];' % {'ref': sha_one})
+                f'\t"{sha_one}"[label="..."];')
         if (sha_one_digits is not None) and (sha_one_digits != 40):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
                 sha_label = format_label(sha_one)
-                dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
-                    'ref': sha_one,
-                    'label': sha_label})
+                dot_file_lines.append(f'\t"{sha_one}"[label="{sha_label}"];')
         for child, self.parents in self.parents.items():
             for p in self.parents:
-                dot_file_lines.append(
-                    '\t"%(source)s" -> "%(target)s";' % {'source': child,
-                                                         'target': p})
+                dot_file_lines.append(f'\t"{child}" -> "{p}";')
         dot_file_lines.append('}')
         return dot_file_lines
 
