@@ -25,7 +25,7 @@ Cram (http://pypi.python.org/pypi/cram) tests for git-big-picture
 No repo
 
   $ git-big-picture
-  fatal: '/tmp/cramtests-.{6,8}/test.cram' is probably not a Git repository (re)
+  fatal: '/.+/cramtests-.{6,8}/test.cram' is probably not a Git repository (re)
   [10]
 
 create a fake repo and export vars
