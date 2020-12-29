@@ -868,19 +868,21 @@ class CommitGraph:
 
         dot_file_lines = ['digraph {']
         for sha_one, labels, color in label_gen():
+            label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
+                format_label(sha_one), ] or list()))
             dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
                 'ref': sha_one,
-                'label': '\\n'.join(labels
-                    + ((with_commit_messages or sha_ones_on_labels) and [format_label(sha_one), ] or list())),
+                'label': label,
                 'color': color})
         for sha_one in self.dotdot:
             dot_file_lines.append(
                 '\t"%(ref)s"[label="..."];' % {'ref': sha_one})
         if (sha_one_digits is not None) and (sha_one_digits != 40):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
+                sha_label = format_label(sha_one)
                 dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
                     'ref': sha_one,
-                    'label': format_label(sha_one)})
+                    'label': sha_label})
         for child, self.parents in self.parents.items():
             for p in self.parents:
                 dot_file_lines.append(
