@@ -477,5 +477,3 @@ Authors/Contributors
 * Yaroslav Halchenko <debian@onerussian.com>
 * Chris West (Faux)  <git@goeswhere.com>
 * Antonio Valentino  <antonio.valentino@tiscali.it>
-
-
