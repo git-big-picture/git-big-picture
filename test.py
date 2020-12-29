@@ -23,11 +23,12 @@
 from __future__ import print_function
 
 import os
-import tempfile as tf
-import shutil as sh
-import unittest as ut
-import git_big_picture as gbp
 import shlex
+import shutil as sh
+import tempfile as tf
+import unittest as ut
+
+import git_big_picture as gbp
 
 debug = False
 
