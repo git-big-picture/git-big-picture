@@ -118,7 +118,7 @@ Alternatively, Just run it straight from a clone or download:
     $ ./git-big-picture --help
 
     $ wget https://raw.github.com/git-big-picture/git-big-picture/master/git-big-picture
-    $ chmod 755 git-big-picture 
+    $ chmod 755 git-big-picture
     $ ./git-big-picture -h
 
 Alternatively, use the standard ``setup.py`` script to install it system wide
