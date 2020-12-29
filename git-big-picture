@@ -511,7 +511,7 @@ def get_command_output(command_list, cwd=None, git_env=None):
     return load
 
 
-class Git(object):
+class Git:
 
     def __init__(self, repo_dir):
 
@@ -630,7 +630,7 @@ def graph_factory(repo_dir):
     return CommitGraph(git.get_parent_map(), ab, tags, git=git)
 
 
-class CommitGraph(object):
+class CommitGraph:
     """ Directed Acyclic Graph (DAG) git repository.
 
     Parameters
