@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # This file is part of git-big-picture
 #
@@ -21,7 +20,6 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 
 import copy
 import optparse
@@ -327,7 +325,7 @@ def write_to_file(output_file, dot_output):
     """
     try:
         f = open(output_file, 'wb+')
-    except IOError as e:
+    except OSError as e:
         barf("Could not open file '%s':\n>>>%s"
                 % (output_file, e),
                 EXIT_CODES["not_write_to_file"])
@@ -355,7 +353,7 @@ def show_in_viewer(output_file, viewer):
     try:
         subprocess.call([viewer, output_file])
     except OSError as e:
-        barf("Error calling viewer: '%s':\n>>>%s" % (viewer, e),
+        barf(f"Error calling viewer: '{viewer}':\n>>>{e}",
                 EXIT_CODES["no_such_viewer"])
 
 
@@ -512,7 +510,7 @@ def get_command_output(command_list, cwd=None, git_env=None):
     return load
 
 
-class Git(object):
+class Git:
 
     def __init__(self, repo_dir):
 
@@ -631,7 +629,7 @@ def graph_factory(repo_dir):
     return CommitGraph(git.get_parent_map(), ab, tags, git=git)
 
 
-class CommitGraph(object):
+class CommitGraph:
     """ Directed Acyclic Graph (DAG) git repository.
 
     Parameters
@@ -815,7 +813,7 @@ class CommitGraph(object):
         all commits unambiguously. """
         key_count = len(self.parents)
         for digit_count in range(7, 40):
-            if len(set(e[0:digit_count] for e in self.parents.keys())) == key_count:
+            if len({e[0:digit_count] for e in self.parents.keys()}) == key_count:
                 return digit_count
         return 40
 
@@ -870,24 +868,19 @@ class CommitGraph(object):
 
         dot_file_lines = ['digraph {']
         for sha_one, labels, color in label_gen():
-            dot_file_lines.append('\t"%(ref)s"[label="%(label)s", color="%(color)s", style=filled];' % {
-                'ref': sha_one,
-                'label': '\\n'.join(labels
-                    + ((with_commit_messages or sha_ones_on_labels) and [format_label(sha_one), ] or list())),
-                'color': color})
+            label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
+                format_label(sha_one), ] or list()))
+            dot_file_lines.append(f'\t"{sha_one}"[label="{label}", color="{color}", style=filled];')
         for sha_one in self.dotdot:
             dot_file_lines.append(
-                '\t"%(ref)s"[label="..."];' % {'ref': sha_one})
+                f'\t"{sha_one}"[label="..."];')
         if (sha_one_digits is not None) and (sha_one_digits != 40):
             for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
-                dot_file_lines.append('\t"%(ref)s"[label="%(label)s"];' % {
-                    'ref': sha_one,
-                    'label': format_label(sha_one)})
+                sha_label = format_label(sha_one)
+                dot_file_lines.append(f'\t"{sha_one}"[label="{sha_label}"];')
         for child, self.parents in self.parents.items():
             for p in self.parents:
-                dot_file_lines.append(
-                    '\t"%(source)s" -> "%(target)s";' % {'source': child,
-                                                         'target': p})
+                dot_file_lines.append(f'\t"{child}" -> "{p}";')
         dot_file_lines.append('}')
         return dot_file_lines
 

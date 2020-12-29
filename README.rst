@@ -118,7 +118,7 @@ Alternatively, Just run it straight from a clone or download:
     $ ./git-big-picture --help
 
     $ wget https://raw.github.com/git-big-picture/git-big-picture/master/git-big-picture
-    $ chmod 755 git-big-picture 
+    $ chmod 755 git-big-picture
     $ ./git-big-picture -h
 
 Alternatively, use the standard ``setup.py`` script to install it system wide
@@ -361,6 +361,22 @@ file:
 
     $ git-big-picture -g -V
 
+
+Development
+-----------
+
+git-big-picture uses `pre-commit <https://pre-commit.com/>`_, both locally and in the CI.
+To activate the same local pre-commit Git hooks for yourself, you could do:
+
+.. code:: console
+
+    $ pip install pre-commit
+    $ pre-commit install --install-hooks
+
+When you do a commit after that, pre-commit will run the checks
+configured in file ``.pre-commit-config.yaml``.
+
+
 Testing
 -------
 
@@ -477,5 +493,3 @@ Authors/Contributors
 * Yaroslav Halchenko <debian@onerussian.com>
 * Chris West (Faux)  <git@goeswhere.com>
 * Antonio Valentino  <antonio.valentino@tiscali.it>
-
-

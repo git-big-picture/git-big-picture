@@ -1,0 +1,48 @@
+# This file is part of git-big-picture
+#
+# Copyright (C) 2020 Sebastian Pipping <sebastian@pipping.org>
+#
+# git-big-picture is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# git-big-piture is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
+
+name: Detect outdated pre-commit hooks
+
+on:
+  schedule:
+    - cron: '0 16 * * 5'  # Every Friday 4pm
+
+jobs:
+  pip_detect_outdated:
+    name: Detect outdated pre-commit hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.9
+
+      - name: Install pre-commit
+        run: |-
+          pip install \
+            --disable-pip-version-check \
+            --no-warn-script-location \
+            --user \
+            pre-commit
+          echo "PATH=${HOME}/.local/bin:${PATH}" >> "${GITHUB_ENV}"
+
+      - name: Check for outdated hooks (and fail if any)
+        run: |-
+          pre-commit autoupdate
+          git diff --exit-code -- .pre-commit-config.yaml

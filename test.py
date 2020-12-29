@@ -1,5 +1,4 @@
 #!/usr/bin/env nosetests
-# -*- coding: utf-8 -*-
 #
 # This file is part of git-big-picture
 #
@@ -20,14 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
 
 import os
-import tempfile as tf
-import shutil as sh
-import unittest as ut
-import git_big_picture as gbp
 import shlex
+import shutil as sh
+import tempfile as tf
+import unittest as ut
+
+import git_big_picture as gbp
 
 debug = False
 
@@ -40,7 +39,7 @@ def dispatch(command_string):
 
 
 def tag(sha1, tag_name):
-    dispatch('git tag %s %s' % (tag_name, sha1))
+    dispatch(f'git tag {tag_name} {sha1}')
 
 
 def get_head_sha():
@@ -92,22 +91,22 @@ class TestGitTools(ut.TestCase):
             new_tree = dispatch('git write-tree').strip()
             new_commit = dispatch('git commit-tree %s -m empty' %
                     new_tree).strip()
-            dispatch('git branch %s %s' % (branch_name, new_commit))
+            dispatch(f'git branch {branch_name} {new_commit}')
             return new_commit
 
         a = empty_commit('a')
-        b = empty_commit('b')
+        empty_commit('b')
         graph = self.graph
         self.assertEqual(graph.roots, [a])
         c = create_root('C')
         graph = self.graph
-        self.assertEqual(set(graph.roots), set([a, c]))
+        self.assertEqual(set(graph.roots), {a, c})
         d = create_root('D')
         graph = self.graph
-        self.assertEqual(set(graph.roots), set([a, c, d]))
+        self.assertEqual(set(graph.roots), {a, c, d})
         e = create_root('E')
         graph = self.graph
-        self.assertEqual(set(graph.roots), set([a, c, d, e]))
+        self.assertEqual(set(graph.roots), {a, c, d, e})
 
     def filter_roots(self):
         a = empty_commit('a')
@@ -116,12 +115,12 @@ class TestGitTools(ut.TestCase):
         filterd_graph = graph.filter(roots=True)
         expected_parents = {
             a: set(),
-            b: set((a,)),
+            b: {a},
         }
         self.assertEqual(expected_parents, filterd_graph.parents)
 
     def test_find_merges_bifurcations(self):
-        """ Check that finding merges and bifurcations works.
+        r""" Check that finding merges and bifurcations works.
 
             master other
                 |   |
@@ -130,18 +129,18 @@ class TestGitTools(ut.TestCase):
               --C--
         """
         a = empty_commit('a')
-        b = empty_commit('b')
+        empty_commit('b')
         dispatch('git checkout -b other HEAD^')
-        c = empty_commit('c')
+        empty_commit('c')
         dispatch('git merge master')
         d = get_head_sha()
 
         graph = self.graph
-        self.assertEqual(set(graph.merges), set([d]))
-        self.assertEqual(set(graph.bifurcations), set([a]))
+        self.assertEqual(set(graph.merges), {d})
+        self.assertEqual(set(graph.bifurcations), {a})
 
     def test_get_parent_map(self):
-        """ Check get_parent_map() works:
+        r""" Check get_parent_map() works:
 
             master other
                 |   |
@@ -158,9 +157,9 @@ class TestGitTools(ut.TestCase):
 
         expected_parents = {
             a: set(),
-            b: set((a,)),
-            c: set((a,)),
-            d: set((c, b)),
+            b: {a},
+            c: {a},
+            d: {c, b},
         }
         self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(),
                 expected_parents)
@@ -177,13 +176,13 @@ class TestGitTools(ut.TestCase):
         """
         a = empty_commit('A')
         dispatch('git branch one')
-        b = empty_commit('B')
+        empty_commit('B')
         c = empty_commit('C')
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
             a: set(),
-            c: set((a,)),
+            c: {a},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -198,29 +197,29 @@ class TestGitTools(ut.TestCase):
         a = empty_commit('A')
         b = empty_commit('B')
         dispatch('git tag 0.1')
-        c = empty_commit('C')
-        d = empty_commit('D')
-        e = empty_commit('E')
+        empty_commit('C')
+        empty_commit('D')
+        empty_commit('E')
         f = empty_commit('F')
         graph = self.graph
         # use the defaults
         filterd_graph = graph.filter()
         expected_reduced_parents = {
             a: set(),
-            b: set((a,)),
-            f: set((b,)),
+            b: {a},
+            f: {b},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
         filterd_graph = graph.filter(roots=False)
         expected_reduced_parents = {
             b: set(),
-            f: set((b,)),
+            f: {b},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
         filterd_graph = graph.filter(tags=False)
         expected_reduced_parents = {
             a: set(),
-            f: set((a,)),
+            f: {a},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -253,7 +252,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_parent_of_parent_loop(self):
-        """ Test the case, where an alternative route may lead to a parents
+        r""" Test the case, where an alternative route may lead to a parents
         parent.
 
            0.1         0.2    master
@@ -271,14 +270,14 @@ class TestGitTools(ut.TestCase):
         """
         a = empty_commit('A')
         tag(a, '0.1')
-        b = empty_commit('B')
+        empty_commit('B')
         c = empty_commit('C')
         d = empty_commit('D')
         tag(d, '0.2')
-        e = empty_commit('E')
+        empty_commit('E')
 
         dispatch('git checkout -b topic %s' % c)
-        g = empty_commit('G')
+        empty_commit('G')
         dispatch('git checkout master')
         dispatch('git merge topic')
         f = get_head_sha()
@@ -287,14 +286,14 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            d: set((a,)),
+            d: {a},
             a: set(),
-            f: set((a, d,)),
+            f: {a, d},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_expose_multi_parent_bug(self):
-        """ Test for a peculiar bug that used to exist in pruning the graph.
+        r""" Test for a peculiar bug that used to exist in pruning the graph.
 
         Before:
 
@@ -314,11 +313,11 @@ class TestGitTools(ut.TestCase):
         b = empty_commit('B')
         tag(b, '0.1')
         c = empty_commit('C')
-        d = empty_commit('D')
-        e = empty_commit('E')
+        empty_commit('D')
+        empty_commit('E')
         dispatch('git checkout -b topic %s' % c)
-        n = empty_commit('N')
-        o = empty_commit('O')
+        empty_commit('N')
+        empty_commit('O')
         p = empty_commit('P')
         dispatch('git checkout master')
         dispatch('git merge topic')
@@ -326,17 +325,17 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            b: set((a,)),
+            b: {a},
             a: set(),
-            f: set((p, b,)),
-            p: set((b,)),
+            f: {p, b},
+            p: {b},
         }
         if debug:
             print("a", a)
             print("b", b)
             print("p", p)
             print("f", f)
-        out = dispatch("git log --oneline %s..%s" % (f, p))
+        out = dispatch(f"git log --oneline {f}..{p}")
         if debug:
             print(out)
             print_dict(expected_reduced_parents)
@@ -344,7 +343,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def more_realistic(self):
-        """ Test a slightly larger DAG
+        r""" Test a slightly larger DAG
 
         input:
                     0.1.1   0.1.2
@@ -368,21 +367,21 @@ class TestGitTools(ut.TestCase):
         b = empty_commit('B')
         tag(b, '0.1')
         c = empty_commit('C')
-        d = empty_commit('D')
-        e = empty_commit('E')
+        empty_commit('D')
+        empty_commit('E')
         dispatch('git checkout -b maint %s' % b)
-        g = empty_commit('G')
+        empty_commit('G')
         h = empty_commit('H')
         tag(h, '0.1.1')
-        i = empty_commit('I')
+        empty_commit('I')
         j = empty_commit('J')
         tag(j, '0.1.2')
-        k = empty_commit('K')
-        l = empty_commit('L')
+        empty_commit('K')
+        empty_commit('L')
         m = empty_commit('M')
         dispatch('git checkout -b topic %s' % c)
-        n = empty_commit('N')
-        o = empty_commit('O')
+        empty_commit('N')
+        empty_commit('O')
         p = empty_commit('P')
         dispatch('git checkout master')
         dispatch('git merge topic')
@@ -390,13 +389,13 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            m: set((j,)),
-            j: set((h,)),
-            h: set((b,)),
-            b: set((a,)),
+            m: {j},
+            j: {h},
+            h: {b},
+            b: {a},
             a: set(),
-            f: set((p, b,)),
-            p: set((b,)),
+            f: {p, b},
+            p: {b},
         }
         print_dict(expected_reduced_parents)
         print_dict(graph.parents)

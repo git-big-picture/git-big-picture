@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # This file is part of git-big-picture
 #
@@ -21,6 +20,7 @@
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 from setuptools import setup
+
 from git_big_picture import __version__ as VERSION
 
 with open('README.rst') as f:
