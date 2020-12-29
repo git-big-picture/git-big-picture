@@ -101,13 +101,13 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(graph.roots, [a])
         c = create_root('C')
         graph = self.graph
-        self.assertEqual(set(graph.roots), set([a, c]))
+        self.assertEqual(set(graph.roots), {a, c})
         d = create_root('D')
         graph = self.graph
-        self.assertEqual(set(graph.roots), set([a, c, d]))
+        self.assertEqual(set(graph.roots), {a, c, d})
         e = create_root('E')
         graph = self.graph
-        self.assertEqual(set(graph.roots), set([a, c, d, e]))
+        self.assertEqual(set(graph.roots), {a, c, d, e})
 
     def filter_roots(self):
         a = empty_commit('a')
@@ -116,7 +116,7 @@ class TestGitTools(ut.TestCase):
         filterd_graph = graph.filter(roots=True)
         expected_parents = {
             a: set(),
-            b: set((a,)),
+            b: {a},
         }
         self.assertEqual(expected_parents, filterd_graph.parents)
 
@@ -137,8 +137,8 @@ class TestGitTools(ut.TestCase):
         d = get_head_sha()
 
         graph = self.graph
-        self.assertEqual(set(graph.merges), set([d]))
-        self.assertEqual(set(graph.bifurcations), set([a]))
+        self.assertEqual(set(graph.merges), {d})
+        self.assertEqual(set(graph.bifurcations), {a})
 
     def test_get_parent_map(self):
         """ Check get_parent_map() works:
@@ -158,9 +158,9 @@ class TestGitTools(ut.TestCase):
 
         expected_parents = {
             a: set(),
-            b: set((a,)),
-            c: set((a,)),
-            d: set((c, b)),
+            b: {a},
+            c: {a},
+            d: {c, b},
         }
         self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(),
                 expected_parents)
@@ -183,7 +183,7 @@ class TestGitTools(ut.TestCase):
         filterd_graph = graph.filter()
         expected_reduced_parents = {
             a: set(),
-            c: set((a,)),
+            c: {a},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -207,20 +207,20 @@ class TestGitTools(ut.TestCase):
         filterd_graph = graph.filter()
         expected_reduced_parents = {
             a: set(),
-            b: set((a,)),
-            f: set((b,)),
+            b: {a},
+            f: {b},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
         filterd_graph = graph.filter(roots=False)
         expected_reduced_parents = {
             b: set(),
-            f: set((b,)),
+            f: {b},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
         filterd_graph = graph.filter(tags=False)
         expected_reduced_parents = {
             a: set(),
-            f: set((a,)),
+            f: {a},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -287,9 +287,9 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            d: set((a,)),
+            d: {a},
             a: set(),
-            f: set((a, d,)),
+            f: {a, d},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
@@ -326,10 +326,10 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            b: set((a,)),
+            b: {a},
             a: set(),
-            f: set((p, b,)),
-            p: set((b,)),
+            f: {p, b},
+            p: {b},
         }
         if debug:
             print("a", a)
@@ -390,13 +390,13 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         filterd_graph = graph.filter()
         expected_reduced_parents = {
-            m: set((j,)),
-            j: set((h,)),
-            h: set((b,)),
-            b: set((a,)),
+            m: {j},
+            j: {h},
+            h: {b},
+            b: {a},
             a: set(),
-            f: set((p, b,)),
-            p: set((b,)),
+            f: {p, b},
+            p: {b},
         }
         print_dict(expected_reduced_parents)
         print_dict(graph.parents)
