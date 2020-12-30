@@ -25,7 +25,6 @@ import copy
 import optparse
 import os
 import re
-import shlex
 import subprocess
 import sys
 import tempfile
@@ -518,20 +517,19 @@ class Git:
         # under the assumption that if git rev-parse fails
         # it really is not a git repo
         try:
-            self('git rev-parse')
+            self(['git', 'rev-parse'])
         except Exception:
             barf("'%s' is probably not a Git repository" % self.repo_dir,
                     EXIT_CODES['no_git_repo'])
 
-    def __call__(self, command):
-        return get_command_output(shlex.split(command),
-                cwd=self.repo_dir).splitlines()
+    def __call__(self, argv):
+        return get_command_output(argv, cwd=self.repo_dir).splitlines()
 
     def config(self, settings):
         config_settings = {}
         for setting in settings:
             try:
-                val = self('git config big-picture.%s' % setting)[0]
+                val = self(['git', 'config', f'big-picture.{setting}'])[0]
             except Exception:
                 val = None
             if val is None:
@@ -568,7 +566,8 @@ class Git:
             mapping of non-commit sha1s to sets of strings
         """
 
-        output = self("git for-each-ref --format=\"['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']\"")
+        ref_format = "['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']"
+        output = self(['git', 'for-each-ref', f'--format={ref_format}'])
         lbranch_prefix = 'refs/heads/'
         rbranch_prefix = 'refs/remotes/'
         tag_prefix = 'refs/tags/'
@@ -590,9 +589,9 @@ class Git:
                 add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
             elif name.startswith(tag_prefix):
                 # recusively dereference until we find a non-tag object
-                sha1 = self('git rev-parse %s^{}' % name)[0]
+                sha1 = self(['git', 'rev-parse', '%s^{}' % name])[0]
                 # determine object type and to respective dict
-                obj_type = self('git cat-file -t %s' % sha1)[0]
+                obj_type = self(['git', 'cat-file', '-t', sha1])[0]
                 if obj_type in ['blob', 'tree']:
                     add_to_dict(nctags, sha1, name.replace(tag_prefix, ''))
                 else:
@@ -611,7 +610,7 @@ class Git:
         """
 
         parents = {}
-        lines = self('git rev-list --all --parents')
+        lines = self(['git', 'rev-list', '--all', '--parents'])
         for line in lines:
             sha_ones = [e.group(0) for e in re.finditer(sha1_pattern, line)]
             count = len(sha_ones)
