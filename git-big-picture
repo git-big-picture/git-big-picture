@@ -983,6 +983,8 @@ def main(opts, args):
                 if sleep_time > 0:
                     debug("Now sleeping for %0.1f seconds" % sleep_time)
                     time.sleep(sleep_time)
+                debug(f"Removing temp file: {temporary_file.name!r}")
+                temporary_file.close()  # also removes the file
     elif output_settings[PROCESSED]:
         debug("Will now print dot processed output in format: '%s'" %
                 output_settings[FORMAT])
