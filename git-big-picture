@@ -149,7 +149,7 @@ def create_parser():
             help='disable writing image to file')
 
     format_group.add_option('-w', '--wait',
-            action='store', type='float', dest='wait',
+            action='store', type='float', dest=WAIT_TIME,
             metavar='SECONDS',
             help='keep the temporary file available for at least this many seconds')
     format_group.add_option('-W', '--no-wait',
