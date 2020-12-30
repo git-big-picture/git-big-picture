@@ -55,7 +55,7 @@ OUTPUT_DEFAULTS = {
         PROCESSED: False,
         VIEWER:    False,
         OUT_FILE:  False,
-        WAIT_TIME: 10,
+        WAIT_TIME: 2.0,
         }
 
 # filter settings
