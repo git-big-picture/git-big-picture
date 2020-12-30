@@ -151,7 +151,13 @@ def create_parser():
     format_group.add_option('-w', '--wait',
             action='store', type='float', dest=WAIT_SECONDS,
             metavar='SECONDS',
-            help='keep the temporary file available for at least this many seconds')
+            help='wait for SECONDS seconds before deleting the temporary file'
+                 ' that is opened using the viewer command'
+                 f' (default: {OUTPUT_DEFAULTS[WAIT_SECONDS]} seconds)'
+                 '; this helps e.g. with '
+                 'viewer commands that tell other running processes '
+                 'to open that file on their behalf'
+                 ', to then shut themselves down')
 
     parser.add_option_group(format_group)
 
