@@ -32,9 +32,6 @@ create a fake repo and export vars
 
   $ git init -q
   $ git commit -q --allow-empty -m "foo"
-  $ export outfile_svg='file.svg'
-  $ export viewer='true'
-  $ export stats_file='stats'
 
 run without options
 
@@ -55,16 +52,16 @@ mix --graphiz and --processed and others
   $ git-big-picture -p -g
   fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
   [7]
-  $ git-big-picture -g -v $viewer
+  $ git-big-picture -g -v true
   fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
-  $ git-big-picture -p -v $viewer
+  $ git-big-picture -p -v true
   fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
-  $ git-big-picture -g -o $outfile_svg
+  $ git-big-picture -g -o file.svg
   fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
-  $ git-big-picture -p -o $outfile_svg
+  $ git-big-picture -p -o file.svg
   fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
   [7]
 
@@ -81,18 +78,18 @@ try wrong format
 
 mismatch format, filename takes precedence
 
-  $ git-big-picture -f pdf -o $outfile_svg
+  $ git-big-picture -f pdf -o file.svg
   $ ls
   file.svg
-  $ rm $outfile_svg
+  $ rm file.svg
   $ ls
 
 try just filename
 
-  $ git-big-picture -o $outfile_svg
-  $ ls $outfile_svg
+  $ git-big-picture -o file.svg
+  $ ls file.svg
   file.svg
-  $ rm $outfile_svg
+  $ rm file.svg
   $ ls
 
 try using differnt format
@@ -117,20 +114,20 @@ format but no extension
   warning: Filename had no suffix, using format: svg
   $ ls
   file.svg
-  $ rm $outfile_svg
+  $ rm file.svg
   $ ls
 
 provide filename and viewer
 
-  $ git-big-picture -o $outfile_svg -v $viewer
+  $ git-big-picture -o file.svg -v true
   $ ls
   file.svg
-  $ rm $outfile_svg
+  $ rm file.svg
   $ ls
 
 provide filename and viewer and format
 
-  $ git-big-picture -f png -o file -v $viewer
+  $ git-big-picture -f png -o file -v true
   warning: Filename had no suffix, using format: png
   $ ls
   file.png
@@ -139,8 +136,8 @@ provide filename and viewer and format
 
 try profiling
 
-  $ git-big-picture --pstats=$stats_file -o $outfile_svg
-  $ ls $stats_file
+  $ git-big-picture --pstats=stats -o file.svg
+  $ ls stats
   stats
-  $ rm $stats_file $outfile_svg
+  $ rm stats file.svg
   $ ls
