@@ -9,7 +9,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# git-big-piture is distributed in the hope that it will be useful,
+# git-big-picture is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -38,7 +38,7 @@ run without options
     2: fatal: Must provide an output option. Try '-h' for more information
     [8]
 
-mix --graphiz and --processed and others
+mix --graphviz and --processed and others
 
     $ git-big-picture -p -g
     2: fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
@@ -81,7 +81,7 @@ try just filename
     $ rm file.svg
     $ ls
 
-try using differnt format
+try using different format
 
     $ git-big-picture -o file.pdf
     $ ls file.pdf
