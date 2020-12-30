@@ -548,6 +548,17 @@ class Git:
                 val = self(['git', 'config', f'big-picture.{setting}'])[0]
             except Exception:
                 val = None
+
+            # We need to keep the result of "git config big-picture.wait 1"
+            # from ending up as boolean True a few lines below
+            if setting == WAIT_SECONDS and val is not None:
+                try:
+                    config_settings[setting] = float(val)
+                except ValueError:
+                    debug(f"Could not convert {val!r} to float")
+                    config_settings[setting] = None
+                continue
+
             if val is None:
                 config_settings[setting] = None
             elif val.lower() in ['1', 'yes', 'true', 'on']:
