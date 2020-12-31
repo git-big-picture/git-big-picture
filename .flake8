@@ -14,7 +14,6 @@
 # E266 too many leading '#' for block comment
 # E241 multiple spaces after ','
 # E251 unexpected spaces around keyword / parameter equals
-# E741 ambiguous variable name 'l'
 # E501 line too long (xxx > 79 characters)
 # W503 line break before binary operator
 # W504 line break after binary operator
@@ -29,7 +28,6 @@ ignore =
     E266
     E241
     E251
-    E741
     E501
     W503
     W504
