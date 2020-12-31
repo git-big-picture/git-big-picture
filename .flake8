@@ -11,7 +11,6 @@
 # E127 continuation line over-indented for visual indent
 # E128 continuation line under-indented for visual indent
 # E221 multiple spaces before operator
-# E266 too many leading '#' for block comment
 # E241 multiple spaces after ','
 # E251 unexpected spaces around keyword / parameter equals
 # E501 line too long (xxx > 79 characters)
@@ -25,7 +24,6 @@ ignore =
     E127
     E128
     E221
-    E266
     E241
     E251
     E501
