@@ -109,7 +109,7 @@ https://pypi.org/project/git-big-picture/
 
    $ pip install git-big-picture
 
-Alternatively, Just run it straight from a clone or download:
+Alternatively, just run it straight from a clone or download:
 
 .. code:: console
 
