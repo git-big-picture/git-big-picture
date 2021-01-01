@@ -32,7 +32,7 @@ import tempfile
 __version__ = '0.10.2.dev0'
 __docformat__ = "restructuredtext"
 
-## settings and defaults
+
 # format settings
 GRAPHVIZ  = 'graphviz'
 PROCESSED = 'processed'
@@ -74,6 +74,7 @@ FILTER_DEFAULTS = {
         MERGES:       False,
         BIFURCATIONS: False,
         }
+
 # annotation settings
 MESSAGES     = 'messages'
 ANNOTATION_SETTINGS = [
