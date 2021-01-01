@@ -120,14 +120,14 @@ Alternatively, just run it straight from a Git clone:
     $ pip install -e .          # installs to the virtualenv
     $ git-big-picture --help
 
-Alternatively, use the standard ``setup.py`` script to install it system wide
+Alternatively, use pip to install it system wide
 or just for the user.
 
 .. code:: console
 
-    $ ./setup.py install
+    $ pip install .
     (may need root privileges)
-    $ ./setup.py install --user
+    $ pip install --user .
 
 Git Integration
 ---------------
