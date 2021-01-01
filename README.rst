@@ -109,17 +109,16 @@ https://pypi.org/project/git-big-picture/
 
    $ pip install git-big-picture
 
-Alternatively, just run it straight from a clone or download:
+Alternatively, just run it straight from a Git clone:
 
 .. code:: console
 
     $ git clone git://github.com/git-big-picture/git-big-picture.git
     $ cd git-big-picture
-    $ ./git-big-picture --help
-
-    $ wget https://raw.github.com/git-big-picture/git-big-picture/master/git-big-picture
-    $ chmod 755 git-big-picture
-    $ ./git-big-picture -h
+    $ python3 -m venv venv      # creates a virtualenv
+    $ source venv/bin/activate  # activates the virtualenv
+    $ pip install -e .          # installs to the virtualenv
+    $ git-big-picture --help
 
 Alternatively, use the standard ``setup.py`` script to install it system wide
 or just for the user.
@@ -405,7 +404,8 @@ The command line interface is tested with `Scruf <https://gitlab.com/matthewhugh
 
 .. code:: console
 
-    $ PATH="${PWD}:${PATH}" ./test.scf
+    $ PATH="venv/bin:${PATH}" ./test.scf
+
 
 Debugging
 ---------

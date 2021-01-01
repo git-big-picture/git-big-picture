@@ -52,6 +52,7 @@ cd "${temp_dir}"
 python3 -m venv ${venv}
 source ${venv}/bin/activate
 pip install --quiet --disable-pip-version-check -r "${source_dir}"/test_requirements.txt
+pip install --quiet --disable-pip-version-check -e "${source_dir}"
 sed "s,\./,${source_dir}/,g" "${source_dir}"/.coveragerc > .coveragerc
 cat <<SITECUSTOMIZE_PY_EOF > "$(ls -1d ${venv}/lib/python*)"/site-packages/sitecustomize.py
 try:
@@ -68,7 +69,7 @@ coverage erase
 
 coverage run ${venv}/bin/pytest "${source_dir}"/test.py \
     || exit_code=$?
-PATH="${source_dir}:${PATH}" COVERAGE_PROCESS_START=.coveragerc \
+PATH="${venv}/bin:${PATH}" COVERAGE_PROCESS_START=.coveragerc \
     coverage run ${venv}/bin/scruf "${source_dir}"/test.scf \
     || exit_code=$?
 
