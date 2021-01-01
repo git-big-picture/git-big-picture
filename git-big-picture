@@ -20,9 +20,8 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import argparse
 import copy
-import optparse
 import os
 import re
 import subprocess
@@ -99,57 +98,58 @@ EXIT_CODES = {"too_many_args":              1,
               "no_options":                 8,
               "no_git":                     9,
               "no_git_repo":               10,
-              "mutually_exclusive":        11,
              }
 
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
 DEBUG = False
 
-USAGE = "%prog OPTIONS [<repo-directory>]"
+USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 
 
 def create_parser():
-    parser = optparse.OptionParser(usage=USAGE, version=__version__)
-    format_group = optparse.OptionGroup(parser, "Output Options",
+    parser = argparse.ArgumentParser(prog='git-big-picture', usage=USAGE)
+    parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
+
+    format_group = parser.add_argument_group("Output Options",
             "Options to control output and format")
 
     # output options
-    format_group.add_option('-f', '--format',
-            action='store', type='string', dest='format',
+    format_group.add_argument('-f', '--format',
+            dest=FORMAT,
             metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
 
-    format_group.add_option('-g', '--graphviz',
-            action='store_true', dest='graphviz',
+    format_group.add_argument('-g', '--graphviz',
+            default=None, action='store_true', dest=GRAPHVIZ,
             help='output lines suitable as input for dot/graphviz')
-    format_group.add_option('-G', '--no-graphviz',
-            action='store_true', dest='no_graphviz',
+    format_group.add_argument('-G', '--no-graphviz',
+            default=None, action='store_false', dest=GRAPHVIZ,
             help='disable dot/graphviz output')
 
-    format_group.add_option('-p', '--processed',
-            action='store_true', dest='processed',
+    format_group.add_argument('-p', '--processed',
+            default=None, action='store_true', dest=PROCESSED,
             help='output the dot processed, binary data')
-    format_group.add_option('-P', '--no-processed',
-            action='store_true', dest='no_processed',
+    format_group.add_argument('-P', '--no-processed',
+            default=None, action='store_false', dest=PROCESSED,
             help='disable binary output')
 
-    format_group.add_option('-v', '--viewer',
-            action='store', type='string', dest='viewer',
+    format_group.add_argument('-v', '--viewer',
+            dest=VIEWER,
             metavar='CMD',
             help='write image to tempfile and start specified viewer')
-    format_group.add_option('-V', '--no-viewer',
-            action='store_true', dest='no_viewer',
+    format_group.add_argument('-V', '--no-viewer',
+            default=None, action='store_false', dest=VIEWER,
             help='disable starting viewer')
 
-    format_group.add_option('-o', '--outfile',
-            action='store', type='string', dest='outfile',
+    format_group.add_argument('-o', '--outfile',
+            dest=OUT_FILE,
             metavar='FILE', help='write image to specified file')
-    format_group.add_option('-O', '--no-outfile',
-            action='store_true', dest='no_outfile',
+    format_group.add_argument('-O', '--no-outfile',
+            default=None, action='store_false', dest=OUT_FILE,
             help='disable writing image to file')
 
-    format_group.add_option('-w', '--wait',
-            action='store', type='float', dest=WAIT_SECONDS,
+    format_group.add_argument('-w', '--wait',
+            type=float, dest=WAIT_SECONDS,
             metavar='SECONDS',
             help='wait for SECONDS seconds before deleting the temporary file'
                  ' that is opened using the viewer command'
@@ -159,69 +159,72 @@ def create_parser():
                  'to open that file on their behalf'
                  ', to then shut themselves down')
 
-    parser.add_option_group(format_group)
-
-    filter_group = optparse.OptionGroup(parser, "Filter Options",
+    filter_group = parser.add_argument_group("Filter Options",
             "Options to control commit/ref selection")
 
     # commit/ref selection -- filtering options
-    filter_group.add_option('-a', '--all',
-            action='store_true', dest='all_commits',
+    filter_group.add_argument('-a', '--all',
+            default=None, action='store_true', dest='all_commits',
             help='include all commits')
 
-    filter_group.add_option('-b', '--branches',
-            action='store_true', dest='branches',
+    filter_group.add_argument('-b', '--branches',
+            default=None, action='store_true', dest=BRANCHES,
             help='show commits pointed to by branches')
-    filter_group.add_option('-B', '--no-branches',
-            action='store_true', dest='no_branches',
+    filter_group.add_argument('-B', '--no-branches',
+            default=None, action='store_false', dest=BRANCHES,
             help='do not show commits pointed to by branches')
 
-    filter_group.add_option('-t', '--tags',
-            action='store_true', dest='tags',
+    filter_group.add_argument('-t', '--tags',
+            default=None, action='store_true', dest=TAGS,
             help='show commits pointed to by tags')
-    filter_group.add_option('-T', '--no-tags',
-            action='store_true', dest='no_tags',
+    filter_group.add_argument('-T', '--no-tags',
+            default=None, action='store_false', dest=TAGS,
             help='do not show commits pointed to by tags')
 
-    filter_group.add_option('-r', '--roots',
-            action='store_true', dest='roots',
+    filter_group.add_argument('-r', '--roots',
+            default=None, action='store_true', dest=ROOTS,
             help='show root commits')
-    filter_group.add_option('-R', '--no-roots',
-            action='store_true', dest='no_roots',
+    filter_group.add_argument('-R', '--no-roots',
+            default=None, action='store_false', dest=ROOTS,
             help='do not show root commits')
 
-    filter_group.add_option('-m', '--merges',
-            action='store_true', dest='merges',
+    filter_group.add_argument('-m', '--merges',
+            default=None, action='store_true', dest=MERGES,
             help='include merge commits')
-    filter_group.add_option('-M', '--no-merges',
-            action='store_true', dest='no_merges',
+    filter_group.add_argument('-M', '--no-merges',
+            default=None, action='store_false', dest=MERGES,
             help='do not include merge commits')
 
-    filter_group.add_option('-i', '--bifurcations',
-            action='store_true', dest='bifurcations',
+    filter_group.add_argument('-i', '--bifurcations',
+            default=None, action='store_true', dest=BIFURCATIONS,
             help='include bifurcation commits')
-    filter_group.add_option('-I', '--no-bifurcations',
-            action='store_true', dest='no_bifurcations',
+    filter_group.add_argument('-I', '--no-bifurcations',
+            default=None, action='store_false', dest=BIFURCATIONS,
             help='do not include bifurcation commits')
 
-    filter_group.add_option('-c', '--commit-messages',
-            action='store_true', dest='messages',
+    filter_group.add_argument('-c', '--commit-messages',
+            default=None, action='store_true', dest=MESSAGES,
             help='include commit messages on labels')
-    filter_group.add_option('-C', '--no-commit-messages',
-            action='store_true', dest='no_messages',
+    filter_group.add_argument('-C', '--no-commit-messages',
+            default=None, action='store_false', dest=MESSAGES,
             help='do not include commit messages on labels')
 
-    parser.add_option_group(filter_group)
-
     # miscellaneous options
-    parser.add_option('--pstats',
-            action='store', type='string', dest='pstats_outfile',
+    parser.add_argument('--pstats',
+            dest='pstats_outfile',
             metavar='FILE',
             help='run cProfile profiler writing pstats output to FILE')
 
-    parser.add_option('-d', '--debug',
+    parser.add_argument('-d', '--debug',
             action='store_true', dest='debug',
             help='activate debug output')
+
+    # NOTE: This would have nargs='?' but we're using nargs='*'
+    #       here so that we can provide a custom error message
+    #       and exit code in function ``parse_variable_args``.
+    parser.add_argument('repo_dirs', metavar='REPOSITORY', nargs='*',
+                        help='path to the Git working directory'
+                             '\n(default: current directory)')
 
     return parser
 
@@ -396,18 +399,10 @@ def guess_format_from_filename(output_file):
 
 def parse_output_options(opts):
     cmdline_settings = {}
-    for setting in OUTPUT_SETTINGS[1:]:
-        positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting, None)
-        if positive is not None and negative is not None:
-            barf("'%s' and '%s' are mutually exclusive" %
-                    ('--' + setting, '--no-' + setting),
-                    EXIT_CODES['mutually_exclusive'])
-        if positive is not None:
-            cmdline_settings[setting] = positive
-        elif negative is not None:
-            cmdline_settings[setting] = False
-        else:
-            cmdline_settings[setting] = None
+    for setting in OUTPUT_SETTINGS:
+        if setting == FORMAT:
+            continue
+        cmdline_settings[setting] = getattr(opts, setting)
     val = getattr(opts, FORMAT)
     cmdline_settings[FORMAT] = val if val is not None else None
     return cmdline_settings
@@ -434,17 +429,7 @@ def parse_filter_options(opts, SETTINGS):
     """
     cmdline_settings = {}
     for setting in SETTINGS:
-        positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
-        if positive is not None and negative is not None:
-            barf("'%s' and '%s' are mutually exclusive" %
-                    ('--' + setting, '--no-' + setting),
-                    EXIT_CODES['mutually_exclusive'])
-        elif positive is not None:
-            cmdline_settings[setting] = True
-        elif negative is not None:
-            cmdline_settings[setting] = False
-        else:
-            cmdline_settings[setting] = None
+        cmdline_settings[setting] = getattr(opts, setting)
     return cmdline_settings
 
 
@@ -911,8 +896,8 @@ class CommitGraph:
         return dot_file_lines
 
 
-def main(opts, args):
-    repo_dir = parse_variable_args(args)
+def main(opts):
+    repo_dir = parse_variable_args(opts.repo_dirs)
     debug("The Git repository is at: '%s'" % repo_dir)
     graph = graph_factory(repo_dir)
     output_settings = set_settings(OUTPUT_SETTINGS,
@@ -1012,9 +997,9 @@ def main(opts, args):
 
 if __name__ == '__main__':
 
-    opts, args = PARSER.parse_args()
+    opts = PARSER.parse_args()
 
-    if opts.debug is not None:
+    if opts.debug:
         DEBUG = True
         debug('Activate debug')
 
@@ -1027,6 +1012,6 @@ if __name__ == '__main__':
     if opts.pstats_outfile is not None:
         import cProfile
         debug("Running in profiler, output is: '%s'" % opts.pstats_outfile)
-        cProfile.run('main(opts, args)', opts.pstats_outfile)
+        cProfile.run('main(opts)', opts.pstats_outfile)
     else:
-        main(opts, args)
+        main(opts)
