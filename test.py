@@ -57,9 +57,8 @@ def print_dict(dict_):
 
 
 class TestGitTools(ut.TestCase):
-
     def setUp(self):
-        """ Setup testing environment.
+        """Setup testing environment.
 
         Create temporary directory, initialise git repo, and set some options.
 
@@ -85,12 +84,10 @@ class TestGitTools(ut.TestCase):
         return gbp.graph_factory(self.testing_dir)
 
     def test_find_roots(self):
-
         def create_root(branch_name):
             dispatch('git read-tree --empty')
             new_tree = dispatch('git write-tree').strip()
-            new_commit = dispatch('git commit-tree %s -m empty' %
-                    new_tree).strip()
+            new_commit = dispatch('git commit-tree %s -m empty' % new_tree).strip()
             dispatch(f'git branch {branch_name} {new_commit}')
             return new_commit
 
@@ -120,13 +117,13 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_parents, filterd_graph.parents)
 
     def test_find_merges_bifurcations(self):
-        r""" Check that finding merges and bifurcations works.
+        r"""Check that finding merges and bifurcations works.
 
-            master other
-                |   |
-            A---B---D
-             \     /
-              --C--
+        master other
+            |   |
+        A---B---D
+         \     /
+          --C--
         """
         a = empty_commit('a')
         empty_commit('b')
@@ -140,13 +137,13 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(set(graph.bifurcations), {a})
 
     def test_get_parent_map(self):
-        r""" Check get_parent_map() works:
+        r"""Check get_parent_map() works:
 
-            master other
-                |   |
-            A---B---D
-             \     /
-              --C--
+        master other
+            |   |
+        A---B---D
+         \     /
+          --C--
         """
         a = empty_commit('a')
         b = empty_commit('b')
@@ -161,11 +158,10 @@ class TestGitTools(ut.TestCase):
             c: {a},
             d: {c, b},
         }
-        self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(),
-                expected_parents)
+        self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(), expected_parents)
 
     def test_filter_one(self):
-        """ Remove a single commit from between two commits.
+        """Remove a single commit from between two commits.
 
             A---B---C
             |       |
@@ -187,11 +183,11 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_filter_with_tags(self):
-        """ Remove three commits and root commit
+        """Remove three commits and root commit
 
-            A---B---C---D---E---F
-                |               |
-               0.1            master
+        A---B---C---D---E---F
+            |               |
+           0.1            master
 
         """
         a = empty_commit('A')
@@ -224,8 +220,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_no_commit_tags(self):
-        """ Test for tree-tag and a blob-tag.
-        """
+        """Test for tree-tag and a blob-tag."""
 
         a = empty_commit('A')
         f = open('foo', 'w')
@@ -252,7 +247,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_parent_of_parent_loop(self):
-        r""" Test the case, where an alternative route may lead to a parents
+        r"""Test the case, where an alternative route may lead to a parents
         parent.
 
            0.1         0.2    master
@@ -293,7 +288,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def test_expose_multi_parent_bug(self):
-        r""" Test for a peculiar bug that used to exist in pruning the graph.
+        r"""Test for a peculiar bug that used to exist in pruning the graph.
 
         Before:
 
@@ -343,7 +338,7 @@ class TestGitTools(ut.TestCase):
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
     def more_realistic(self):
-        r""" Test a slightly larger DAG
+        r"""Test a slightly larger DAG
 
         input:
                     0.1.1   0.1.2

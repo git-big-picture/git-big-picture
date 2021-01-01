@@ -26,15 +26,16 @@ from git_big_picture import __version__ as VERSION
 with open('README.rst') as f:
     long_description = f.read()
 
-setup(name = 'git-big-picture',
-    version = VERSION,
-    author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
-    description = 'Git -- the big picture',
+setup(
+    name='git-big-picture',
+    version=VERSION,
+    author='Sebastian Pipping, Julius Plenz, and Valentin Haenel',
+    description='Git -- the big picture',
     long_description=long_description,
-    url = 'https://github.com/git-big-picture/git-big-picture',
-    license = 'GPL v3 or later',
+    url='https://github.com/git-big-picture/git-big-picture',
+    license='GPL v3 or later',
     python_requires='>=3.6',
-    scripts = ['git-big-picture'],
+    scripts=['git-big-picture'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
