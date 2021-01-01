@@ -111,7 +111,7 @@ def create_parser():
     parser = argparse.ArgumentParser(prog='git-big-picture', usage=USAGE)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
-    format_group = parser.add_argument_group("Output Options",
+    format_group = parser.add_argument_group("output options",
             "Options to control output and format")
 
     # output options
@@ -159,7 +159,7 @@ def create_parser():
                  'to open that file on their behalf'
                  ', to then shut themselves down')
 
-    filter_group = parser.add_argument_group("Filter Options",
+    filter_group = parser.add_argument_group("filter options",
             "Options to control commit/ref selection")
 
     # commit/ref selection -- filtering options
