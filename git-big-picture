@@ -374,7 +374,7 @@ def guess_format_from_filename(output_file):
 
     """
     if '.' in output_file:
-        return True, opts.outfile.split('.')[-1]
+        return True, output_file.split('.')[-1]
     else:
         return False, None
 
