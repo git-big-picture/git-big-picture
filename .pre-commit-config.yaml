@@ -45,3 +45,13 @@ repos:
     rev: v1.0.1
     hooks:
       - id: rst-linter
+
+  - repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+      - id: black
+        args: [
+            '--target-version', 'py36',
+            '--skip-string-normalization',
+            '--line-length', '99',
+        ]
