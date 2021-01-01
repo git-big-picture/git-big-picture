@@ -27,6 +27,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import textwrap
 import time
 
 __version__ = '0.10.2.dev0'
@@ -108,7 +109,8 @@ USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(prog='git-big-picture', usage=USAGE)
+    parser = argparse.ArgumentParser(prog='git-big-picture', usage=USAGE,
+                                     formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
     format_group = parser.add_argument_group("output options",
@@ -151,13 +153,14 @@ def create_parser():
     format_group.add_argument('-w', '--wait',
             type=float, dest=WAIT_SECONDS,
             metavar='SECONDS',
-            help='wait for SECONDS seconds before deleting the temporary file'
+            help='\n'.join(textwrap.wrap(
+                 'wait for SECONDS seconds before deleting the temporary file'
                  ' that is opened using the viewer command'
                  f' (default: {OUTPUT_DEFAULTS[WAIT_SECONDS]} seconds)'
                  '; this helps e.g. with '
                  'viewer commands that tell other running processes '
                  'to open that file on their behalf'
-                 ', to then shut themselves down')
+                 ', to then shut themselves down', width=57)))
 
     filter_group = parser.add_argument_group("filter options",
             "Options to control commit/ref selection")
