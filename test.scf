@@ -126,8 +126,8 @@ try profiling
     $ rm stats file.svg
     $ ls
 
-crash on branch names that contain single ticks ("'")
+be robust with regard to branch names that contain tick characters ("'")
     $ git branch "single'tick"
-    $ set -o pipefail; git-big-picture -g |& tail -n1
-    SyntaxError: invalid syntax
-    [1]
+    $ git branch "one'two'three"
+    $ git-big-picture -g > /dev/null
+    [0]
