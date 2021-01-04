@@ -108,7 +108,7 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         self.assertEqual(set(graph.roots), {a, c, d, e})
 
-    def filter_roots(self):
+    def test_filter_roots(self):
         a = empty_commit('a')
         b = empty_commit('b')
         graph = self.graph
@@ -342,7 +342,7 @@ class TestGitTools(ut.TestCase):
             print_dict(graph.parents)
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
-    def more_realistic(self):
+    def test_more_realistic(self):
         r""" Test a slightly larger DAG
 
         input:
