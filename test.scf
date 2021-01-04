@@ -112,6 +112,12 @@ provide filename and viewer and format
     $ rm file.png
     $ ls
 
+check for deletion of temp files
+    $ ls -1 "$(git-big-picture -d -v true | fgrep 'temp file' | tee /dev/stderr | grep -Eo "/[^']+" | uniq)"
+    2: [RE] ^debug:   Created temp file: '/[^']+'$
+    2: [RE] ^debug:   Removing temp file: '/[^']+'$
+    2: [RE] ^ls: .*/.+/git-big-picture.*.svg.*No such file or directory$
+
 try profiling
     $ git-big-picture --pstats=stats -o file.svg
     $ ls stats
