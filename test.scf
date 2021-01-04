@@ -120,6 +120,14 @@ provide filename and viewer and format
     $ rm file.png
     $ ls
 
+check explicit direction of history
+    $ bash -c 'set -o pipefail; for i in {down,left,right,up}wards; do git-big-picture -g --history-direction=${i} | fgrep rankdir ; done'
+    [RE] rankdir="BT";
+    [RE] rankdir="LR";
+    [RE] rankdir="RL";
+    [RE] rankdir="TB";
+    [0]
+
 check for deletion of temp files
     $ ls -1 "$(git-big-picture -d -v true | fgrep 'temp file' | tee /dev/stderr | grep -Eo "/[^']+" | uniq)"
     2: [RE] ^debug:   Created temp file: '/[^']+'$
