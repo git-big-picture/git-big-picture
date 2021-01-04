@@ -1,0 +1,118 @@
+#!/usr/bin/env scruf
+# This file is part of git-big-picture
+#
+# Copyright (C) 2012-2018 Valentin Haenel <valentin.haenel@gmx.de>
+# Copyright (C) 2020      Sebastian Pipping <sebastian@pipping.org>
+#
+# git-big-picture is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# git-big-picture is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
+
+# Scruf (https://gitlab.com/matthewhughes/scruf) tests for git-big-picture
+
+no repo
+    $ git-big-picture
+    2: [RE] fatal: '/.+' is probably not a Git repository
+    [10]
+
+create a fake repo (i.e. global setup for all following tests)
+    $ git init -q
+    $ git commit -q --allow-empty -m "foo"
+
+run without options
+    $ git init -q
+    $ git commit -q --allow-empty -m "foo"
+    $ git-big-picture .
+    2: fatal: Must provide an output option. Try '-h' for more information
+    [8]
+
+mix --graphviz and --processed and others
+    $ git-big-picture -p -g
+    2: fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
+    [7]
+    $ git-big-picture -g -v true
+    2: fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
+    [7]
+    $ git-big-picture -p -v true
+    2: fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
+    [7]
+    $ git-big-picture -g -o file.svg
+    2: fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
+    [7]
+    $ git-big-picture -p -o file.svg
+    2: fatal: Options '-g | --graphviz' and '-p | --processed' are incompatible with other output options.
+    [7]
+
+try wrong format
+    $ git-big-picture -p -f foo
+    2: fatal: 'dot' terminated prematurely with error code 1;
+    2: probably you specified an invalid format, see 'man dot'.
+    2: The error from 'dot' was:
+    2: [RE] >>>Format: "foo" not recognized. Use one of: .*$
+    [4]
+
+mismatch format, filename takes precedence
+    $ git-big-picture -f pdf -o file.svg
+    $ ls
+    file.svg
+    $ rm file.svg
+    $ ls
+
+try just filename
+    $ git-big-picture -o file.svg
+    $ ls file.svg
+    file.svg
+    $ rm file.svg
+    $ ls
+
+try using different format
+    $ git-big-picture -o file.pdf
+    $ ls file.pdf
+    file.pdf
+    $ rm file.pdf
+    $ ls
+
+try no such viewer
+    $ git-big-picture -f svg -v foo
+    2: fatal: Error calling viewer: 'foo':
+    2: [RE] >>>\[Errno 2\] No such file or directory.*$
+    [6]
+
+format but no extension
+    $ git-big-picture -f svg -o file
+    2: warning: Filename had no suffix, using format: svg
+    $ ls
+    file.svg
+    $ rm file.svg
+    $ ls
+
+provide filename and viewer
+    $ git-big-picture -o file.svg -v true
+    $ ls
+    file.svg
+    $ rm file.svg
+    $ ls
+
+provide filename and viewer and format
+    $ git-big-picture -f png -o file -v true
+    2: warning: Filename had no suffix, using format: png
+    $ ls
+    file.png
+    $ rm file.png
+    $ ls
+
+try profiling
+    $ git-big-picture --pstats=stats -o file.svg
+    $ ls stats
+    stats
+    $ rm stats file.svg
+    $ ls

@@ -96,7 +96,7 @@ Dependencies
 * Python >=3.6
 * Git (1.7.1 works)
 * Graphviz utility
-* Nosetest and Cram (only for running tests)
+* Nosetest and Scruf (only for running tests)
 
 Installation
 ------------
@@ -386,11 +386,11 @@ The Python code is tested with `nose <https://nose.readthedocs.org/en/latest/>`_
 
     $ ./test.py
 
-The command line interface is tested with `cram <https://bitheap.org/cram/>`_:
+The command line interface is tested with `Scruf <https://gitlab.com/matthewhughes/scruf>`_:
 
 .. code:: console
 
-    $ ./test.cram
+    $ PATH="${PWD}:${PATH}" ./test.scf
 
 Debugging
 ---------
