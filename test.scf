@@ -29,8 +29,6 @@ create a fake repo (i.e. global setup for all following tests)
     $ git commit -q --allow-empty -m "foo"
 
 run without options
-    $ git init -q
-    $ git commit -q --allow-empty -m "foo"
     $ git-big-picture .
     2: fatal: Must provide an output option. Try '-h' for more information
     [8]
