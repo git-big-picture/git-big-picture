@@ -33,6 +33,10 @@ run without options
     2: fatal: Must provide an output option. Try '-h' for more information
     [8]
 
+cover including commit messsages (smoke test)
+    $ git-big-picture -c -g >/dev/null
+    [0]
+
 mix --graphviz and --processed and others
     $ git-big-picture -p -g
     2: fatal: Options '-g | --graphviz' and '-p | --processed' are mutually exclusive.
