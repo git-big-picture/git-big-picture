@@ -28,6 +28,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 
 __version__ = '0.10.2.dev0'
 __docformat__ = "restructuredtext"
@@ -39,12 +40,14 @@ PROCESSED = 'processed'
 FORMAT    = 'format'
 VIEWER    = 'viewer'
 OUT_FILE  = 'outfile'
+WAIT_SECONDS = 'wait'
 OUTPUT_SETTINGS = [
         FORMAT,
         GRAPHVIZ,
         PROCESSED,
         VIEWER,
         OUT_FILE,
+        WAIT_SECONDS,
         ]
 OUTPUT_DEFAULTS = {
         FORMAT:    'svg',
@@ -52,6 +55,7 @@ OUTPUT_DEFAULTS = {
         PROCESSED: False,
         VIEWER:    False,
         OUT_FILE:  False,
+        WAIT_SECONDS: 2.0,
         }
 
 # filter settings
@@ -143,6 +147,17 @@ def create_parser():
     format_group.add_option('-O', '--no-outfile',
             action='store_true', dest='no_outfile',
             help='disable writing image to file')
+
+    format_group.add_option('-w', '--wait',
+            action='store', type='float', dest=WAIT_SECONDS,
+            metavar='SECONDS',
+            help='wait for SECONDS seconds before deleting the temporary file'
+                 ' that is opened using the viewer command'
+                 f' (default: {OUTPUT_DEFAULTS[WAIT_SECONDS]} seconds)'
+                 '; this helps e.g. with '
+                 'viewer commands that tell other running processes '
+                 'to open that file on their behalf'
+                 ', to then shut themselves down')
 
     parser.add_option_group(format_group)
 
@@ -382,7 +397,7 @@ def guess_format_from_filename(output_file):
 def parse_output_options(opts):
     cmdline_settings = {}
     for setting in OUTPUT_SETTINGS[1:]:
-        positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting)
+        positive, negative = getattr(opts, setting), getattr(opts, 'no_' + setting, None)
         if positive is not None and negative is not None:
             barf("'%s' and '%s' are mutually exclusive" %
                     ('--' + setting, '--no-' + setting),
@@ -533,6 +548,17 @@ class Git:
                 val = self(['git', 'config', f'big-picture.{setting}'])[0]
             except Exception:
                 val = None
+
+            # We need to keep the result of "git config big-picture.wait 1"
+            # from ending up as boolean True a few lines below
+            if setting == WAIT_SECONDS and val is not None:
+                try:
+                    config_settings[setting] = float(val)
+                except ValueError:
+                    debug(f"Could not convert {val!r} to float")
+                    config_settings[setting] = None
+                continue
+
             if val is None:
                 config_settings[setting] = None
             elif val.lower() in ['1', 'yes', 'true', 'on']:
@@ -954,17 +980,30 @@ def main(opts, args):
     # create outfile and possibly view that or a temporary file in viewer
     if output_settings[VIEWER] or output_settings[OUT_FILE]:
         # no output file requested, create a temporary one
+        temporary_file = None
         if not output_settings[OUT_FILE]:
-            output_settings[OUT_FILE] = tempfile.NamedTemporaryFile(
+            temporary_file = tempfile.NamedTemporaryFile(
                     prefix='git-big-picture',
-                    suffix='.' + output_settings[FORMAT]).name
+                    suffix='.' + output_settings[FORMAT])
+            output_settings[OUT_FILE] = temporary_file.name
             debug("Created temp file: '%s'" % output_settings[OUT_FILE])
         debug("Writing to file: '%s'" % output_settings[OUT_FILE])
         write_to_file(output_settings[OUT_FILE], dot_output)
         if output_settings[VIEWER]:
             debug("Will now open file in viewer: '%s'" %
                     output_settings[VIEWER])
+            if temporary_file is not None:
+                wait_until = time.time() + max(0, output_settings[WAIT_SECONDS])
             show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
+            if temporary_file is not None:
+                # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtime duration.
+                #       As a result, for a long-running process we don't wait any more than necessary.
+                sleep_time = wait_until - time.time()
+                if sleep_time > 0:
+                    debug("Now sleeping for %0.1f seconds" % sleep_time)
+                    time.sleep(sleep_time)
+                debug(f"Removing temp file: {temporary_file.name!r}")
+                temporary_file.close()  # also removes the file
     elif output_settings[PROCESSED]:
         debug("Will now print dot processed output in format: '%s'" %
                 output_settings[FORMAT])

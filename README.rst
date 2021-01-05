@@ -189,6 +189,12 @@ Usage
         -o FILE, --outfile=FILE
                             write image to specified file
         -O, --no-outfile    disable writing image to file
+        -w SECONDS, --wait=SECONDS
+                            wait for SECONDS seconds before deleting the temporary
+                            file that is opened using the viewer command (default:
+                            2.0 seconds); this helps e.g. with viewer commands
+                            that tell other running processes to open that file on
+                            their behalf, to then shut themselves down
 
     Filter Options:
         Options to control commit/ref selection

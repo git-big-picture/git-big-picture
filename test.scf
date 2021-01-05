@@ -27,6 +27,7 @@ no repo
 create a fake repo (i.e. global setup for all following tests)
     $ git init -q
     $ git commit -q --allow-empty -m "foo"
+    $ git config big-picture.wait 0.01  # to speed up the test suite
 
 run without options
     $ git-big-picture .
@@ -111,6 +112,12 @@ provide filename and viewer and format
     file.png
     $ rm file.png
     $ ls
+
+check for deletion of temp files
+    $ ls -1 "$(git-big-picture -d -v true | fgrep 'temp file' | tee /dev/stderr | grep -Eo "/[^']+" | uniq)"
+    2: [RE] ^debug:   Created temp file: '/[^']+'$
+    2: [RE] ^debug:   Removing temp file: '/[^']+'$
+    2: [RE] ^ls: .*/.+/git-big-picture.*.svg.*No such file or directory$
 
 try profiling
     $ git-big-picture --pstats=stats -o file.svg
