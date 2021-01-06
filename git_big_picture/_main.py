@@ -952,9 +952,9 @@ def innermost_main(opts):
         barf("Options '-g | --graphviz' and '-p | --processed' " +
              "are mutually exclusive.",
                 EXIT_CODES["graphviz_processed_others"])
-    elif (output_settings[GRAPHVIZ] or output_settings[PROCESSED]) and any([
-        output_settings[VIEWER],
-        output_settings[OUT_FILE]]):
+    elif (output_settings[GRAPHVIZ] or output_settings[PROCESSED]) and (
+        output_settings[VIEWER] or
+        output_settings[OUT_FILE]):
         barf("Options '-g | --graphviz' and '-p | --processed' " +
              "are incompatible with other output options.",
                 EXIT_CODES["graphviz_processed_others"])
