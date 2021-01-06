@@ -166,51 +166,57 @@ Usage
 .. code:: console
 
     $ git-big-picture --help
-    Usage: git-big-picture OPTIONS [<repo-directory>]
+    usage: git-big-picture OPTIONS [REPOSITORY]
 
-    Options:
-    --version             show program's version number and exit
-    -h, --help            show this help message and exit
-    --pstats=FILE         run cProfile profiler writing pstats output to FILE
-    -d, --debug           activate debug output
+    positional arguments:
+      REPOSITORY            path to the Git working directory
+                            (default: current directory)
 
-    Output Options:
-        Options to control output and format
+    optional arguments:
+      -h, --help            show this help message and exit
+      --version             show program's version number and exit
+      --pstats FILE         run cProfile profiler writing pstats output to FILE
+      -d, --debug           activate debug output
 
-        -f FMT, --format=FMT
-                            set output format [svg, png, ps, pdf, ...]
-        -g, --graphviz      output lines suitable as input for dot/graphviz
-        -G, --no-graphviz   disable dot/graphviz output
-        -p, --processed     output the dot processed, binary data
-        -P, --no-processed  disable binary output
-        -v CMD, --viewer=CMD
-                            write image to tempfile and start specified viewer
-        -V, --no-viewer     disable starting viewer
-        -o FILE, --outfile=FILE
+    output options:
+      Options to control output and format
+
+      -f FMT, --format FMT  set output format [svg, png, ps, pdf, ...]
+      -g, --graphviz        output lines suitable as input for dot/graphviz
+      -G, --no-graphviz     disable dot/graphviz output
+      -p, --processed       output the dot processed, binary data
+      -P, --no-processed    disable binary output
+      -v CMD, --viewer CMD  write image to tempfile and start specified viewer
+      -V, --no-viewer       disable starting viewer
+      -o FILE, --outfile FILE
                             write image to specified file
-        -O, --no-outfile    disable writing image to file
-        -w SECONDS, --wait=SECONDS
+      -O, --no-outfile      disable writing image to file
+      -w SECONDS, --wait SECONDS
                             wait for SECONDS seconds before deleting the temporary
                             file that is opened using the viewer command (default:
-                            2.0 seconds); this helps e.g. with viewer commands
-                            that tell other running processes to open that file on
-                            their behalf, to then shut themselves down
+                            2.0 seconds); this helps e.g. with viewer commands that
+                            tell other running processes to open that file on their
+                            behalf, to then shut themselves down
 
-    Filter Options:
-        Options to control commit/ref selection
+    filter options:
+      Options to control commit/ref selection
 
-        -a, --all           include all commits
-        -b, --branches      show commits pointed to by branches
-        -B, --no-branches   do not show commits pointed to by branches
-        -t, --tags          show commits pointed to by tags
-        -T, --no-tags       do not show commits pointed to by tags
-        -r, --roots         show root commits
-        -R, --no-roots      do not show root commits
-        -m, --merges        include merge commits
-        -M, --no-merges     do not include merge commits
-        -i, --bifurcations  include bifurcation commits
-        -I, --no-bifurcations
+      -a, --all             include all commits
+      -b, --branches        show commits pointed to by branches
+      -B, --no-branches     do not show commits pointed to by branches
+      -t, --tags            show commits pointed to by tags
+      -T, --no-tags         do not show commits pointed to by tags
+      -r, --roots           show root commits
+      -R, --no-roots        do not show root commits
+      -m, --merges          include merge commits
+      -M, --no-merges       do not include merge commits
+      -i, --bifurcations    include bifurcation commits
+      -I, --no-bifurcations
                             do not include bifurcation commits
+      -c, --commit-messages
+                            include commit messages on labels
+      -C, --no-commit-messages
+                            do not include commit messages on labels
 
 Usage Examples
 --------------
