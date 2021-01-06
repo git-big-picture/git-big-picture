@@ -42,12 +42,8 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install graphviz
-    - name: Install build dependencies (Linux and macOS)
-      run: |
-        pip install -r test_requirements.txt
     - name: Run the test suite
       run: |
         git config --global user.email tests@git-big-picture.test
         git config --global user.name 'git-big-picture test suite'
-        ./test.py
-        PATH="${PATH}:${PWD}" ./test.scf
+        ./run-tests-with-coverage.sh
