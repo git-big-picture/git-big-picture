@@ -29,7 +29,7 @@ with open('README.rst') as f:
 setup(name = 'git-big-picture',
     version = VERSION,
     author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
-    description = 'Git -- the big picture',
+    description = 'Git — the big picture',
     long_description=long_description,
     url = 'https://github.com/git-big-picture/git-big-picture',
     license = 'GPL v3 or later',
