@@ -66,7 +66,7 @@ SITECUSTOMIZE_PY_EOF
 exit_code=0
 coverage erase
 
-coverage run ${venv}/bin/nosetests "${source_dir}"/test.py \
+coverage run ${venv}/bin/pytest "${source_dir}"/test.py \
     || exit_code=$?
 PATH="${source_dir}:${PATH}" COVERAGE_PROCESS_START=.coveragerc \
     coverage run ${venv}/bin/scruf "${source_dir}"/test.scf \
