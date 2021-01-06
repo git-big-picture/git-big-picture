@@ -974,7 +974,7 @@ def innermost_main(opts):
         try:
             if not output_settings[OUT_FILE]:
                 temporary_file = tempfile.NamedTemporaryFile(
-                        prefix='git-big-picture',
+                        prefix='git-big-picture-',
                         suffix='.' + output_settings[FORMAT])
                 output_settings[OUT_FILE] = temporary_file.name
                 debug("Created temp file: '%s'" % output_settings[OUT_FILE])
