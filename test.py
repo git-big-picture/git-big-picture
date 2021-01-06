@@ -28,8 +28,6 @@ import unittest as ut
 
 import git_big_picture as gbp
 
-debug = False
-
 # The only reason these global commands work, is because we change the cwd of
 # the test script... ugly.
 
@@ -65,8 +63,6 @@ class TestGitTools(ut.TestCase):
 
         """
         self.testing_dir = tf.mkdtemp(prefix='gbp-testing-', dir="/tmp")
-        if debug:
-            print(self.testing_dir)
         self.oldpwd = os.getcwd()
         os.chdir(self.testing_dir)
 
@@ -76,8 +72,7 @@ class TestGitTools(ut.TestCase):
 
     def tearDown(self):
         """ Remove testing environment """
-        if not debug:
-            sh.rmtree(self.testing_dir)
+        sh.rmtree(self.testing_dir)
         os.chdir(self.oldpwd)
 
     @property
@@ -108,7 +103,7 @@ class TestGitTools(ut.TestCase):
         graph = self.graph
         self.assertEqual(set(graph.roots), {a, c, d, e})
 
-    def filter_roots(self):
+    def test_filter_roots(self):
         a = empty_commit('a')
         b = empty_commit('b')
         graph = self.graph
@@ -330,19 +325,10 @@ class TestGitTools(ut.TestCase):
             f: {p, b},
             p: {b},
         }
-        if debug:
-            print("a", a)
-            print("b", b)
-            print("p", p)
-            print("f", f)
-        out = dispatch(f"git log --oneline {f}..{p}")
-        if debug:
-            print(out)
-            print_dict(expected_reduced_parents)
-            print_dict(graph.parents)
+        dispatch(f"git log --oneline {f}..{p}")
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
 
-    def more_realistic(self):
+    def test_more_realistic(self):
         r""" Test a slightly larger DAG
 
         input:
