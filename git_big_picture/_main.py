@@ -249,9 +249,6 @@ def create_parser():
     return parser
 
 
-PARSER = create_parser()
-
-
 def barf(message, exit_code):
     """ Abort execution with error message and exit code.
 
@@ -1026,7 +1023,7 @@ def innermost_main(opts):
 
 
 def inner_main():
-    opts = PARSER.parse_args()
+    opts = create_parser().parse_args()
 
     if opts.debug:
         global DEBUG
