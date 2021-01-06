@@ -1006,8 +1006,9 @@ def innermost_main(opts):
                     wait_until = time.time() + max(0, output_settings[WAIT_SECONDS])
                 show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
                 if temporary_file is not None:
-                    # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtime duration.
-                    #       As a result, for a long-running process we don't wait any more than necessary.
+                    # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtim
+                    #       duration.  As a result, for a long-running process we don't wait
+                    #       any more than necessary.
                     sleep_time = wait_until - time.time()
                     if sleep_time > 0:
                         debug("Now sleeping for %0.1f seconds" % sleep_time)
