@@ -44,3 +44,10 @@ repos:
     rev: v1.0.1
     hooks:
       - id: rst-linter
+
+    # TODO Move to https://github.com/google/yapf
+    #      after >=0.31 has been released
+  - repo: https://github.com/pre-commit/mirrors-yapf/
+    rev: v0.30.0
+    hooks:
+      - id: yapf
