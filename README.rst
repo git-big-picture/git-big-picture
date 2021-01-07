@@ -499,11 +499,11 @@ Licensed under GPL v3 or later, see file COPYING for details.
 Authors/Contributors
 --------------------
 
-* Sebastian Pipping (@hartwork)
-* Julius Plenz (@Feh)
-* Valentin Haenel (@esc)
-* Yaroslav Halchenko (@yarikoptic)
-* Chris West (@FauxFaux)
-* Antonio Valentino (@avalentino)
-* Rafał Zawadzki (@bluszcz)
-* Dan Wallis (@fredden)
+* Sebastian Pipping (`@hartwork <https://github.com/hartwork>`_)
+* Julius Plenz (`@Feh <https://github.com/Feh>`_)
+* Valentin Haenel (`@esc <https://github.com/esc>`_)
+* Yaroslav Halchenko (`@yarikoptic <https://github.com/yarikoptic>`_)
+* Chris West (`@FauxFaux <https://github.com/FauxFaux>`_)
+* Antonio Valentino (`@avalentino <https://github.com/avalentino>`_)
+* Rafał Zawadzki (`@bluszcz <https://github.com/bluszcz>`_)
+* Dan Wallis (`@fredden <https://github.com/fredden>`_)
