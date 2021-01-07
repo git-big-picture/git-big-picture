@@ -21,6 +21,7 @@
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
+import ast
 import copy
 import os
 import re
@@ -583,8 +584,8 @@ class Git:
             mapping of non-commit sha1s to sets of strings
         """
 
-        ref_format = "['%(objectname)', '%(*objectname)',  '%(objecttype)', '%(refname)']"
-        output = self(['git', 'for-each-ref', f'--format={ref_format}'])
+        ref_format = '[%(objectname), %(*objectname), %(objecttype), %(refname)]'
+        output = self(['git', 'for-each-ref', f'--format={ref_format}', '--python'])
         lbranch_prefix = 'refs/heads/'
         rbranch_prefix = 'refs/remotes/'
         tag_prefix = 'refs/tags/'
@@ -595,7 +596,7 @@ class Git:
             dic.setdefault(sha1, set()).add(name)
 
         for ref_info in output:
-            sha1, tag_sha1, ref_type, name = eval(ref_info)
+            sha1, tag_sha1, ref_type, name = ast.literal_eval(ref_info)
             if ref_type not in ['commit', 'tag']:
                 continue
             elif name.startswith(lbranch_prefix):
@@ -886,6 +887,7 @@ class CommitGraph:
         for sha_one, labels, color in label_gen():
             label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
                 format_label(sha_one), ] or list()))
+            label = label.replace('"', '\\"')
             dot_file_lines.append(f'\t"{sha_one}"[label="{label}", color="{color}", style=filled];')
         for sha_one in self.dotdot:
             dot_file_lines.append(

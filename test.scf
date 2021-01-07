@@ -125,3 +125,10 @@ try profiling
     stats
     $ rm stats file.svg
     $ ls
+
+be robust with regard to branch names that contain special characters
+    $ git branch "single'tick"
+    $ git branch "one'two'three"
+    $ git branch 'double"quote'
+    $ git-big-picture -w0 -v true
+    [0]
