@@ -38,11 +38,11 @@ cover including commit messsages (smoke test)
     $ git-big-picture -c -g >/dev/null
 
 test option precedence for -C followed by -c (include commit messages)
-    $ git-big-picture -g -C -c | grep 'foo'
+    $ git-big-picture -g -C -c | grep -q 'foo'
     [0]
 
 test option precedence for -c followed by -C (don't include commit messages)
-    $ git-big-picture -g -c -C | grep 'foo'
+    $ git-big-picture -g -c -C | grep -q 'foo'
     [1]
 
 mix --graphviz and --processed and others
