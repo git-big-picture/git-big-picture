@@ -24,6 +24,7 @@ import argparse
 import copy
 import os
 import re
+import signal
 import subprocess
 import sys
 import tempfile
@@ -99,7 +100,8 @@ EXIT_CODES = {"too_many_args":              1,
               "no_options":                 8,
               "no_git":                     9,
               "no_git_repo":               10,
-             }
+              "killed_by_sigint":          128 + signal.SIGINT,
+              }
 
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
@@ -899,7 +901,7 @@ class CommitGraph:
         return dot_file_lines
 
 
-def main(opts):
+def innermost_main(opts):
     repo_dir = parse_variable_args(opts.repo_dirs)
     debug("The Git repository is at: '%s'" % repo_dir)
     graph = graph_factory(repo_dir)
@@ -969,27 +971,30 @@ def main(opts):
     if output_settings[VIEWER] or output_settings[OUT_FILE]:
         # no output file requested, create a temporary one
         temporary_file = None
-        if not output_settings[OUT_FILE]:
-            temporary_file = tempfile.NamedTemporaryFile(
-                    prefix='git-big-picture',
-                    suffix='.' + output_settings[FORMAT])
-            output_settings[OUT_FILE] = temporary_file.name
-            debug("Created temp file: '%s'" % output_settings[OUT_FILE])
-        debug("Writing to file: '%s'" % output_settings[OUT_FILE])
-        write_to_file(output_settings[OUT_FILE], dot_output)
-        if output_settings[VIEWER]:
-            debug("Will now open file in viewer: '%s'" %
-                    output_settings[VIEWER])
+        try:
+            if not output_settings[OUT_FILE]:
+                temporary_file = tempfile.NamedTemporaryFile(
+                        prefix='git-big-picture',
+                        suffix='.' + output_settings[FORMAT])
+                output_settings[OUT_FILE] = temporary_file.name
+                debug("Created temp file: '%s'" % output_settings[OUT_FILE])
+            debug("Writing to file: '%s'" % output_settings[OUT_FILE])
+            write_to_file(output_settings[OUT_FILE], dot_output)
+            if output_settings[VIEWER]:
+                debug("Will now open file in viewer: '%s'" %
+                        output_settings[VIEWER])
+                if temporary_file is not None:
+                    wait_until = time.time() + max(0, output_settings[WAIT_SECONDS])
+                show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
+                if temporary_file is not None:
+                    # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtime duration.
+                    #       As a result, for a long-running process we don't wait any more than necessary.
+                    sleep_time = wait_until - time.time()
+                    if sleep_time > 0:
+                        debug("Now sleeping for %0.1f seconds" % sleep_time)
+                        time.sleep(sleep_time)
+        finally:
             if temporary_file is not None:
-                wait_until = time.time() + max(0, output_settings[WAIT_SECONDS])
-            show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
-            if temporary_file is not None:
-                # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtime duration.
-                #       As a result, for a long-running process we don't wait any more than necessary.
-                sleep_time = wait_until - time.time()
-                if sleep_time > 0:
-                    debug("Now sleeping for %0.1f seconds" % sleep_time)
-                    time.sleep(sleep_time)
                 debug(f"Removing temp file: {temporary_file.name!r}")
                 temporary_file.close()  # also removes the file
     elif output_settings[PROCESSED]:
@@ -998,11 +1003,11 @@ def main(opts):
         print(dot_output)
 
 
-if __name__ == '__main__':
-
+def inner_main():
     opts = PARSER.parse_args()
 
     if opts.debug:
+        global DEBUG
         DEBUG = True
         debug('Activate debug')
 
@@ -1015,6 +1020,17 @@ if __name__ == '__main__':
     if opts.pstats_outfile is not None:
         import cProfile
         debug("Running in profiler, output is: '%s'" % opts.pstats_outfile)
-        cProfile.run('main(opts)', opts.pstats_outfile)
+        cProfile.runctx('innermost_main(opts)', globals(), locals(), opts.pstats_outfile)
     else:
-        main(opts)
+        innermost_main(opts)
+
+
+def main():
+    try:
+        inner_main()
+    except KeyboardInterrupt:
+        sys.exit(EXIT_CODES['killed_by_sigint'])
+
+
+if __name__ == '__main__':
+    main()
