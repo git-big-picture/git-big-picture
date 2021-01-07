@@ -505,3 +505,5 @@ Authors/Contributors
 * Yaroslav Halchenko (@yarikoptic)
 * Chris West (@FauxFaux)
 * Antonio Valentino (@avalentino)
+* Rafał Zawadzki (@bluszcz)
+* Dan Wallis (@fredden)
