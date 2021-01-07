@@ -126,8 +126,9 @@ try profiling
     $ rm stats file.svg
     $ ls
 
-be robust with regard to branch names that contain tick characters ("'")
+be robust with regard to branch names that contain special characters
     $ git branch "single'tick"
     $ git branch "one'two'three"
-    $ git-big-picture -g > /dev/null
+    $ git branch 'double"quote'
+    $ git-big-picture -w0 -v true
     [0]

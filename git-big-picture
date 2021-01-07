@@ -885,6 +885,7 @@ class CommitGraph:
         for sha_one, labels, color in label_gen():
             label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
                 format_label(sha_one), ] or list()))
+            label = label.replace('"', '\\"')
             dot_file_lines.append(f'\t"{sha_one}"[label="{label}", color="{color}", style=filled];')
         for sha_one in self.dotdot:
             dot_file_lines.append(
