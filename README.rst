@@ -96,7 +96,7 @@ Dependencies
 * Python >=3.6
 * Git (1.7.1 works)
 * Graphviz utility
-* Nosetest and Scruf (only for running tests)
+* pytest and Scruf (only for running tests)
 
 Installation
 ------------
@@ -392,7 +392,7 @@ configured in file ``.pre-commit-config.yaml``.
 Testing
 -------
 
-The Python code is tested with `nose <https://nose.readthedocs.org/en/latest/>`_:
+The Python code is tested with test runner `pytest <https://pytest.org>`_:
 
 .. code:: console
 

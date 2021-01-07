@@ -1,4 +1,4 @@
-#!/usr/bin/env nosetests
+#!/usr/bin/env pytest
 #
 # This file is part of git-big-picture
 #
