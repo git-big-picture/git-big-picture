@@ -106,6 +106,15 @@ EXIT_CODES = {"too_many_args":              1,
 
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
+# https://graphviz.org/doc/info/attrs.html#k:rankdir
+# NOTE: "left to right" to a human is "right to left" to Graphviz; same for top and bottom
+RANKDIR_OF_HISTORY_DIRECTION = {
+    'downwards': 'BT',
+    'leftwards': 'LR',
+    'rightwards': 'RL',
+    'upwards': 'TB',
+}
+
 DEBUG = False
 
 USAGE = "%(prog)s OPTIONS [REPOSITORY]"
@@ -123,6 +132,11 @@ def create_parser():
     format_group.add_argument('-f', '--format',
             dest=FORMAT,
             metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+
+    format_group.add_argument('--history-direction',
+            default=None, choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
+            help='enforce a specific direction of history on Graphviz\n'
+                 '(default: upwards)')
 
     format_group.add_argument('-g', '--graphviz',
             default=None, action='store_true', dest=GRAPHVIZ,
@@ -834,7 +848,8 @@ class CommitGraph:
                 return digit_count
         return 40
 
-    def _generate_dot_file(self, sha_ones_on_labels, with_commit_messages, sha_one_digits=None):
+    def _generate_dot_file(self, sha_ones_on_labels, with_commit_messages, sha_one_digits=None,
+                           history_direction=None):
         """ Generate graphviz input.
 
         Parameters
@@ -884,6 +899,9 @@ class CommitGraph:
                 yield (k, labels, color)
 
         dot_file_lines = ['digraph {']
+        if history_direction is not None:
+            rankdir = RANKDIR_OF_HISTORY_DIRECTION[history_direction]
+            dot_file_lines.append(f'\trankdir="{rankdir}";')
         for sha_one, labels, color in label_gen():
             label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
                 format_label(sha_one), ] or list()))
@@ -929,7 +947,9 @@ def innermost_main(opts):
     dot_file_lines = graph._generate_dot_file(
         sha_ones_on_labels=opts.all_commits,
         with_commit_messages=annotation_settings['messages'],
-        sha_one_digits=sha_one_digits)
+        sha_one_digits=sha_one_digits,
+        history_direction=opts.history_direction,
+    )
 
     if (output_settings[GRAPHVIZ] and output_settings[PROCESSED]):
         barf("Options '-g | --graphviz' and '-p | --processed' " +
