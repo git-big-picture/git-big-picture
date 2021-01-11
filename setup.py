@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 from git_big_picture import __version__ as VERSION
 
@@ -34,7 +34,12 @@ setup(name = 'git-big-picture',
     url = 'https://github.com/git-big-picture/git-big-picture',
     license = 'GPL v3 or later',
     python_requires='>=3.6',
-    scripts = ['git-big-picture'],
+    packages=find_packages(),
+    entry_points={
+        'console_scripts': [
+            'git-big-picture = git_big_picture._main:main',
+        ],
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',

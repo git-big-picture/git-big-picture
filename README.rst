@@ -109,35 +109,34 @@ https://pypi.org/project/git-big-picture/
 
    $ pip install git-big-picture
 
-Alternatively, Just run it straight from a clone or download:
+Alternatively, just run it straight from a Git clone:
 
 .. code:: console
 
     $ git clone git://github.com/git-big-picture/git-big-picture.git
     $ cd git-big-picture
-    $ ./git-big-picture --help
+    $ python3 -m venv venv      # creates a virtualenv
+    $ source venv/bin/activate  # activates the virtualenv
+    $ pip install -e .          # installs to the virtualenv
+    $ git-big-picture --help
 
-    $ wget https://raw.github.com/git-big-picture/git-big-picture/master/git-big-picture
-    $ chmod 755 git-big-picture
-    $ ./git-big-picture -h
-
-Alternatively, use the standard ``setup.py`` script to install it system wide
+Alternatively, use pip to install it system wide
 or just for the user.
 
 .. code:: console
 
-    $ ./setup.py install
+    $ pip install .
     (may need root privileges)
-    $ ./setup.py install --user
+    $ pip install --user .
 
 Git Integration
 ---------------
 
-You can easily integrate this script as a regular Git command, by making the
-script ``git-big-picture`` available on the ``$PATH``. For instance: using
-``./setup.py install`` method, as described above should do the trick.
-Alternatively symlink or copy ``git-big-picture`` into a directory listed in
-your ``$PATH``, for example ``$HOME/bin``.
+After installation using pip,
+you can easily integrate this script as a regular Git command, by making
+sure that executable ``git-big-picture`` is found during ``${PATH}`` lookup.
+E.g. you could append a line like ``export PATH="${HOME}/.local/bin:${PATH}"``
+to your ``~/.bashrc`` if you are using Bash.
 
 You may then use ``git big-picture`` (w/o the first dash) as you would any other Git command:
 
@@ -405,7 +404,8 @@ The command line interface is tested with `Scruf <https://gitlab.com/matthewhugh
 
 .. code:: console
 
-    $ PATH="${PWD}:${PATH}" ./test.scf
+    $ PATH="venv/bin:${PATH}" ./test.scf
+
 
 Debugging
 ---------
