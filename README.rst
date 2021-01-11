@@ -462,11 +462,11 @@ Changelog
   * Drop support for end-of-life versions of Python (2.7, 3.4, 3.5)
   * Continuous integration via GitHub Actions
 
-* v0.10.1 - 2018-11-04
+* ``v0.10.1`` — 2018-11-04
 
   * Fix PyPI release
 
-* v0.10.0 - 2018-11-04
+* ``v0.10.0`` — 2018-11-04
 
   * First release after 6 years
   * Support for Python: 2.7, 3.4, 3.5, 3.6, 3.7 (`#13 <https://github.com/git-big-picture/git-big-picture/pull/13>`_, `#14 <https://github.com/git-big-picture/git-big-picture/pull/14>`_, `#24 <https://github.com/git-big-picture/git-big-picture/pull/24>`_)
@@ -475,7 +475,7 @@ Changelog
   * Continuous integration via travis.ci (`#29 <https://github.com/git-big-picture/git-big-picture/pull/29>`_)
   * Fixed installation instructions (`#26 <https://github.com/git-big-picture/git-big-picture/pull/26>`_)
 
-* v0.9.0 - 2012-11-20
+* ``v0.9.0`` — 2012-11-20
 
   * rst-ify readme
   * Fix long standing bug in graph search algorithm
@@ -487,7 +487,7 @@ Changelog
   * Add command line interface tests using Cram
   * Overhaul documentation to reflect changes
 
-* v0.8.0 - 2012-11-05
+* ``v0.8.0`` — 2012-11-05
 
   * Snapshot of all developments Mar 2010 - Now
   * Extended command line options for viewing and formatting
