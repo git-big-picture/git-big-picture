@@ -469,11 +469,11 @@ Changelog
 * v0.10.0 - 2018-11-04
 
   * First release after 6 years
-  * Support for Python: 2.7, 3.4, 3.5, 3.6, 3.7
+  * Support for Python: 2.7, 3.4, 3.5, 3.6, 3.7 (`#13 <https://github.com/git-big-picture/git-big-picture/pull/13>`_, `#14 <https://github.com/git-big-picture/git-big-picture/pull/14>`_, `#24 <https://github.com/git-big-picture/git-big-picture/pull/24>`_)
   * Add Python classifiers to setup.py
-  * Tempfile suffix now matches format
-  * Continuous integration via travis.ci
-  * Fixed installation instructions
+  * Tempfile suffix now matches format (`#28 <https://github.com/git-big-picture/git-big-picture/pull/28>`_)
+  * Continuous integration via travis.ci (`#29 <https://github.com/git-big-picture/git-big-picture/pull/29>`_)
+  * Fixed installation instructions (`#26 <https://github.com/git-big-picture/git-big-picture/pull/26>`_)
 
 * v0.9.0 - 2012-11-20
 
