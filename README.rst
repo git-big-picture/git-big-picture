@@ -510,3 +510,7 @@ Authors/Contributors
 * Antonio Valentino (`@avalentino <https://github.com/avalentino>`_)
 * Rafał Zawadzki (`@bluszcz <https://github.com/bluszcz>`_)
 * Dan Wallis (`@fredden <https://github.com/fredden>`_)
+* Sergey Azarkevich (`@azarkevich <https://github.com/azarkevich>`_)
+* Johannes Koepcke (`@jkoepcke <https://github.com/jkoepcke>`_)
+* Rolf Offermanns (`@zapp42 <https://github.com/zapp42>`_)
+* François Maheux (`@franckspike <https://github.com/franckspike>`_)
