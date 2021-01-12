@@ -49,10 +49,15 @@ cd "${temp_dir}"
 #          while still not hardcoding a specific temp directory.
 
 # Prepare a virtualenv ready to run tests with subprocess coverage
+# Also check for (and enforce) conflict-free and all-pinned dependencies
 python3 -m venv ${venv}
 source ${venv}/bin/activate
 pip install --quiet --disable-pip-version-check -r "${source_dir}"/test_requirements.txt
 pip install --quiet --disable-pip-version-check -e "${source_dir}"
+pip check > /dev/null
+diff -U0 \
+    <(sed -e '/#.*/d' -e '/^$/d' "${source_dir}"/test_requirements.txt | sort -f) \
+    <(pip freeze | fgrep -v git_big_picture | sort -f)
 sed "s,\./,${source_dir}/,g" "${source_dir}"/.coveragerc > .coveragerc
 cat <<SITECUSTOMIZE_PY_EOF > "$(ls -1d ${venv}/lib/python*)"/site-packages/sitecustomize.py
 try:

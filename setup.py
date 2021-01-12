@@ -26,6 +26,17 @@ from git_big_picture import __version__ as VERSION
 with open('README.rst') as f:
     long_description = f.read()
 
+_tests_require = [
+    # Keep in sync with test_requirements.txt
+    'coverage',
+    'pytest',
+    'scruf',
+]
+
+_extras_require = {
+    'tests': _tests_require,
+}
+
 setup(name = 'git-big-picture',
     version = VERSION,
     author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
@@ -35,6 +46,8 @@ setup(name = 'git-big-picture',
     license = 'GPL v3 or later',
     python_requires='>=3.6',
     packages=find_packages(),
+    extras_require=_extras_require,
+    tests_require=_tests_require,
     entry_points={
         'console_scripts': [
             'git-big-picture = git_big_picture._main:main',
