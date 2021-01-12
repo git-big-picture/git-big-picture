@@ -19,7 +19,6 @@
 # You should have received a copy of the GNU General Public License
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import os
 import shlex
 import shutil as sh
@@ -55,7 +54,6 @@ def print_dict(dict_):
 
 
 class TestGitTools(ut.TestCase):
-
     def setUp(self):
         """ Setup testing environment.
 
@@ -80,12 +78,10 @@ class TestGitTools(ut.TestCase):
         return gbp.graph_factory(self.testing_dir)
 
     def test_find_roots(self):
-
         def create_root(branch_name):
             dispatch('git read-tree --empty')
             new_tree = dispatch('git write-tree').strip()
-            new_commit = dispatch('git commit-tree %s -m empty' %
-                    new_tree).strip()
+            new_commit = dispatch('git commit-tree %s -m empty' % new_tree).strip()
             dispatch(f'git branch {branch_name} {new_commit}')
             return new_commit
 
@@ -156,8 +152,7 @@ class TestGitTools(ut.TestCase):
             c: {a},
             d: {c, b},
         }
-        self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(),
-                expected_parents)
+        self.assertEqual(gbp.Git(self.testing_dir).get_parent_map(), expected_parents)
 
     def test_filter_one(self):
         """ Remove a single commit from between two commits.

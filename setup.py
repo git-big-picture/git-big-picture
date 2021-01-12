@@ -37,13 +37,14 @@ _extras_require = {
     'tests': _tests_require,
 }
 
-setup(name = 'git-big-picture',
-    version = VERSION,
-    author = 'Sebastian Pipping, Julius Plenz, and Valentin Haenel',
-    description = 'Git — the big picture',
+setup(
+    name='git-big-picture',
+    version=VERSION,
+    author='Sebastian Pipping, Julius Plenz, and Valentin Haenel',
+    description='Git — the big picture',
     long_description=long_description,
-    url = 'https://github.com/git-big-picture/git-big-picture',
-    license = 'GPL v3 or later',
+    url='https://github.com/git-big-picture/git-big-picture',
+    license='GPL v3 or later',
     python_requires='>=3.6',
     packages=find_packages(),
     extras_require=_extras_require,
