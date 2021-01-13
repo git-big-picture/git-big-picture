@@ -35,74 +35,73 @@ import time
 __version__ = '0.10.2.dev0'
 __docformat__ = "restructuredtext"
 
-
 # format settings
-GRAPHVIZ  = 'graphviz'
+GRAPHVIZ = 'graphviz'
 PROCESSED = 'processed'
-FORMAT    = 'format'
-VIEWER    = 'viewer'
-OUT_FILE  = 'outfile'
+FORMAT = 'format'
+VIEWER = 'viewer'
+OUT_FILE = 'outfile'
 WAIT_SECONDS = 'wait'
 OUTPUT_SETTINGS = [
-        FORMAT,
-        GRAPHVIZ,
-        PROCESSED,
-        VIEWER,
-        OUT_FILE,
-        WAIT_SECONDS,
-        ]
-OUTPUT_DEFAULTS = {
-        FORMAT:    'svg',
-        GRAPHVIZ:  False,
-        PROCESSED: False,
-        VIEWER:    False,
-        OUT_FILE:  False,
-        WAIT_SECONDS: 2.0,
-        }
-
-# filter settings
-BRANCHES     = 'branches'
-TAGS         = 'tags'
-ROOTS        = 'roots'
-MERGES       = 'merges'
-BIFURCATIONS = 'bifurcations'
-FILTER_SETTINGS = [
-        BRANCHES,
-        TAGS,
-        ROOTS,
-        MERGES,
-        BIFURCATIONS,
-        ]
-FILTER_DEFAULTS = {
-        BRANCHES:     True,
-        TAGS:         True,
-        ROOTS:        True,
-        MERGES:       False,
-        BIFURCATIONS: False,
-        }
-
-# annotation settings
-MESSAGES     = 'messages'
-ANNOTATION_SETTINGS = [
-        MESSAGES,
+    FORMAT,
+    GRAPHVIZ,
+    PROCESSED,
+    VIEWER,
+    OUT_FILE,
+    WAIT_SECONDS,
 ]
-ANNOTATION_DEFAULTS = {
-        MESSAGES:     False,
+OUTPUT_DEFAULTS = {
+    FORMAT: 'svg',
+    GRAPHVIZ: False,
+    PROCESSED: False,
+    VIEWER: False,
+    OUT_FILE: False,
+    WAIT_SECONDS: 2.0,
 }
 
+# filter settings
+BRANCHES = 'branches'
+TAGS = 'tags'
+ROOTS = 'roots'
+MERGES = 'merges'
+BIFURCATIONS = 'bifurcations'
+FILTER_SETTINGS = [
+    BRANCHES,
+    TAGS,
+    ROOTS,
+    MERGES,
+    BIFURCATIONS,
+]
+FILTER_DEFAULTS = {
+    BRANCHES: True,
+    TAGS: True,
+    ROOTS: True,
+    MERGES: False,
+    BIFURCATIONS: False,
+}
 
-EXIT_CODES = {"too_many_args":              1,
-              "dot_not_found":              2,
-              "problem_with_dot":           3,
-              "dot_terminated_early":       4,
-              "not_write_to_file":          5,
-              "no_such_viewer":             6,
-              "graphviz_processed_others":  7,
-              "no_options":                 8,
-              "no_git":                     9,
-              "no_git_repo":               10,
-              "killed_by_sigint":          128 + signal.SIGINT,
-              }
+# annotation settings
+MESSAGES = 'messages'
+ANNOTATION_SETTINGS = [
+    MESSAGES,
+]
+ANNOTATION_DEFAULTS = {
+    MESSAGES: False,
+}
+
+EXIT_CODES = {
+    "too_many_args": 1,
+    "dot_not_found": 2,
+    "problem_with_dot": 3,
+    "dot_terminated_early": 4,
+    "not_write_to_file": 5,
+    "no_such_viewer": 6,
+    "graphviz_processed_others": 7,
+    "no_options": 8,
+    "no_git": 9,
+    "no_git_repo": 10,
+    "killed_by_sigint": 128 + signal.SIGINT,
+}
 
 sha1_pattern = re.compile('[0-9a-fA-F]{40}')
 
@@ -121,130 +120,202 @@ USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(prog='git-big-picture', usage=USAGE,
+    parser = argparse.ArgumentParser(prog='git-big-picture',
+                                     usage=USAGE,
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
     format_group = parser.add_argument_group("output options",
-            "Options to control output and format")
+                                             "Options to control output and format")
 
     # output options
-    format_group.add_argument('-f', '--format',
-            dest=FORMAT,
-            metavar='FMT', help='set output format [svg, png, ps, pdf, ...]')
+    format_group.add_argument('-f',
+                              '--format',
+                              dest=FORMAT,
+                              metavar='FMT',
+                              help='set output format [svg, png, ps, pdf, ...]')
 
     format_group.add_argument('--history-direction',
-            default=None, choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
-            help='enforce a specific direction of history on Graphviz\n'
-                 '(default: upwards)')
+                              default=None,
+                              choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
+                              help='enforce a specific direction of history on Graphviz\n'
+                              '(default: upwards)')
 
-    format_group.add_argument('-g', '--graphviz',
-            default=None, action='store_true', dest=GRAPHVIZ,
-            help='output lines suitable as input for dot/graphviz')
-    format_group.add_argument('-G', '--no-graphviz',
-            default=None, action='store_false', dest=GRAPHVIZ,
-            help='disable dot/graphviz output')
+    format_group.add_argument('-g',
+                              '--graphviz',
+                              default=None,
+                              action='store_true',
+                              dest=GRAPHVIZ,
+                              help='output lines suitable as input for dot/graphviz')
+    format_group.add_argument('-G',
+                              '--no-graphviz',
+                              default=None,
+                              action='store_false',
+                              dest=GRAPHVIZ,
+                              help='disable dot/graphviz output')
 
-    format_group.add_argument('-p', '--processed',
-            default=None, action='store_true', dest=PROCESSED,
-            help='output the dot processed, binary data')
-    format_group.add_argument('-P', '--no-processed',
-            default=None, action='store_false', dest=PROCESSED,
-            help='disable binary output')
+    format_group.add_argument('-p',
+                              '--processed',
+                              default=None,
+                              action='store_true',
+                              dest=PROCESSED,
+                              help='output the dot processed, binary data')
+    format_group.add_argument('-P',
+                              '--no-processed',
+                              default=None,
+                              action='store_false',
+                              dest=PROCESSED,
+                              help='disable binary output')
 
-    format_group.add_argument('-v', '--viewer',
-            dest=VIEWER,
-            metavar='CMD',
-            help='write image to tempfile and start specified viewer')
-    format_group.add_argument('-V', '--no-viewer',
-            default=None, action='store_false', dest=VIEWER,
-            help='disable starting viewer')
+    format_group.add_argument('-v',
+                              '--viewer',
+                              dest=VIEWER,
+                              metavar='CMD',
+                              help='write image to tempfile and start specified viewer')
+    format_group.add_argument('-V',
+                              '--no-viewer',
+                              default=None,
+                              action='store_false',
+                              dest=VIEWER,
+                              help='disable starting viewer')
 
-    format_group.add_argument('-o', '--outfile',
-            dest=OUT_FILE,
-            metavar='FILE', help='write image to specified file')
-    format_group.add_argument('-O', '--no-outfile',
-            default=None, action='store_false', dest=OUT_FILE,
-            help='disable writing image to file')
+    format_group.add_argument('-o',
+                              '--outfile',
+                              dest=OUT_FILE,
+                              metavar='FILE',
+                              help='write image to specified file')
+    format_group.add_argument('-O',
+                              '--no-outfile',
+                              default=None,
+                              action='store_false',
+                              dest=OUT_FILE,
+                              help='disable writing image to file')
 
-    format_group.add_argument('-w', '--wait',
-            type=float, dest=WAIT_SECONDS,
-            metavar='SECONDS',
-            help='\n'.join(textwrap.wrap(
-                 'wait for SECONDS seconds before deleting the temporary file'
-                 ' that is opened using the viewer command'
-                 f' (default: {OUTPUT_DEFAULTS[WAIT_SECONDS]} seconds)'
-                 '; this helps e.g. with '
-                 'viewer commands that tell other running processes '
-                 'to open that file on their behalf'
-                 ', to then shut themselves down', width=57)))
+    format_group.add_argument('-w',
+                              '--wait',
+                              type=float,
+                              dest=WAIT_SECONDS,
+                              metavar='SECONDS',
+                              help='\n'.join(
+                                  textwrap.wrap(
+                                      'wait for SECONDS seconds before deleting the temporary file'
+                                      ' that is opened using the viewer command'
+                                      f' (default: {OUTPUT_DEFAULTS[WAIT_SECONDS]} seconds)'
+                                      '; this helps e.g. with '
+                                      'viewer commands that tell other running processes '
+                                      'to open that file on their behalf'
+                                      ', to then shut themselves down',
+                                      width=57)))
 
     filter_group = parser.add_argument_group("filter options",
-            "Options to control commit/ref selection")
+                                             "Options to control commit/ref selection")
 
     # commit/ref selection -- filtering options
-    filter_group.add_argument('-a', '--all',
-            default=None, action='store_true', dest='all_commits',
-            help='include all commits')
+    filter_group.add_argument('-a',
+                              '--all',
+                              default=None,
+                              action='store_true',
+                              dest='all_commits',
+                              help='include all commits')
 
-    filter_group.add_argument('-b', '--branches',
-            default=None, action='store_true', dest=BRANCHES,
-            help='show commits pointed to by branches')
-    filter_group.add_argument('-B', '--no-branches',
-            default=None, action='store_false', dest=BRANCHES,
-            help='do not show commits pointed to by branches')
+    filter_group.add_argument('-b',
+                              '--branches',
+                              default=None,
+                              action='store_true',
+                              dest=BRANCHES,
+                              help='show commits pointed to by branches')
+    filter_group.add_argument('-B',
+                              '--no-branches',
+                              default=None,
+                              action='store_false',
+                              dest=BRANCHES,
+                              help='do not show commits pointed to by branches')
 
-    filter_group.add_argument('-t', '--tags',
-            default=None, action='store_true', dest=TAGS,
-            help='show commits pointed to by tags')
-    filter_group.add_argument('-T', '--no-tags',
-            default=None, action='store_false', dest=TAGS,
-            help='do not show commits pointed to by tags')
+    filter_group.add_argument('-t',
+                              '--tags',
+                              default=None,
+                              action='store_true',
+                              dest=TAGS,
+                              help='show commits pointed to by tags')
+    filter_group.add_argument('-T',
+                              '--no-tags',
+                              default=None,
+                              action='store_false',
+                              dest=TAGS,
+                              help='do not show commits pointed to by tags')
 
-    filter_group.add_argument('-r', '--roots',
-            default=None, action='store_true', dest=ROOTS,
-            help='show root commits')
-    filter_group.add_argument('-R', '--no-roots',
-            default=None, action='store_false', dest=ROOTS,
-            help='do not show root commits')
+    filter_group.add_argument('-r',
+                              '--roots',
+                              default=None,
+                              action='store_true',
+                              dest=ROOTS,
+                              help='show root commits')
+    filter_group.add_argument('-R',
+                              '--no-roots',
+                              default=None,
+                              action='store_false',
+                              dest=ROOTS,
+                              help='do not show root commits')
 
-    filter_group.add_argument('-m', '--merges',
-            default=None, action='store_true', dest=MERGES,
-            help='include merge commits')
-    filter_group.add_argument('-M', '--no-merges',
-            default=None, action='store_false', dest=MERGES,
-            help='do not include merge commits')
+    filter_group.add_argument('-m',
+                              '--merges',
+                              default=None,
+                              action='store_true',
+                              dest=MERGES,
+                              help='include merge commits')
+    filter_group.add_argument('-M',
+                              '--no-merges',
+                              default=None,
+                              action='store_false',
+                              dest=MERGES,
+                              help='do not include merge commits')
 
-    filter_group.add_argument('-i', '--bifurcations',
-            default=None, action='store_true', dest=BIFURCATIONS,
-            help='include bifurcation commits')
-    filter_group.add_argument('-I', '--no-bifurcations',
-            default=None, action='store_false', dest=BIFURCATIONS,
-            help='do not include bifurcation commits')
+    filter_group.add_argument('-i',
+                              '--bifurcations',
+                              default=None,
+                              action='store_true',
+                              dest=BIFURCATIONS,
+                              help='include bifurcation commits')
+    filter_group.add_argument('-I',
+                              '--no-bifurcations',
+                              default=None,
+                              action='store_false',
+                              dest=BIFURCATIONS,
+                              help='do not include bifurcation commits')
 
-    filter_group.add_argument('-c', '--commit-messages',
-            default=None, action='store_true', dest=MESSAGES,
-            help='include commit messages on labels')
-    filter_group.add_argument('-C', '--no-commit-messages',
-            default=None, action='store_false', dest=MESSAGES,
-            help='do not include commit messages on labels')
+    filter_group.add_argument('-c',
+                              '--commit-messages',
+                              default=None,
+                              action='store_true',
+                              dest=MESSAGES,
+                              help='include commit messages on labels')
+    filter_group.add_argument('-C',
+                              '--no-commit-messages',
+                              default=None,
+                              action='store_false',
+                              dest=MESSAGES,
+                              help='do not include commit messages on labels')
 
     # miscellaneous options
     parser.add_argument('--pstats',
-            dest='pstats_outfile',
-            metavar='FILE',
-            help='run cProfile profiler writing pstats output to FILE')
+                        dest='pstats_outfile',
+                        metavar='FILE',
+                        help='run cProfile profiler writing pstats output to FILE')
 
-    parser.add_argument('-d', '--debug',
-            action='store_true', dest='debug',
-            help='activate debug output')
+    parser.add_argument('-d',
+                        '--debug',
+                        action='store_true',
+                        dest='debug',
+                        help='activate debug output')
 
     # NOTE: This would have nargs='?' but we're using nargs='*'
     #       here so that we can provide a custom error message
     #       and exit code in function ``parse_variable_args``.
-    parser.add_argument('repo_dirs', metavar='REPOSITORY', nargs='*',
+    parser.add_argument('repo_dirs',
+                        metavar='REPOSITORY',
+                        nargs='*',
                         help='path to the Git working directory'
-                             '\n(default: current directory)')
+                        '\n(default: current directory)')
 
     return parser
 
@@ -325,25 +396,25 @@ def run_dot(output_format, dot_file_lines):
     """
     try:
         p = subprocess.Popen(['dot', '-T' + output_format],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
     except OSError as e:
         if e.errno == 2:
             barf("'dot' not found! Please install the Graphviz utility.",
-                    EXIT_CODES["dot_not_found"])
+                 EXIT_CODES["dot_not_found"])
         else:
             barf("A problem occured calling 'dot -T%s'" % output_format,
-                    EXIT_CODES["problem_with_dot"])
+                 EXIT_CODES["problem_with_dot"])
 
     # send dot input, automatically receive and store output and error
     out, err = p.communicate(input='\n'.join(dot_file_lines).encode('utf-8'))
     if p.returncode != 0:
-        barf("'dot' terminated prematurely with error code %d;\n"
-                "probably you specified an invalid format, see 'man dot'.\n"
-                "The error from 'dot' was:\n"
-                ">>>%s" % (p.returncode, err.decode('utf-8')),
-             EXIT_CODES["dot_terminated_early"])
+        barf(
+            "'dot' terminated prematurely with error code %d;\n"
+            "probably you specified an invalid format, see 'man dot'.\n"
+            "The error from 'dot' was:\n"
+            ">>>%s" % (p.returncode, err.decode('utf-8')), EXIT_CODES["dot_terminated_early"])
     return out
 
 
@@ -361,9 +432,7 @@ def write_to_file(output_file, dot_output):
     try:
         f = open(output_file, 'wb+')
     except OSError as e:
-        barf("Could not open file '%s':\n>>>%s"
-                % (output_file, e),
-                EXIT_CODES["not_write_to_file"])
+        barf(f"Could not open file '{output_file}':\n>>>{e}", EXIT_CODES["not_write_to_file"])
     f.write(dot_output)
     f.flush()
     os.fsync(f.fileno())
@@ -388,8 +457,7 @@ def show_in_viewer(output_file, viewer):
     try:
         subprocess.call([viewer, output_file])
     except OSError as e:
-        barf(f"Error calling viewer: '{viewer}':\n>>>{e}",
-                EXIT_CODES["no_such_viewer"])
+        barf(f"Error calling viewer: '{viewer}':\n>>>{e}", EXIT_CODES["no_such_viewer"])
 
 
 def guess_format_from_filename(output_file):
@@ -472,9 +540,7 @@ def set_settings(settings, defaults, conf, cli):
         an appropriate value for setting
 
     """
-    order = [('defaults',          defaults),
-             ('conf file',         conf),
-             ('command line args', cli)]
+    order = [('defaults', defaults), ('conf file', conf), ('command line args', cli)]
     output = {}
     for setting in settings:
         prev, val, prev_val = None, None, None
@@ -484,11 +550,10 @@ def set_settings(settings, defaults, conf, cli):
             if container[setting] is not None:
                 prev_val, val = val, container[setting]
                 if prev_val is not None:
-                    debug("Value for '%s' found in '%s', overrides setting '%s' from '%s': '%s'"
-                            % (setting, desc, prev_val, prev, val))
+                    debug("Value for '%s' found in '%s', overrides setting '%s' from '%s': '%s'" %
+                          (setting, desc, prev_val, prev, val))
                 else:
-                    debug("Value for '%s' found in '%s': '%s'"
-                            % (setting, desc, val))
+                    debug(f"Value for '{setting}' found in '{desc}': '{val}'")
             prev = desc
         if val is None:
             debug("No value for '%s' found anywhere" % setting)
@@ -513,8 +578,11 @@ def get_command_output(command_list, cwd=None, git_env=None):
     output : string
         the raw output of the command executed
     """
-    p = subprocess.Popen(command_list, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, env=git_env, cwd=cwd)
+    p = subprocess.Popen(command_list,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE,
+                         env=git_env,
+                         cwd=cwd)
     load = p.stdout.read().decode('utf-8')
     p.stdout.close()
     p.stderr.close()
@@ -522,13 +590,12 @@ def get_command_output(command_list, cwd=None, git_env=None):
     if p.returncode:
         err = p.stderr.read()
         err = '\n'.join(('> ' + e) for e in err.split('\n'))
-        raise Exception('Stderr:\n%s\nReturn code %d from command "%s"'
-            % (err, p.returncode, ' '.join(command_list)))
+        raise Exception('Stderr:\n%s\nReturn code %d from command "%s"' %
+                        (err, p.returncode, ' '.join(command_list)))
     return load
 
 
 class Git:
-
     def __init__(self, repo_dir):
 
         self.repo_dir = repo_dir
@@ -538,7 +605,7 @@ class Git:
             self(['git', 'rev-parse'])
         except Exception:
             barf("'%s' is probably not a Git repository" % self.repo_dir,
-                    EXIT_CODES['no_git_repo'])
+                 EXIT_CODES['no_git_repo'])
 
     def __call__(self, argv):
         return get_command_output(argv, cwd=self.repo_dir).splitlines()
@@ -730,11 +797,11 @@ class CommitGraph:
         for sha_one, pars in self.parents.items():
             for p in pars:
                 for c in self.children[p]:
-                    assert(p in self.parents[c])
+                    assert (p in self.parents[c])
         for sha_one, chs in self.children.items():
             for c in chs:
                 for p in self.parents[c]:
-                    assert(c in self.children[p])
+                    assert (c in self.children[p])
 
     @property
     def roots(self):
@@ -744,22 +811,20 @@ class CommitGraph:
     @property
     def merges(self):
         """ Find all merge commits. """
-        return [sha for sha, parents in self.parents.items()
-                if len(parents) > 1]
+        return [sha for sha, parents in self.parents.items() if len(parents) > 1]
 
     @property
     def bifurcations(self):
         """ Find all bifurcations. """
-        return [sha for sha, children in self.children.items()
-                if len(children) > 1]
+        return [sha for sha, children in self.children.items() if len(children) > 1]
 
     def filter(self,
-            branches=FILTER_DEFAULTS[BRANCHES],
-            tags=FILTER_DEFAULTS[TAGS],
-            roots=FILTER_DEFAULTS[ROOTS],
-            merges=FILTER_DEFAULTS[MERGES],
-            bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
-            additional=None):
+               branches=FILTER_DEFAULTS[BRANCHES],
+               tags=FILTER_DEFAULTS[TAGS],
+               roots=FILTER_DEFAULTS[ROOTS],
+               merges=FILTER_DEFAULTS[MERGES],
+               bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
+               additional=None):
         """ Filter the commit graph.
 
         Remove, or 'filter' the unwanted commits from the DAG. This will modify
@@ -831,10 +896,8 @@ class CommitGraph:
                         # is not interesting, keep searching
                         to_visit.extend(self.parents[commit_j])
 
-        return CommitGraph(reachable_interesting_parents,
-                copy.deepcopy(self.branches),
-                copy.deepcopy(self.tags),
-                self.git)
+        return CommitGraph(reachable_interesting_parents, copy.deepcopy(self.branches),
+                           copy.deepcopy(self.tags), self.git)
 
     def _minimal_sha_one_digits(self):
         """ Calculate the minimal number of sha1 digits required to represent
@@ -845,7 +908,10 @@ class CommitGraph:
                 return digit_count
         return 40
 
-    def _generate_dot_file(self, sha_ones_on_labels, with_commit_messages, sha_one_digits=None,
+    def _generate_dot_file(self,
+                           sha_ones_on_labels,
+                           with_commit_messages,
+                           sha_one_digits=None,
                            history_direction=None):
         """ Generate graphviz input.
 
@@ -863,7 +929,6 @@ class CommitGraph:
         dot_file_lines : list of strings
             lines of the graphviz input
         """
-
         def format_sha_one(sha_one):
             """ Shorten sha1 if required. """
             if (sha_one_digits is None) or (sha_one_digits == 40):
@@ -881,8 +946,7 @@ class CommitGraph:
 
         def label_gen():
             keys = set(self.branches.keys()).union(set(self.tags.keys()))
-            for k in (k for k in keys
-                      if k in self.parents or k in self.children):
+            for k in (k for k in keys if k in self.parents or k in self.children):
                 labels = []
                 case = 0
                 if k in self.tags:
@@ -901,14 +965,16 @@ class CommitGraph:
             dot_file_lines.append(f'\trankdir="{rankdir}";')
         for sha_one, labels, color in label_gen():
             label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
-                format_label(sha_one), ] or list()))
+                format_label(sha_one),
+            ] or list()))
             label = label.replace('"', '\\"')
-            dot_file_lines.append(f'\t"{sha_one}"[label="{label}", color="{color}", style=filled];')
-        for sha_one in self.dotdot:
             dot_file_lines.append(
-                f'\t"{sha_one}"[label="..."];')
+                f'\t"{sha_one}"[label="{label}", color="{color}", style=filled];')
+        for sha_one in self.dotdot:
+            dot_file_lines.append(f'\t"{sha_one}"[label="..."];')
         if (sha_one_digits is not None) and (sha_one_digits != 40):
-            for sha_one in (e for e in self.parents.keys() if not (self._has_label(e) or e in self.dotdot)):
+            for sha_one in (e for e in self.parents.keys()
+                            if not (self._has_label(e) or e in self.dotdot)):
                 sha_label = format_label(sha_one)
                 dot_file_lines.append(f'\t"{sha_one}"[label="{sha_label}"];')
         for child, self.parents in self.parents.items():
@@ -922,18 +988,14 @@ def innermost_main(opts):
     repo_dir = parse_variable_args(opts.repo_dirs)
     debug("The Git repository is at: '%s'" % repo_dir)
     graph = graph_factory(repo_dir)
-    output_settings = set_settings(OUTPUT_SETTINGS,
-            OUTPUT_DEFAULTS,
-            graph.git.config(OUTPUT_SETTINGS),
-            parse_output_options(opts))
-    filter_settings = set_settings(FILTER_SETTINGS,
-            FILTER_DEFAULTS,
-            graph.git.config(FILTER_SETTINGS),
-            parse_filter_options(opts, FILTER_SETTINGS))
-    annotation_settings = set_settings(ANNOTATION_SETTINGS,
-            ANNOTATION_DEFAULTS,
-            graph.git.config(ANNOTATION_SETTINGS),
-            parse_filter_options(opts, ANNOTATION_SETTINGS))
+    output_settings = set_settings(OUTPUT_SETTINGS, OUTPUT_DEFAULTS,
+                                   graph.git.config(OUTPUT_SETTINGS), parse_output_options(opts))
+    filter_settings = set_settings(FILTER_SETTINGS, FILTER_DEFAULTS,
+                                   graph.git.config(FILTER_SETTINGS),
+                                   parse_filter_options(opts, FILTER_SETTINGS))
+    annotation_settings = set_settings(ANNOTATION_SETTINGS, ANNOTATION_DEFAULTS,
+                                       graph.git.config(ANNOTATION_SETTINGS),
+                                       parse_filter_options(opts, ANNOTATION_SETTINGS))
     if opts.all_commits:
         sha_one_digits = graph._minimal_sha_one_digits()
     else:
@@ -949,22 +1011,20 @@ def innermost_main(opts):
     )
 
     if (output_settings[GRAPHVIZ] and output_settings[PROCESSED]):
-        barf("Options '-g | --graphviz' and '-p | --processed' " +
-             "are mutually exclusive.",
-                EXIT_CODES["graphviz_processed_others"])
-    elif (output_settings[GRAPHVIZ] or output_settings[PROCESSED]) and any([
-        output_settings[VIEWER],
-        output_settings[OUT_FILE]]):
-        barf("Options '-g | --graphviz' and '-p | --processed' " +
-             "are incompatible with other output options.",
-                EXIT_CODES["graphviz_processed_others"])
+        barf("Options '-g | --graphviz' and '-p | --processed' " + "are mutually exclusive.",
+             EXIT_CODES["graphviz_processed_others"])
+    elif (output_settings[GRAPHVIZ] or output_settings[PROCESSED]) and (output_settings[VIEWER] or
+                                                                        output_settings[OUT_FILE]):
+        barf(
+            "Options '-g | --graphviz' and '-p | --processed' "
+            + "are incompatible with other output options.",
+            EXIT_CODES["graphviz_processed_others"])
     elif not any([
-        output_settings[GRAPHVIZ],
-        output_settings[PROCESSED],
-        output_settings[VIEWER],
-        output_settings[OUT_FILE]]):
+            output_settings[GRAPHVIZ], output_settings[PROCESSED], output_settings[VIEWER],
+            output_settings[OUT_FILE]
+    ]):
         barf("Must provide an output option. Try '-h' for more information",
-                EXIT_CODES["no_options"])
+             EXIT_CODES["no_options"])
     # if plain just print dot input to stdout
     if output_settings[GRAPHVIZ]:
         debug('Will now print dot format')
@@ -973,16 +1033,14 @@ def innermost_main(opts):
         return
     # check for format mismatch between -f and -o
     if output_settings[FORMAT] and output_settings[OUT_FILE]:
-        (has_suffix, guess) = guess_format_from_filename(
-                output_settings[OUT_FILE])
+        (has_suffix, guess) = guess_format_from_filename(output_settings[OUT_FILE])
         if output_settings[FORMAT] != guess and guess is not None:
             debug("Format mismatch: '%s'(-f|--format or default)"
-                    "vs. '%s'(filename), will use: "
-                    "'%s'" % (output_settings[FORMAT], guess, guess))
+                  "vs. '%s'(filename), will use: "
+                  "'%s'" % (output_settings[FORMAT], guess, guess))
             output_settings[FORMAT] = guess
         if guess is None:
-            warn('Filename had no suffix, using format: %s' %
-                    output_settings[FORMAT])
+            warn('Filename had no suffix, using format: %s' % output_settings[FORMAT])
             output_settings[OUT_FILE] += '.' + output_settings[FORMAT]
     # run the 'dot' utility
     dot_output = run_dot(output_settings[FORMAT], dot_file_lines)
@@ -992,22 +1050,21 @@ def innermost_main(opts):
         temporary_file = None
         try:
             if not output_settings[OUT_FILE]:
-                temporary_file = tempfile.NamedTemporaryFile(
-                        prefix='git-big-picture-',
-                        suffix='.' + output_settings[FORMAT])
+                temporary_file = tempfile.NamedTemporaryFile(prefix='git-big-picture-',
+                                                             suffix='.' + output_settings[FORMAT])
                 output_settings[OUT_FILE] = temporary_file.name
                 debug("Created temp file: '%s'" % output_settings[OUT_FILE])
             debug("Writing to file: '%s'" % output_settings[OUT_FILE])
             write_to_file(output_settings[OUT_FILE], dot_output)
             if output_settings[VIEWER]:
-                debug("Will now open file in viewer: '%s'" %
-                        output_settings[VIEWER])
+                debug("Will now open file in viewer: '%s'" % output_settings[VIEWER])
                 if temporary_file is not None:
                     wait_until = time.time() + max(0, output_settings[WAIT_SECONDS])
                 show_in_viewer(output_settings[OUT_FILE], output_settings[VIEWER])
                 if temporary_file is not None:
-                    # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtime duration.
-                    #       As a result, for a long-running process we don't wait any more than necessary.
+                    # NOTE: The idea is to sleep for WAIT_SECONDS minus the process runtim
+                    #       duration.  As a result, for a long-running process we don't wait
+                    #       any more than necessary.
                     sleep_time = wait_until - time.time()
                     if sleep_time > 0:
                         debug("Now sleeping for %0.1f seconds" % sleep_time)
@@ -1017,8 +1074,7 @@ def innermost_main(opts):
                 debug(f"Removing temp file: {temporary_file.name!r}")
                 temporary_file.close()  # also removes the file
     elif output_settings[PROCESSED]:
-        debug("Will now print dot processed output in format: '%s'" %
-                output_settings[FORMAT])
+        debug("Will now print dot processed output in format: '%s'" % output_settings[FORMAT])
         print(dot_output)
 
 
@@ -1033,8 +1089,7 @@ def inner_main():
     try:
         get_command_output(['git', '--help'])
     except Exception as e:
-        barf("git is either not installed or not on your $PATH:\n>>>%s" % e,
-                EXIT_CODES["no_git"])
+        barf("git is either not installed or not on your $PATH:\n>>>%s" % e, EXIT_CODES["no_git"])
 
     if opts.pstats_outfile is not None:
         import cProfile
