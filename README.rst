@@ -456,26 +456,73 @@ TODO
 Changelog
 ---------
 
-* Git ``HEAD``
+* ``v1.0.0`` — 2021-01-13
 
-  * Add support for Python 3.8 and 3.9
-  * Drop support for end-of-life versions of Python (2.7, 3.4, 3.5)
-  * Continuous integration via GitHub Actions
+  * **Security Fixes**
 
-* v0.10.1 - 2018-11-04
+    * `CVE-2021-3028 <https://cve.mitre.org/cgi-bin/cvename.cgi?name=2021-3028>`_
+      — Fix local code execution through attacker controlled branch names (`#62 <https://github.com/git-big-picture/git-big-picture/pull/62>`_)
+
+  * **New Features and Improvements**
+
+    * Re-joined forces and moved https://github.com/esc/git-big-picture to new org home https://github.com/git-big-picture/git-big-picture
+    * Support history directions other than upwards (`#35 <https://github.com/git-big-picture/git-big-picture/pull/35>`_, `#36 <https://github.com/git-big-picture/git-big-picture/issues/36>`_, `#59 <https://github.com/git-big-picture/git-big-picture/pull/59>`_)
+    * Allow including commit messages in node labels (`#16 <https://github.com/git-big-picture/git-big-picture/issues/16>`_, `#31 <https://github.com/git-big-picture/git-big-picture/pull/31>`_, `#32 <https://github.com/git-big-picture/git-big-picture/pull/32>`_)
+    * Support ``python -m git_big_picture`` (`#58 <https://github.com/git-big-picture/git-big-picture/pull/58>`_)
+    * Improved ``--help`` output (`#54 <https://github.com/git-big-picture/git-big-picture/pull/54>`_)
+    * Improve tempfile prefix (`#68 <https://github.com/git-big-picture/git-big-picture/pull/68>`_)
+    * Add support for Python 3.8 and 3.9 (`#42 <https://github.com/git-big-picture/git-big-picture/pull/42>`_)
+
+  * **Dropped Features**
+
+    * Drop support for end-of-life versions of Python (2.7, 3.4, 3.5) (`#38 <https://github.com/git-big-picture/git-big-picture/pull/38>`_)
+
+  * **Bugs Fixed**
+
+    * Handle ``Ctrl+C`` gracefully (`#70 <https://github.com/git-big-picture/git-big-picture/pull/70>`_)
+    * Stop leaving temp files behind (`#25 <https://github.com/git-big-picture/git-big-picture/pull/25>`_, `#49 <https://github.com/git-big-picture/git-big-picture/pull/49>`_)
+    * Be robust with regard to branch names that contain quotation marks (`#27 <https://github.com/git-big-picture/git-big-picture/pull/27>`_, `#62 <https://github.com/git-big-picture/git-big-picture/pull/62>`_)
+    * ``readme``: Fix a typo and word casing (`#43 <https://github.com/git-big-picture/git-big-picture/pull/43>`_)
+    * Fix typo "piture" (`#51 <https://github.com/git-big-picture/git-big-picture/pull/51>`_)
+
+  * **Under the Hood**
+
+    * screenshots: Reduce image size using lossless `zopflipng <https://github.com/google/zopfli/blob/master/README.zopflipng>`_ 1.0.3 (`#39 <https://github.com/git-big-picture/git-big-picture/pull/39>`_)
+    * Apply move of Git repository to all URLs but Travis CI (`#40 <https://github.com/git-big-picture/git-big-picture/pull/40>`_)
+    * Replace Travis CI by GitHub Actions (`#41 <https://github.com/git-big-picture/git-big-picture/pull/41>`_)
+    * Make CI cover support for macOS (`#44 <https://github.com/git-big-picture/git-big-picture/pull/44>`_)
+    * Make GitHub Dependabot keep our GitHub Actions up to date (`#45 <https://github.com/git-big-picture/git-big-picture/pull/45>`_, `#46 <https://github.com/git-big-picture/git-big-picture/pull/46>`_)
+    * Integrate `pre-commit <https://pre-commit.com/>`_ for dev and CI (`#47 <https://github.com/git-big-picture/git-big-picture/pull/47>`_, `#53 <https://github.com/git-big-picture/git-big-picture/pull/53>`_, `#55 <https://github.com/git-big-picture/git-big-picture/pull/55>`_)
+    * For safety, stop using ``shlex.split`` (outside of tests) (`#48 <https://github.com/git-big-picture/git-big-picture/pull/48>`_, `#65 <https://github.com/git-big-picture/git-big-picture/pull/65>`_)
+    * Migrate from unmaintained Cram to maintained Scruf (`#50 <https://github.com/git-big-picture/git-big-picture/pull/50>`_, `#64 <https://github.com/git-big-picture/git-big-picture/pull/64>`_)
+    * Delete empty ``requirements.txt`` (`#52 <https://github.com/git-big-picture/git-big-picture/pull/52>`_)
+    * Migrate from optparse to argparse (`#54 <https://github.com/git-big-picture/git-big-picture/pull/54>`_)
+    * Fix variable mix-up (`#57 <https://github.com/git-big-picture/git-big-picture/pull/57>`_)
+    * Start using standard setuptools entry point (`#58 <https://github.com/git-big-picture/git-big-picture/pull/58>`_)
+    * Address dead test code (`#60 <https://github.com/git-big-picture/git-big-picture/pull/60>`_)
+    * Start measuring code coverage (`#61 <https://github.com/git-big-picture/git-big-picture/pull/61>`_)
+    * Replace nose by pytest for a test runner (`#63 <https://github.com/git-big-picture/git-big-picture/issues/63>`_, `#67 <https://github.com/git-big-picture/git-big-picture/pull/67>`_)
+    * Start auto-formatting using `yapf <https://github.com/google/yapf>`_ (`#66 <https://github.com/git-big-picture/git-big-picture/issues/66>`_)
+    * ``setup.py``: Replace ASCII "--" with "—" (em dash) in description (`#69 <https://github.com/git-big-picture/git-big-picture/pull/69>`_)
+    * ``Readme``: Improve section on people involved (`#71 <https://github.com/git-big-picture/git-big-picture/pull/71>`_)
+    * tests: Cover option precedence on the command line (`#72 <https://github.com/git-big-picture/git-big-picture/pull/72>`_)
+    * Pin and auto-update test requirements (`#73 <https://github.com/git-big-picture/git-big-picture/pull/73>`_, `#75 <https://github.com/git-big-picture/git-big-picture/pull/75>`_)
+    * Document changes of release 1.0.0 (`#74 <https://github.com/git-big-picture/git-big-picture/pull/74>`_)
+
+* ``v0.10.1`` — 2018-11-04
 
   * Fix PyPI release
 
-* v0.10.0 - 2018-11-04
+* ``v0.10.0`` — 2018-11-04
 
   * First release after 6 years
-  * Support for Python: 2.7, 3.4, 3.5, 3.6, 3.7
+  * Support for Python: 2.7, 3.4, 3.5, 3.6, 3.7 (`#13 <https://github.com/git-big-picture/git-big-picture/pull/13>`_, `#14 <https://github.com/git-big-picture/git-big-picture/pull/14>`_, `#24 <https://github.com/git-big-picture/git-big-picture/pull/24>`_)
   * Add Python classifiers to setup.py
-  * Tempfile suffix now matches format
-  * Continuous integration via travis.ci
-  * Fixed installation instructions
+  * Tempfile suffix now matches format (`#28 <https://github.com/git-big-picture/git-big-picture/pull/28>`_)
+  * Continuous integration via travis.ci (`#29 <https://github.com/git-big-picture/git-big-picture/pull/29>`_)
+  * Fixed installation instructions (`#26 <https://github.com/git-big-picture/git-big-picture/pull/26>`_)
 
-* v0.9.0 - 2012-11-20
+* ``v0.9.0`` — 2012-11-20
 
   * rst-ify readme
   * Fix long standing bug in graph search algorithm
@@ -487,7 +534,7 @@ Changelog
   * Add command line interface tests using Cram
   * Overhaul documentation to reflect changes
 
-* v0.8.0 - 2012-11-05
+* ``v0.8.0`` — 2012-11-05
 
   * Snapshot of all developments Mar 2010 - Now
   * Extended command line options for viewing and formatting
@@ -510,3 +557,7 @@ Authors/Contributors
 * Antonio Valentino (`@avalentino <https://github.com/avalentino>`_)
 * Rafał Zawadzki (`@bluszcz <https://github.com/bluszcz>`_)
 * Dan Wallis (`@fredden <https://github.com/fredden>`_)
+* Sergey Azarkevich (`@azarkevich <https://github.com/azarkevich>`_)
+* Johannes Koepcke (`@jkoepcke <https://github.com/jkoepcke>`_)
+* Rolf Offermanns (`@zapp42 <https://github.com/zapp42>`_)
+* François Maheux (`@franckspike <https://github.com/franckspike>`_)
