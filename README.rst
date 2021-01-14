@@ -447,12 +447,6 @@ uses Graphviz too:
 
     $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
-TODO
-----
-
-* Sanitize the test suite
-* --abbrev switch
-
 Changelog
 ---------
 
