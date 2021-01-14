@@ -62,5 +62,5 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3 :: Only',
     ],
-    data_files = [('share/man/man1', ['git-big-picture.1'])],
+    data_files=[('share/man/man1', ['git-big-picture.1'])],
 )
