@@ -122,6 +122,7 @@ USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 def create_parser():
     parser = argparse.ArgumentParser(prog='git-big-picture',
                                      usage=USAGE,
+                                     description='Visualize Git repositories',
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
