@@ -167,6 +167,8 @@ Usage
     $ git-big-picture --help
     usage: git-big-picture OPTIONS [REPOSITORY]
 
+    Visualize Git repositories
+
     positional arguments:
       REPOSITORY            path to the Git working directory
                             (default: current directory)
@@ -219,6 +221,9 @@ Usage
                             include commit messages on labels
       -C, --no-commit-messages
                             do not include commit messages on labels
+
+    git-big-picture is software libre, licensed under the GPL v3 or later license.
+    Please report bugs at https://github.com/git-big-picture/git-big-picture/issues.  Thank you!
 
 Usage Examples
 --------------
