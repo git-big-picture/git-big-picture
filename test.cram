@@ -80,21 +80,18 @@ mismatch format, filename takes precedence
     $ ls
     file.svg
     $ rm file.svg
-    $ ls
 
 try just filename
     $ git-big-picture -o file.svg
-    $ ls file.svg
+    $ ls
     file.svg
     $ rm file.svg
-    $ ls
 
 try using different format
     $ git-big-picture -o file.pdf
-    $ ls file.pdf
+    $ ls
     file.pdf
     $ rm file.pdf
-    $ ls
 
 try no such viewer
     $ git-big-picture -f svg -v foo
@@ -108,14 +105,12 @@ format but no extension
     $ ls
     file.svg
     $ rm file.svg
-    $ ls
 
 provide filename and viewer
     $ git-big-picture -o file.svg -v true
     $ ls
     file.svg
     $ rm file.svg
-    $ ls
 
 provide filename and viewer and format
     $ git-big-picture -f png -o file -v true
@@ -123,7 +118,6 @@ provide filename and viewer and format
     $ ls
     file.png
     $ rm file.png
-    $ ls
 
 check explicit direction of history
     $ bash -c 'set -o pipefail; for i in {down,left,right,up}wards; do git-big-picture -g --history-direction=${i} | fgrep rankdir ; done'
@@ -141,10 +135,10 @@ check for deletion of temp files
 
 try profiling
     $ git-big-picture --pstats=stats -o file.svg
-    $ ls stats
+    $ ls
+    file.svg
     stats
     $ rm stats file.svg
-    $ ls
 
 be robust with regard to branch names that contain special characters
     $ git branch "single'tick"
