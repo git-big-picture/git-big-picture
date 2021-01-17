@@ -450,7 +450,7 @@ uses Graphviz too:
 Changelog
 ---------
 
-* ``v1.0.1`` — ????-??-??
+* ``v1.1.0`` — 2021-01-20
 
   * **New Features and Improvements**
 
