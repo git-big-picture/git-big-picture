@@ -59,6 +59,7 @@ diff -U0 \
     <(sed -e '/#.*/d' -e '/^$/d' "${source_dir}"/test_requirements.txt | sort -f) \
     <(pip freeze | fgrep -v git_big_picture | sort -f)
 sed "s,\./,${source_dir}/,g" "${source_dir}"/.coveragerc > .coveragerc
+cp "${source_dir}"/.cramrc .
 cat <<SITECUSTOMIZE_PY_EOF > "$(ls -1d ${venv}/lib/python*)"/site-packages/sitecustomize.py
 try:
     import coverage
@@ -75,7 +76,7 @@ coverage erase
 coverage run ${venv}/bin/pytest "${source_dir}"/test.py \
     || exit_code=$?
 PATH="${venv}/bin:${PATH}" COVERAGE_PROCESS_START=.coveragerc \
-    coverage run ${venv}/bin/scruf "${source_dir}"/test.scf \
+    coverage run ${venv}/bin/cram "${source_dir}"/test.cram \
     || exit_code=$?
 
 coverage combine
