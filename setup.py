@@ -29,8 +29,8 @@ with open('README.rst') as f:
 _tests_require = [
     # Keep in sync with test_requirements.txt
     'coverage',
+    'cram',
     'pytest',
-    'scruf',
 ]
 
 _extras_require = {

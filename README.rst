@@ -96,7 +96,7 @@ Dependencies
 * Python >=3.6
 * Git (1.7.1 works)
 * Graphviz utility
-* pytest and Scruf (only for running tests)
+* pytest and Cram (only for running tests)
 
 Installation
 ------------
@@ -400,11 +400,11 @@ The Python code is tested with test runner `pytest <https://pytest.org>`_:
 
     $ ./test.py
 
-The command line interface is tested with `Scruf <https://gitlab.com/matthewhughes/scruf>`_:
+The command line interface is tested with `Cram <https://bitheap.org/cram/>`_:
 
 .. code:: console
 
-    $ PATH="venv/bin:${PATH}" ./test.scf
+    $ PATH="venv/bin:${PATH}" ./test.cram
 
 
 Debugging
