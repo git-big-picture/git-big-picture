@@ -1,2 +1,6 @@
+__pycache__/
+/.idea/
+/dist/
 /htmlcov/
 /.coverage
+/README.htm
