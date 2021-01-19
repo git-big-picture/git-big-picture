@@ -123,6 +123,8 @@ _EPILOG = textwrap.dedent("""
     Please report bugs at https://github.com/git-big-picture/git-big-picture/issues.  Thank you!
 """)
 
+_RIGHT_COLUMN_WRAP_WIDTH = 57
+
 
 def create_parser():
     parser = argparse.ArgumentParser(prog='git-big-picture',
@@ -212,7 +214,7 @@ def create_parser():
                                       'viewer commands that tell other running processes '
                                       'to open that file on their behalf'
                                       ', to then shut themselves down',
-                                      width=57)))
+                                      width=_RIGHT_COLUMN_WRAP_WIDTH)))
 
     filter_group = parser.add_argument_group("filter options",
                                              "Options to control commit/ref selection")
