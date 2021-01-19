@@ -118,11 +118,17 @@ DEBUG = False
 
 USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 
+_EPILOG = textwrap.dedent("""
+    git-big-picture is software libre, licensed under the GPL v3 or later license.
+    Please report bugs at https://github.com/git-big-picture/git-big-picture/issues.  Thank you!
+""")
+
 
 def create_parser():
     parser = argparse.ArgumentParser(prog='git-big-picture',
                                      usage=USAGE,
                                      description='Visualize Git repositories',
+                                     epilog=_EPILOG,
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
