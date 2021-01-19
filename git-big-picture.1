@@ -100,7 +100,11 @@ include merge commits
 do not include merge commits
 .TP
 \fB\-i\fR, \fB\-\-bifurcations\fR
-include bifurcation commits
+include bifurcation commits; a bifurcation commit is a
+commit that is a parent to more than one other commits,
+i.e. it marks the point where one or more new branches
+came to life; bifurcation commits can also be thought of
+as the counterpart of merge commits
 .TP
 \fB\-I\fR, \fB\-\-no\-bifurcations\fR
 do not include bifurcation commits

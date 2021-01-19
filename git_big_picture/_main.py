@@ -284,7 +284,16 @@ def create_parser():
                               default=None,
                               action='store_true',
                               dest=BIFURCATIONS,
-                              help='include bifurcation commits')
+                              help='\n'.join(
+                                  textwrap.wrap(
+                                      'include bifurcation commits'
+                                      '; a bifurcation commit is a commit that '
+                                      'is a parent to more than one other commits, '
+                                      'i.e. it marks the point where one or more '
+                                      'new branches came to life; bifurcation '
+                                      'commits can also be thought of as the '
+                                      'counterpart of merge commits',
+                                      width=_RIGHT_COLUMN_WRAP_WIDTH)))
     filter_group.add_argument('-I',
                               '--no-bifurcations',
                               default=None,
