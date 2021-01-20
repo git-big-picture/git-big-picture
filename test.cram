@@ -26,6 +26,8 @@ no repo
 
 create a fake repo (i.e. global setup for all following tests)
     $ git init -q
+    $ git config user.email tests@git-big-picture.test
+    $ git config user.name 'git-big-picture test suite'
     $ git commit -q --allow-empty -m "foo"
     $ git config big-picture.wait 0.01  # to speed up the test suite
 

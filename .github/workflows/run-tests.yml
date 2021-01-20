@@ -44,6 +44,4 @@ jobs:
         brew install graphviz
     - name: Run the test suite
       run: |
-        git config --global user.email tests@git-big-picture.test
-        git config --global user.name 'git-big-picture test suite'
         ./run-tests-with-coverage.sh
