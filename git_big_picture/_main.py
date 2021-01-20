@@ -32,7 +32,7 @@ import tempfile
 import textwrap
 import time
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 __docformat__ = "restructuredtext"
 
 # format settings

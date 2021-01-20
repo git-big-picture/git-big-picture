@@ -459,6 +459,22 @@ uses Graphviz too:
 Changelog
 ---------
 
+* ``v1.1.0`` — 2021-01-20
+
+  * **New Features and Improvements**
+
+    * Add manpage from Debian package (`#79 <https://github.com/git-big-picture/git-big-picture/pull/79>`_)
+    * Improve ``--help`` output (`#80 <https://github.com/git-big-picture/git-big-picture/pull/80>`_)
+    * Document the meaning of term "bifurcation commit" (`#80 <https://github.com/git-big-picture/git-big-picture/pull/80>`_, `#84 <https://github.com/git-big-picture/git-big-picture/issues/84>`_)
+
+  * **Under the Hood**
+
+    * Remove TODOs from README (`#77 <https://github.com/git-big-picture/git-big-picture/issues/77>`_, `#78 <https://github.com/git-big-picture/git-big-picture/pull/78>`_)
+    * Make CI prevent copies of ``--help`` output from going out-of-sync (`#80 <https://github.com/git-big-picture/git-big-picture/pull/80>`_)
+    * Extend changelog + release 1.1.0 (`#81 <https://github.com/git-big-picture/git-big-picture/pull/81>`_)
+    * Migrate back to Cram (`#82 <https://github.com/git-big-picture/git-big-picture/pull/82>`_)
+    * Extend .gitignore (`#83 <https://github.com/git-big-picture/git-big-picture/pull/83>`_)
+
 * ``v1.0.0`` — 2021-01-13
 
   * **Security Fixes**
@@ -511,6 +527,7 @@ Changelog
     * tests: Cover option precedence on the command line (`#72 <https://github.com/git-big-picture/git-big-picture/pull/72>`_)
     * Pin and auto-update test requirements (`#73 <https://github.com/git-big-picture/git-big-picture/pull/73>`_, `#75 <https://github.com/git-big-picture/git-big-picture/pull/75>`_)
     * Document changes of release 1.0.0 (`#74 <https://github.com/git-big-picture/git-big-picture/pull/74>`_)
+    * Release version 1.0.0 (`#76 <https://github.com/git-big-picture/git-big-picture/issues/76>`_)
 
 * ``v0.10.1`` — 2018-11-04
 
@@ -564,3 +581,4 @@ Authors/Contributors
 * Johannes Koepcke (`@jkoepcke <https://github.com/jkoepcke>`_)
 * Rolf Offermanns (`@zapp42 <https://github.com/zapp42>`_)
 * François Maheux (`@franckspike <https://github.com/franckspike>`_)
+* Doug Torrance (`@d-torrance <https://github.com/d-torrance>`_)
