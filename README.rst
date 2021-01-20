@@ -167,6 +167,8 @@ Usage
     $ git-big-picture --help
     usage: git-big-picture OPTIONS [REPOSITORY]
 
+    Visualize Git repositories
+
     positional arguments:
       REPOSITORY            path to the Git working directory
                             (default: current directory)
@@ -212,13 +214,20 @@ Usage
       -R, --no-roots        do not show root commits
       -m, --merges          include merge commits
       -M, --no-merges       do not include merge commits
-      -i, --bifurcations    include bifurcation commits
+      -i, --bifurcations    include bifurcation commits; a bifurcation commit is a
+                            commit that is a parent to more than one other commits,
+                            i.e. it marks the point where one or more new branches
+                            came to life; bifurcation commits can also be thought of
+                            as the counterpart of merge commits
       -I, --no-bifurcations
                             do not include bifurcation commits
       -c, --commit-messages
                             include commit messages on labels
       -C, --no-commit-messages
                             do not include commit messages on labels
+
+    git-big-picture is software libre, licensed under the GPL v3 or later license.
+    Please report bugs at https://github.com/git-big-picture/git-big-picture/issues.  Thank you!
 
 Usage Examples
 --------------

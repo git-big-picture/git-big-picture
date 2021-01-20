@@ -118,10 +118,19 @@ DEBUG = False
 
 USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 
+_EPILOG = textwrap.dedent("""
+    git-big-picture is software libre, licensed under the GPL v3 or later license.
+    Please report bugs at https://github.com/git-big-picture/git-big-picture/issues.  Thank you!
+""")
+
+_RIGHT_COLUMN_WRAP_WIDTH = 57
+
 
 def create_parser():
     parser = argparse.ArgumentParser(prog='git-big-picture',
                                      usage=USAGE,
+                                     description='Visualize Git repositories',
+                                     epilog=_EPILOG,
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
 
@@ -205,7 +214,7 @@ def create_parser():
                                       'viewer commands that tell other running processes '
                                       'to open that file on their behalf'
                                       ', to then shut themselves down',
-                                      width=57)))
+                                      width=_RIGHT_COLUMN_WRAP_WIDTH)))
 
     filter_group = parser.add_argument_group("filter options",
                                              "Options to control commit/ref selection")
@@ -275,7 +284,16 @@ def create_parser():
                               default=None,
                               action='store_true',
                               dest=BIFURCATIONS,
-                              help='include bifurcation commits')
+                              help='\n'.join(
+                                  textwrap.wrap(
+                                      'include bifurcation commits'
+                                      '; a bifurcation commit is a commit that '
+                                      'is a parent to more than one other commits, '
+                                      'i.e. it marks the point where one or more '
+                                      'new branches came to life; bifurcation '
+                                      'commits can also be thought of as the '
+                                      'counterpart of merge commits',
+                                      width=_RIGHT_COLUMN_WRAP_WIDTH)))
     filter_group.add_argument('-I',
                               '--no-bifurcations',
                               default=None,
