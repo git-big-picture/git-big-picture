@@ -459,6 +459,17 @@ uses Graphviz too:
 Changelog
 ---------
 
+* ``v1.1.1`` — 2021-01-20
+
+  * **Bugs Fixed**
+
+    * Fix version number in man page (`#86 <https://github.com/git-big-picture/git-big-picture/pull/86>`_)
+
+  * **Under the Hood**
+
+    * Move Git user setup into Cram tests (to make them work better outside of CI) (`#85 <https://github.com/git-big-picture/git-big-picture/pull/85>`_)
+    * Extend changelog + release 1.1.1 (`#87 <https://github.com/git-big-picture/git-big-picture/pull/87>`_)
+
 * ``v1.1.0`` — 2021-01-20
 
   * **New Features and Improvements**
