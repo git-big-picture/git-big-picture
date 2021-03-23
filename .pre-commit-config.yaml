@@ -17,7 +17,7 @@
 
 repos:
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.10.0
+    rev: v2.11.0
     hooks:
       - id: pyupgrade
         args: ['--py36-plus']
@@ -32,12 +32,12 @@ repos:
         exclude: '^test.cram$'
 
   - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.4
+    rev: 3.9.0
     hooks:
       - id: flake8
 
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v5.7.0
+    rev: v5.8.0
     hooks:
       - id: isort
 
@@ -49,6 +49,6 @@ repos:
     # TODO Move to https://github.com/google/yapf
     #      after >=0.31 has been released
   - repo: https://github.com/pre-commit/mirrors-yapf/
-    rev: v0.30.0
+    rev: v0.31.0
     hooks:
       - id: yapf
