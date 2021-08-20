@@ -65,7 +65,7 @@ Demo Video
 
 Chuwei Lu has made a YouTube video showing how to use ``git-big-picture``:
 
-https://www.youtube.com/watch?v=H7w7JWSy3oc&feature=youtu.be
+https://www.youtube.com/watch?v=H7w7JWSy3oc
 
 Screenshots
 -----------
