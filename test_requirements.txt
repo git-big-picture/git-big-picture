@@ -6,7 +6,7 @@ pytest==6.2.4
 
 # Indirect dependencies
 attrs==21.2.0
-importlib-metadata==4.7.1
+importlib-metadata==4.8.1
 iniconfig==1.1.1
 packaging==21.0
 pluggy==0.13.1
