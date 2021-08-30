@@ -2,7 +2,7 @@
 # Keep in sync with setup.py
 coverage==5.5
 cram==0.7
-pytest==6.2.4
+pytest==6.2.5
 
 # Indirect dependencies
 attrs==21.2.0
