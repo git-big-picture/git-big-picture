@@ -8,7 +8,7 @@ pytest==6.2.5
 attrs==21.2.0
 importlib-metadata==4.8.1
 iniconfig==1.1.1
-packaging==21.0
+packaging==21.2
 pluggy==1.0.0
 py==1.10.0
 pyparsing==3.0.3
