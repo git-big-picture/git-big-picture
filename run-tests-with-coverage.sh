@@ -56,8 +56,8 @@ pip install --quiet --disable-pip-version-check -r "${source_dir}"/test_requirem
 pip install --quiet --disable-pip-version-check -e "${source_dir}"
 pip check > /dev/null
 diff -U0 \
-    <(sed -e '/#.*/d' -e '/^$/d' "${source_dir}"/test_requirements.txt | sort -f) \
-    <(pip freeze | fgrep -v git_big_picture | sort -f)
+    <(sed -e '/#.*/d' -e '/^$/d' "${source_dir}"/test_requirements.txt | sed 's,-,_,g' | sort -f) \
+    <(pip freeze | fgrep -v git_big_picture | sed 's,-,_,g' | sort -f)
 sed "s,\./,${source_dir}/,g" "${source_dir}"/.coveragerc > .coveragerc
 cp "${source_dir}"/.cramrc .
 cat <<SITECUSTOMIZE_PY_EOF > "$(ls -1d ${venv}/lib/python*)"/site-packages/sitecustomize.py
