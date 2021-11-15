@@ -13,5 +13,5 @@ pluggy==1.0.0
 py==1.11.0
 pyparsing==2.4.7
 toml==0.10.2
-typing-extensions==3.10.0.2
+typing-extensions==4.0.0
 zipp==3.6.0
