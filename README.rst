@@ -93,7 +93,7 @@ We also have a real world examples from:
 Dependencies
 ------------
 
-* Python >=3.6
+* Python >=3.7
 * Git (1.7.1 works)
 * Graphviz utility
 * pytest and Cram (only for running tests)
