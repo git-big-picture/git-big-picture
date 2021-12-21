@@ -968,10 +968,10 @@ class CommitGraph:
                 labels = []
                 case = 0
                 if k in self.tags:
-                    case = case + 1
+                    case += 1
                     labels.extend(sorted(self.tags[k]))
                 if k in self.branches:
-                    case = case + 2
+                    case += 2
                     labels.extend(sorted(self.branches[k]))
                 # http://www.graphviz.org/doc/info/colors.html
                 color = "/pastel13/%d" % case
