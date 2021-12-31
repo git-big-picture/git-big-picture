@@ -14,4 +14,4 @@ py==1.11.0
 pyparsing==3.0.6
 toml==0.10.2
 typing-extensions==4.0.1
-zipp==3.6.0
+zipp==3.7.0
