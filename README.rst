@@ -459,6 +459,13 @@ uses Graphviz too:
 Changelog
 ---------
 
+* ``UPCOMING`` — XXXX-XX-XX
+
+  * **New Features and Improvements**
+
+    * Switch default history direction from upwards to rightwards
+      (`#184 <https://github.com/git-big-picture/git-big-picture/pull/184>`_)
+
 * ``v1.1.1`` — 2021-01-20
 
   * **Bugs Fixed**
