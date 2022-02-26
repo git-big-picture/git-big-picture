@@ -145,10 +145,10 @@ def create_parser():
                               help='set output format [svg, png, ps, pdf, ...]')
 
     format_group.add_argument('--history-direction',
-                              default=None,
+                              default='rightwards',
                               choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
                               help='enforce a specific direction of history on Graphviz\n'
-                              '(default: upwards)')
+                              '(default: %(default)s)')
 
     format_group.add_argument('-g',
                               '--graphviz',

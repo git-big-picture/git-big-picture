@@ -185,7 +185,7 @@ Usage
       -f FMT, --format FMT  set output format [svg, png, ps, pdf, ...]
       --history-direction {downwards,leftwards,rightwards,upwards}
                             enforce a specific direction of history on Graphviz
-                            (default: upwards)
+                            (default: rightwards)
       -g, --graphviz        output lines suitable as input for dot/graphviz
       -G, --no-graphviz     disable dot/graphviz output
       -p, --processed       output the dot processed, binary data
