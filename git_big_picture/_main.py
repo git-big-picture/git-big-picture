@@ -606,7 +606,10 @@ def get_command_output(command_list, cwd=None, git_env=None):
     p.stderr.close()
     p.wait()
     if p.returncode:
-        err = p.stderr.read()
+        try:
+            err = p.stderr.read()
+        except ValueError:  # case "read of closed file"
+            err = ''
         err = '\n'.join(('> ' + e) for e in err.split('\n'))
         raise Exception('Stderr:\n%s\nReturn code %d from command "%s"' %
                         (err, p.returncode, ' '.join(command_list)))
