@@ -23,6 +23,7 @@
 import argparse
 import ast
 import copy
+import errno
 import os
 import re
 import signal
@@ -31,6 +32,7 @@ import sys
 import tempfile
 import textwrap
 import time
+from typing import List
 
 __version__ = '1.1.1'
 __docformat__ = "restructuredtext"
@@ -397,6 +399,36 @@ def parse_variable_args(args):
     return args[0] if len(args) == 1 else os.getcwd()
 
 
+def run_graphviz_command(argv: List[str],
+                         stdin_lines: List[str],
+                         enoent_exit_code: int,
+                         nonzero_exit_code: int,
+                         exception_exit_code: int,
+                         hint: str = ''):
+    tool = argv[0]
+    try:
+        p = subprocess.Popen(argv,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            barf(f'{tool!r} not found! Please install the Graphviz utility.', enoent_exit_code)
+        else:
+            barf(f'A problem occured calling {" ".join(argv)!r}', exception_exit_code)
+
+    out, err = p.communicate(input='\n'.join(stdin_lines).encode('utf-8'))
+
+    if p.returncode != 0:
+        hint_part = f';\n{hint}' if hint else ''
+        barf(
+            f'{tool!r} terminated prematurely with error code {p.returncode}{hint_part}.\n'
+            f'The error from {tool!r} was:\n'
+            f'>>>{err.decode("utf-8")}', nonzero_exit_code)
+
+    return out
+
+
 def run_dot(output_format, dot_file_lines):
     """ Run the 'dot' utility.
 
@@ -412,28 +444,14 @@ def run_dot(output_format, dot_file_lines):
     Raw output from 'dot' utility
 
     """
-    try:
-        p = subprocess.Popen(['dot', '-T' + output_format],
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-    except OSError as e:
-        if e.errno == 2:
-            barf("'dot' not found! Please install the Graphviz utility.",
-                 EXIT_CODES["dot_not_found"])
-        else:
-            barf("A problem occured calling 'dot -T%s'" % output_format,
-                 EXIT_CODES["problem_with_dot"])
-
-    # send dot input, automatically receive and store output and error
-    out, err = p.communicate(input='\n'.join(dot_file_lines).encode('utf-8'))
-    if p.returncode != 0:
-        barf(
-            "'dot' terminated prematurely with error code %d;\n"
-            "probably you specified an invalid format, see 'man dot'.\n"
-            "The error from 'dot' was:\n"
-            ">>>%s" % (p.returncode, err.decode('utf-8')), EXIT_CODES["dot_terminated_early"])
-    return out
+    return run_graphviz_command(
+        argv=['dot', f'-T{output_format}'],
+        stdin_lines=dot_file_lines,
+        enoent_exit_code=EXIT_CODES['dot_not_found'],
+        nonzero_exit_code=EXIT_CODES['dot_terminated_early'],
+        exception_exit_code=EXIT_CODES['problem_with_dot'],
+        hint='probably you specified an invalid format, see \'man dot\'',
+    )
 
 
 def write_to_file(output_file, dot_output):
