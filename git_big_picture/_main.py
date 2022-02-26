@@ -44,6 +44,7 @@ FORMAT = 'format'
 VIEWER = 'viewer'
 OUT_FILE = 'outfile'
 WAIT_SECONDS = 'wait'
+SIMPLIFY = 'simplify'
 OUTPUT_SETTINGS = [
     FORMAT,
     GRAPHVIZ,
@@ -51,6 +52,7 @@ OUTPUT_SETTINGS = [
     VIEWER,
     OUT_FILE,
     WAIT_SECONDS,
+    SIMPLIFY,
 ]
 OUTPUT_DEFAULTS = {
     FORMAT: 'svg',
@@ -59,6 +61,7 @@ OUTPUT_DEFAULTS = {
     VIEWER: False,
     OUT_FILE: False,
     WAIT_SECONDS: 2.0,
+    SIMPLIFY: False,
 }
 
 # filter settings
@@ -102,6 +105,9 @@ EXIT_CODES = {
     "no_options": 8,
     "no_git": 9,
     "no_git_repo": 10,
+    "tred_not_found": 11,
+    "problem_with_tred": 12,
+    "tred_terminated_early": 13,
     "killed_by_sigint": 128 + signal.SIGINT,
 }
 
@@ -151,6 +157,11 @@ def create_parser():
                               choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
                               help='enforce a specific direction of history on Graphviz\n'
                               '(default: %(default)s)')
+
+    format_group.add_argument('--simplify',
+                              action='store_true',
+                              help='remove edges implied by transitivity using Graphviz\n'
+                              'filter "tred" (default: do not remove implied edges)')
 
     format_group.add_argument('-g',
                               '--graphviz',
@@ -451,6 +462,27 @@ def run_dot(output_format, dot_file_lines):
         nonzero_exit_code=EXIT_CODES['dot_terminated_early'],
         exception_exit_code=EXIT_CODES['problem_with_dot'],
         hint='probably you specified an invalid format, see \'man dot\'',
+    )
+
+
+def simplify_using_tred(dot_file_lines):
+    """ Run the 'tred' utility.
+
+    Parameters
+    ----------
+    dot_file_lines : list of strings
+        graphviz input lines
+
+    Returns
+    -------
+    Raw output from 'tred' utility
+    """
+    return run_graphviz_command(
+        argv=['tred'],
+        stdin_lines=dot_file_lines,
+        enoent_exit_code=EXIT_CODES['tred_not_found'],
+        nonzero_exit_code=EXIT_CODES['tred_terminated_early'],
+        exception_exit_code=EXIT_CODES['problem_with_tred'],
     )
 
 
@@ -1067,6 +1099,10 @@ def innermost_main(opts):
     ]):
         barf("Must provide an output option. Try '-h' for more information",
              EXIT_CODES["no_options"])
+
+    if output_settings[SIMPLIFY]:
+        dot_file_lines = simplify_using_tred(dot_file_lines).decode('utf-8').split('\n')
+
     # if plain just print dot input to stdout
     if output_settings[GRAPHVIZ]:
         debug('Will now print dot format')

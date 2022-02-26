@@ -186,6 +186,8 @@ Usage
       --history-direction {downwards,leftwards,rightwards,upwards}
                             enforce a specific direction of history on Graphviz
                             (default: rightwards)
+      --simplify            remove edges implied by transitivity using Graphviz
+                            filter "tred" (default: do not remove implied edges)
       -g, --graphviz        output lines suitable as input for dot/graphviz
       -G, --no-graphviz     disable dot/graphviz output
       -p, --processed       output the dot processed, binary data
