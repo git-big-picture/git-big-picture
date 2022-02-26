@@ -48,7 +48,7 @@ def empty_commit(mess):
     return get_head_sha()
 
 
-class TestGitTools(ut.TestCase):
+class _GitRepoTestMixin:
 
     def setUp(self):
         """ Setup testing environment.
@@ -68,6 +68,9 @@ class TestGitTools(ut.TestCase):
         """ Remove testing environment """
         sh.rmtree(self.testing_dir)
         os.chdir(self.oldpwd)
+
+
+class TestGitTools(_GitRepoTestMixin, ut.TestCase):
 
     @property
     def graph(self):
