@@ -465,6 +465,11 @@ Changelog
 
     * Switch default history direction from upwards to rightwards
       (`#184 <https://github.com/git-big-picture/git-big-picture/pull/184>`_)
+    * Add support for Python 3.10 (`#162 <https://github.com/git-big-picture/git-big-picture/pull/162>`_)
+
+  * **Dropped Features**
+
+    * Drop support for end-of-life Python 3.6 (`#162 <https://github.com/git-big-picture/git-big-picture/pull/162>`_)
 
 * ``v1.1.1`` — 2021-01-20
 
