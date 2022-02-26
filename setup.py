@@ -30,6 +30,7 @@ _tests_require = [
     # Keep in sync with test_requirements.txt
     'coverage',
     'cram',
+    'parameterized',
     'pytest',
 ]
 

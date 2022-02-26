@@ -24,6 +24,10 @@ import shlex
 import shutil as sh
 import tempfile as tf
 import unittest as ut
+from io import StringIO
+from unittest.mock import patch
+
+from parameterized import parameterized
 
 import git_big_picture._main as gbp
 
@@ -68,6 +72,42 @@ class _GitRepoTestMixin:
         """ Remove testing environment """
         sh.rmtree(self.testing_dir)
         os.chdir(self.oldpwd)
+
+
+class SimplificationTest(_GitRepoTestMixin, ut.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        r"""
+        Now create this graph:
+
+            A---C master
+             \ /
+              B topic
+
+        Note that edge "A---C" is an edge that qualifies as
+        "implied by transitivity" and hence will be removed
+        during simplification.
+        """
+        empty_commit('A')
+        dispatch('git checkout -b topic')
+        empty_commit('B')
+        dispatch('git checkout master')
+        dispatch('git merge --no-ff topic')
+
+    @parameterized.expand([
+        ('with simplify', ['--simplify'], 1),
+        ('without simplify', [], 0),
+    ])
+    def test(self, _label, extra_argv, expected_dropped_edges):
+        opts = gbp.create_parser().parse_args(['--graphviz'] + extra_argv)
+
+        with patch('sys.stdout', StringIO()) as stdout:
+            gbp.innermost_main(opts)
+
+        expected_edge_count = 3 - expected_dropped_edges
+        actual_edge_count = stdout.getvalue().count(' -> ')
+        self.assertEqual(actual_edge_count, expected_edge_count)
 
 
 class TestGitTools(_GitRepoTestMixin, ut.TestCase):

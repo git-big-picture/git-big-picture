@@ -2,6 +2,7 @@
 # Keep in sync with setup.py
 coverage==6.3.2
 cram==0.7
+parameterized==0.8.1
 pytest==7.0.1
 
 # Indirect dependencies
