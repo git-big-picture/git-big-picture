@@ -463,6 +463,8 @@ Changelog
 
   * **New Features and Improvements**
 
+    * Add argument ``--simplify`` to removed edges implied by transitivity based on Graphviz filter ``tred``
+      (`#180 <https://github.com/git-big-picture/git-big-picture/issues/180>`_, `#182 <https://github.com/git-big-picture/git-big-picture/pull/182>`_)
     * Switch default history direction from upwards to rightwards
       (`#184 <https://github.com/git-big-picture/git-big-picture/pull/184>`_)
     * Add support for Python 3.10 (`#162 <https://github.com/git-big-picture/git-big-picture/pull/162>`_)
