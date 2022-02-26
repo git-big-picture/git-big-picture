@@ -614,6 +614,7 @@ def get_command_output(command_list, cwd=None, git_env=None):
 
 
 class Git:
+
     def __init__(self, repo_dir):
 
         self.repo_dir = repo_dir
@@ -777,6 +778,7 @@ class CommitGraph:
         interface to dispatch commands to this repo
 
     """
+
     def __init__(self, parent_map, branch_dict, tag_dict, git=None):
         self.parents = parent_map
         self.branches = branch_dict
@@ -947,6 +949,7 @@ class CommitGraph:
         dot_file_lines : list of strings
             lines of the graphviz input
         """
+
         def format_sha_one(sha_one):
             """ Shorten sha1 if required. """
             if (sha_one_digits is None) or (sha_one_digits == 40):

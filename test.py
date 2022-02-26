@@ -54,6 +54,7 @@ def print_dict(dict_):
 
 
 class TestGitTools(ut.TestCase):
+
     def setUp(self):
         """ Setup testing environment.
 
@@ -78,6 +79,7 @@ class TestGitTools(ut.TestCase):
         return gbp.graph_factory(self.testing_dir)
 
     def test_find_roots(self):
+
         def create_root(branch_name):
             dispatch('git read-tree --empty')
             new_tree = dispatch('git write-tree').strip()
