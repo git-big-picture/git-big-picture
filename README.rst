@@ -186,6 +186,8 @@ Usage
       --history-direction {downwards,leftwards,rightwards,upwards}
                             enforce a specific direction of history on Graphviz
                             (default: rightwards)
+      --simplify            remove edges implied by transitivity using Graphviz
+                            filter "tred" (default: do not remove implied edges)
       -g, --graphviz        output lines suitable as input for dot/graphviz
       -G, --no-graphviz     disable dot/graphviz output
       -p, --processed       output the dot processed, binary data
@@ -463,6 +465,8 @@ Changelog
 
   * **New Features and Improvements**
 
+    * Add argument ``--simplify`` to removed edges implied by transitivity based on Graphviz filter ``tred``
+      (`#180 <https://github.com/git-big-picture/git-big-picture/issues/180>`_, `#182 <https://github.com/git-big-picture/git-big-picture/pull/182>`_)
     * Switch default history direction from upwards to rightwards
       (`#184 <https://github.com/git-big-picture/git-big-picture/pull/184>`_)
     * Add support for Python 3.10 (`#162 <https://github.com/git-big-picture/git-big-picture/pull/162>`_)

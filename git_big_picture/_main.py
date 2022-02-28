@@ -23,6 +23,7 @@
 import argparse
 import ast
 import copy
+import errno
 import os
 import re
 import signal
@@ -31,6 +32,7 @@ import sys
 import tempfile
 import textwrap
 import time
+from typing import List
 
 __version__ = '1.1.1'
 __docformat__ = "restructuredtext"
@@ -42,6 +44,7 @@ FORMAT = 'format'
 VIEWER = 'viewer'
 OUT_FILE = 'outfile'
 WAIT_SECONDS = 'wait'
+SIMPLIFY = 'simplify'
 OUTPUT_SETTINGS = [
     FORMAT,
     GRAPHVIZ,
@@ -49,6 +52,7 @@ OUTPUT_SETTINGS = [
     VIEWER,
     OUT_FILE,
     WAIT_SECONDS,
+    SIMPLIFY,
 ]
 OUTPUT_DEFAULTS = {
     FORMAT: 'svg',
@@ -57,6 +61,7 @@ OUTPUT_DEFAULTS = {
     VIEWER: False,
     OUT_FILE: False,
     WAIT_SECONDS: 2.0,
+    SIMPLIFY: False,
 }
 
 # filter settings
@@ -100,6 +105,9 @@ EXIT_CODES = {
     "no_options": 8,
     "no_git": 9,
     "no_git_repo": 10,
+    "tred_not_found": 11,
+    "problem_with_tred": 12,
+    "tred_terminated_early": 13,
     "killed_by_sigint": 128 + signal.SIGINT,
 }
 
@@ -149,6 +157,11 @@ def create_parser():
                               choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
                               help='enforce a specific direction of history on Graphviz\n'
                               '(default: %(default)s)')
+
+    format_group.add_argument('--simplify',
+                              action='store_true',
+                              help='remove edges implied by transitivity using Graphviz\n'
+                              'filter "tred" (default: do not remove implied edges)')
 
     format_group.add_argument('-g',
                               '--graphviz',
@@ -397,6 +410,36 @@ def parse_variable_args(args):
     return args[0] if len(args) == 1 else os.getcwd()
 
 
+def run_graphviz_command(argv: List[str],
+                         stdin_lines: List[str],
+                         enoent_exit_code: int,
+                         nonzero_exit_code: int,
+                         exception_exit_code: int,
+                         hint: str = ''):
+    tool = argv[0]
+    try:
+        p = subprocess.Popen(argv,
+                             stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            barf(f'{tool!r} not found! Please install the Graphviz utility.', enoent_exit_code)
+        else:
+            barf(f'A problem occured calling {" ".join(argv)!r}', exception_exit_code)
+
+    out, err = p.communicate(input='\n'.join(stdin_lines).encode('utf-8'))
+
+    if p.returncode != 0:
+        hint_part = f';\n{hint}' if hint else ''
+        barf(
+            f'{tool!r} terminated prematurely with error code {p.returncode}{hint_part}.\n'
+            f'The error from {tool!r} was:\n'
+            f'>>>{err.decode("utf-8")}', nonzero_exit_code)
+
+    return out
+
+
 def run_dot(output_format, dot_file_lines):
     """ Run the 'dot' utility.
 
@@ -412,28 +455,35 @@ def run_dot(output_format, dot_file_lines):
     Raw output from 'dot' utility
 
     """
-    try:
-        p = subprocess.Popen(['dot', '-T' + output_format],
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
-    except OSError as e:
-        if e.errno == 2:
-            barf("'dot' not found! Please install the Graphviz utility.",
-                 EXIT_CODES["dot_not_found"])
-        else:
-            barf("A problem occured calling 'dot -T%s'" % output_format,
-                 EXIT_CODES["problem_with_dot"])
+    return run_graphviz_command(
+        argv=['dot', f'-T{output_format}'],
+        stdin_lines=dot_file_lines,
+        enoent_exit_code=EXIT_CODES['dot_not_found'],
+        nonzero_exit_code=EXIT_CODES['dot_terminated_early'],
+        exception_exit_code=EXIT_CODES['problem_with_dot'],
+        hint='probably you specified an invalid format, see \'man dot\'',
+    )
 
-    # send dot input, automatically receive and store output and error
-    out, err = p.communicate(input='\n'.join(dot_file_lines).encode('utf-8'))
-    if p.returncode != 0:
-        barf(
-            "'dot' terminated prematurely with error code %d;\n"
-            "probably you specified an invalid format, see 'man dot'.\n"
-            "The error from 'dot' was:\n"
-            ">>>%s" % (p.returncode, err.decode('utf-8')), EXIT_CODES["dot_terminated_early"])
-    return out
+
+def simplify_using_tred(dot_file_lines):
+    """ Run the 'tred' utility.
+
+    Parameters
+    ----------
+    dot_file_lines : list of strings
+        graphviz input lines
+
+    Returns
+    -------
+    Raw output from 'tred' utility
+    """
+    return run_graphviz_command(
+        argv=['tred'],
+        stdin_lines=dot_file_lines,
+        enoent_exit_code=EXIT_CODES['tred_not_found'],
+        nonzero_exit_code=EXIT_CODES['tred_terminated_early'],
+        exception_exit_code=EXIT_CODES['problem_with_tred'],
+    )
 
 
 def write_to_file(output_file, dot_output):
@@ -1049,6 +1099,10 @@ def innermost_main(opts):
     ]):
         barf("Must provide an output option. Try '-h' for more information",
              EXIT_CODES["no_options"])
+
+    if output_settings[SIMPLIFY]:
+        dot_file_lines = simplify_using_tred(dot_file_lines).decode('utf-8').split('\n')
+
     # if plain just print dot input to stdout
     if output_settings[GRAPHVIZ]:
         debug('Will now print dot format')

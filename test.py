@@ -22,8 +22,14 @@
 import os
 import shlex
 import shutil as sh
+import sys
 import tempfile as tf
 import unittest as ut
+from io import StringIO
+from textwrap import dedent
+from unittest.mock import patch
+
+from parameterized import parameterized
 
 import git_big_picture._main as gbp
 
@@ -48,7 +54,7 @@ def empty_commit(mess):
     return get_head_sha()
 
 
-class TestGitTools(ut.TestCase):
+class _GitRepoTestMixin:
 
     def setUp(self):
         """ Setup testing environment.
@@ -68,6 +74,98 @@ class TestGitTools(ut.TestCase):
         """ Remove testing environment """
         sh.rmtree(self.testing_dir)
         os.chdir(self.oldpwd)
+
+
+class RunGraphvizCommandTest(ut.TestCase):
+    _original_sys_exit = sys.exit
+
+    def _custom_sys_exit(self, value):
+        self._exit_value = value
+        self._original_sys_exit(value)
+
+    def test_command_not_available(self):
+        magic_exit_code = 123  # arbitrary
+        expected_stderr = ("fatal: 'no-such-thing-123' not found!"
+                           " Please install the Graphviz utility.\n")
+
+        with patch('sys.exit', self._custom_sys_exit), \
+                patch('sys.stderr', StringIO()) as stderr, \
+                self.assertRaises(SystemExit):
+            gbp.run_graphviz_command(['no-such-thing-123'], [], magic_exit_code, 0, 0)
+
+        self.assertEqual(stderr.getvalue(), expected_stderr)
+        self.assertEqual(self._exit_value, magic_exit_code)
+
+    def test_non_zero_exit(self):
+        magic_exit_code = 123  # arbitrary
+        argv = ['bash', '-c', "echo $'hello\\nworld' >&2; false"]
+        expected_stderr = dedent("""\
+            fatal: 'bash' terminated prematurely with error code 1.
+            The error from 'bash' was:
+            >>>hello
+            world
+
+        """)
+
+        with patch('sys.exit', self._custom_sys_exit), \
+                patch('sys.stderr', StringIO()) as stderr, \
+                self.assertRaises(SystemExit):
+            gbp.run_graphviz_command(argv, [], 0, magic_exit_code, 0)
+
+        self.assertEqual(stderr.getvalue(), expected_stderr)
+        self.assertEqual(self._exit_value, magic_exit_code)
+
+    def test_exception_handled(self):
+        magic_exit_code = 123  # arbitrary
+        expected_stderr = "fatal: A problem occured calling 'true'\n"
+
+        with patch('subprocess.Popen', side_effect=OSError(1, 2, 3)), \
+                patch('sys.exit', self._custom_sys_exit), \
+                patch('sys.stderr', StringIO()) as stderr, \
+                self.assertRaises(SystemExit):
+            gbp.run_graphviz_command(['true'], [], 0, 0, magic_exit_code)
+
+        self.assertEqual(stderr.getvalue(), expected_stderr)
+        self.assertEqual(self._exit_value, magic_exit_code)
+
+
+class SimplificationTest(_GitRepoTestMixin, ut.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        r"""
+        Now create this graph:
+
+            A---C master
+             \ /
+              B topic
+
+        Note that edge "A---C" is an edge that qualifies as
+        "implied by transitivity" and hence will be removed
+        during simplification.
+        """
+        empty_commit('A')
+        dispatch('git checkout -b topic')
+        empty_commit('B')
+        dispatch('git checkout master')
+        dispatch('git merge --no-ff topic')
+
+    @parameterized.expand([
+        ('with simplify', ['--simplify'], 1),
+        ('without simplify', [], 0),
+    ])
+    def test(self, _label, extra_argv, expected_dropped_edges):
+        opts = gbp.create_parser().parse_args(['--graphviz'] + extra_argv)
+
+        with patch('sys.stdout', StringIO()) as stdout:
+            gbp.innermost_main(opts)
+
+        expected_edge_count = 3 - expected_dropped_edges
+        actual_edge_count = stdout.getvalue().count(' -> ')
+        self.assertEqual(actual_edge_count, expected_edge_count)
+
+
+class TestGitTools(_GitRepoTestMixin, ut.TestCase):
 
     @property
     def graph(self):

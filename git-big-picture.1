@@ -38,6 +38,10 @@ set output format [svg, png, ps, pdf, ...]
 enforce a specific direction of history on Graphviz
 (default: rightwards)
 .TP
+\fB\-\-simplify\fR
+remove edges implied by transitivity using Graphviz
+filter "tred" (default: do not remove implied edges)
+.TP
 \fB\-g\fR, \fB\-\-graphviz\fR
 output lines suitable as input for dot/graphviz
 .TP
