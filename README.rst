@@ -470,6 +470,7 @@ Changelog
     * Switch default history direction from upwards to rightwards
       (`#184 <https://github.com/git-big-picture/git-big-picture/pull/184>`_)
     * Add support for Python 3.10 (`#162 <https://github.com/git-big-picture/git-big-picture/pull/162>`_)
+    * Use ``python3`` rather than ``python`` in Cram tests (`#89 <https://github.com/git-big-picture/git-big-picture/pull/89>`_)
 
   * **Dropped Features**
 
