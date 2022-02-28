@@ -73,7 +73,7 @@ SITECUSTOMIZE_PY_EOF
 exit_code=0
 coverage erase
 
-coverage run ${venv}/bin/pytest "${source_dir}"/test.py \
+coverage run ${venv}/bin/pytest -v -s "${source_dir}"/test.py \
     || exit_code=$?
 PATH="${venv}/bin:${PATH}" COVERAGE_PROCESS_START=.coveragerc \
     coverage run ${venv}/bin/cram "${source_dir}"/test.cram \

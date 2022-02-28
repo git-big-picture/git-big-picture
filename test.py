@@ -48,11 +48,6 @@ def empty_commit(mess):
     return get_head_sha()
 
 
-def print_dict(dict_):
-    for (k, v) in dict_.items():
-        print(k, v)
-
-
 class TestGitTools(ut.TestCase):
 
     def setUp(self):
@@ -380,6 +375,4 @@ class TestGitTools(ut.TestCase):
             f: {p, b},
             p: {b},
         }
-        print_dict(expected_reduced_parents)
-        print_dict(graph.parents)
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
