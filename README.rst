@@ -185,7 +185,7 @@ Usage
       -f FMT, --format FMT  set output format [svg, png, ps, pdf, ...]
       --history-direction {downwards,leftwards,rightwards,upwards}
                             enforce a specific direction of history on Graphviz
-                            (default: upwards)
+                            (default: rightwards)
       -g, --graphviz        output lines suitable as input for dot/graphviz
       -G, --no-graphviz     disable dot/graphviz output
       -p, --processed       output the dot processed, binary data
@@ -458,6 +458,13 @@ uses Graphviz too:
 
 Changelog
 ---------
+
+* ``UPCOMING`` — XXXX-XX-XX
+
+  * **New Features and Improvements**
+
+    * Switch default history direction from upwards to rightwards
+      (`#184 <https://github.com/git-big-picture/git-big-picture/pull/184>`_)
 
 * ``v1.1.1`` — 2021-01-20
 
