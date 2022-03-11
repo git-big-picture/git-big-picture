@@ -58,7 +58,7 @@ jobs:
         uses: peter-evans/create-pull-request@v3.14.0
         with:
           author: 'pre-commit <pre-commit@tools.invalid>'
-          base: master
+          base: main
           body: |-
             For your consideration.
 
