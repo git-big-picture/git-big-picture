@@ -34,7 +34,7 @@ import textwrap
 import time
 from typing import List
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 __docformat__ = "restructuredtext"
 
 # format settings
