@@ -41,7 +41,7 @@ run without options (__main__ module)
     fatal: Must provide an output option. Try '-h' for more information
     [8]
 
-cover including commit messsages (smoke test)
+cover including commit messages (smoke test)
     $ git-big-picture -c -g >/dev/null
 
 test option precedence for -C followed by -c (include commit messages)
