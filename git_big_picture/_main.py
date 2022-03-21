@@ -498,13 +498,12 @@ def write_to_file(output_file, dot_output):
 
     """
     try:
-        f = open(output_file, 'wb+')
+        with open(output_file, 'wb+') as f:
+            f.write(dot_output)
+            f.flush()
+            os.fsync(f.fileno())
     except OSError as e:
-        barf(f"Could not open file '{output_file}':\n>>>{e}", EXIT_CODES["not_write_to_file"])
-    f.write(dot_output)
-    f.flush()
-    os.fsync(f.fileno())
-    f.close()
+        barf(f"Could not write to file '{output_file}':\n>>>{e}", EXIT_CODES["not_write_to_file"])
 
 
 def show_in_viewer(output_file, viewer):
