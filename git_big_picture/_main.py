@@ -34,7 +34,7 @@ import textwrap
 import time
 from typing import List
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 __docformat__ = "restructuredtext"
 
 # format settings
@@ -1152,7 +1152,7 @@ def innermost_main(opts):
                 temporary_file.close()  # also removes the file
     elif output_settings[PROCESSED]:
         debug("Will now print dot processed output in format: '%s'" % output_settings[FORMAT])
-        print(dot_output)
+        sys.stdout.buffer.write(dot_output)
 
 
 def inner_main():

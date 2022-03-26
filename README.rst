@@ -461,6 +461,12 @@ uses Graphviz too:
 Changelog
 ---------
 
+* ``v1.2.1`` — 2022-03-22
+
+  * **Bugs Fixed**
+
+    * Fix output with argument ``--processed`` (`#197 <https://github.com/git-big-picture/git-big-picture/issues/197>`_, `#199 <https://github.com/git-big-picture/git-big-picture/pull/199>`_)
+
 * ``v1.2.0`` — 2022-03-01
 
   * **New Features and Improvements**
