@@ -461,7 +461,7 @@ uses Graphviz too:
 Changelog
 ---------
 
-* ``v1.2.1`` — 2022-03-22
+* ``v1.2.1`` — 2022-03-26
 
   * **Bugs Fixed**
 
