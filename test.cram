@@ -122,14 +122,14 @@ provide filename and viewer and format
     $ rm file.png
 
 check explicit direction of history
-    $ bash -c 'set -o pipefail; for i in {down,left,right,up}wards; do git-big-picture -g --history-direction=${i} | fgrep rankdir ; done'
+    $ bash -c 'set -o pipefail; for i in {down,left,right,up}wards; do git-big-picture -g --history-direction=${i} | grep -F rankdir ; done'
     \trankdir="BT"; (esc)
     \trankdir="LR"; (esc)
     \trankdir="RL"; (esc)
     \trankdir="TB"; (esc)
 
 check for deletion of temp files
-    $ ls -1 "$(git-big-picture -d -v true | fgrep 'temp file' | tee /dev/stderr | grep -Eo "/[^']+" | uniq)" || ( exit 2 )  # for macOS
+    $ ls -1 "$(git-big-picture -d -v true | grep -F 'temp file' | tee /dev/stderr | grep -Eo "/[^']+" | uniq)" || ( exit 2 )  # for macOS
     debug:   Created temp file: '/[^']+' (re)
     debug:   Removing temp file: '/[^']+' (re)
     ls: .*/.+/git-big-picture.*.svg.*No such file or directory (re)
