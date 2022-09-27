@@ -461,6 +461,12 @@ uses Graphviz too:
 Changelog
 ---------
 
+* ``v1.2.2`` — 2022-09-27
+
+  * **Under the Hood**
+
+    * Fix cram tests for grep >=3.8 (`#233 <https://github.com/git-big-picture/git-big-picture/pull/233>`_)
+
 * ``v1.2.1`` — 2022-03-26
 
   * **Bugs Fixed**
