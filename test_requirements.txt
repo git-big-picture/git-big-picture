@@ -3,10 +3,11 @@
 coverage==6.5.0
 cram==0.7
 parameterized==0.8.1
-pytest==7.1.3
+pytest==7.2.0
 
 # Indirect dependencies
 attrs==22.1.0
+exceptiongroup==1.0.0rc9
 importlib-metadata==5.0.0
 iniconfig==1.1.1
 packaging==21.3
