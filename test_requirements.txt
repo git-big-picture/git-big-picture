@@ -1,6 +1,6 @@
 # Direct dependencies
 # Keep in sync with setup.py
-coverage==7.0.3
+coverage==7.0.4
 cram==0.7
 parameterized==0.8.1
 pytest==7.2.0
