@@ -1,8 +1,13 @@
+.. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit
+   :target: https://github.com/pre-commit/pre-commit
+   :alt: pre-commit
+.. image:: https://github.com/git-big-picture/git-big-picture/actions/workflows/run-tests.yml/badge.svg
+   :target: https://github.com/git-big-picture/git-big-picture/actions/workflows/run-tests.yml
+   :alt: Tests
+
+
 git-big-picture
 ===============
-
-.. image:: https://github.com/git-big-picture/git-big-picture/workflows/Tests/badge.svg
-    :target: https://github.com/git-big-picture/git-big-picture/actions
 
 ``git-big-picture`` is a visualization tool for Git repositories. You can think
 of it as a filter that removes uninteresting commits from a DAG modelling a Git
