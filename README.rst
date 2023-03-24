@@ -178,7 +178,7 @@ Usage
       REPOSITORY            path to the Git working directory
                             (default: current directory)
 
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       --version             show program's version number and exit
       --pstats FILE         run cProfile profiler writing pstats output to FILE
