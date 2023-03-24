@@ -26,7 +26,7 @@ jobs:
     name: Tests
     strategy:
       matrix:
-        python-version: [3.7, '3.10']  # no urgent need for: 3.8, 3.9
+        python-version: [3.7, 3.11]  # no urgent need for: 3.8, 3.9, 3.10
         runs-on: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.runs-on }}
     steps:
