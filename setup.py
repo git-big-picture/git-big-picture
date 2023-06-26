@@ -46,7 +46,7 @@ setup(
     long_description=long_description,
     url='https://github.com/git-big-picture/git-big-picture',
     license='GPL v3 or later',
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     packages=find_packages(),
     extras_require=_extras_require,
     tests_require=_tests_require,
@@ -57,7 +57,6 @@ setup(
     },
     classifiers=[
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
