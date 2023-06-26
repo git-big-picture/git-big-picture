@@ -98,7 +98,7 @@ We also have a real world examples from:
 Dependencies
 ------------
 
-* Python >=3.7
+* Python >=3.8
 * Git (1.7.1 works)
 * Graphviz utility
 * pytest and Cram (only for running tests)
@@ -465,6 +465,12 @@ uses Graphviz too:
 
 Changelog
 ---------
+
+* ``XXXXXX`` — XXXX-XX-XX
+
+  * **Dropped Features**
+
+    * Drop support for end-of-life Python 3.7 (`#335 <https://github.com/git-big-picture/git-big-picture/pull/335>`_)
 
 * ``v1.2.2`` — 2022-09-27
 
