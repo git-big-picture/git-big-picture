@@ -118,7 +118,7 @@ Alternatively, just run it straight from a Git clone:
 
 .. code:: console
 
-    $ git clone git://github.com/git-big-picture/git-big-picture.git
+    $ git clone https://github.com/git-big-picture/git-big-picture.git
     $ cd git-big-picture
     $ python3 -m venv venv      # creates a virtualenv
     $ source venv/bin/activate  # activates the virtualenv
