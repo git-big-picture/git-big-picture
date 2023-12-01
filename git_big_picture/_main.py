@@ -128,7 +128,7 @@ USAGE = "%(prog)s OPTIONS [REPOSITORY]"
 
 _EPILOG = textwrap.dedent("""
     git-big-picture is software libre, licensed under the GPL v3 or later license.
-    Please report bugs at https://github.com/git-big-picture/git-big-picture/issues.  Thank you!
+    Please report bugs at https://github.com/git-big-picture/git-big-picture/issues — thank you!
 """)
 
 _RIGHT_COLUMN_WRAP_WIDTH = 57

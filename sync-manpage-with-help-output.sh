@@ -41,6 +41,6 @@ sed_args=(
 )
 
 SOURCE_DATE_EPOCH="$(date --date="${_BUILD_MONTH}-15" +%s)" \
-    help2man --no-info --name 'Visualize Git repositories' git-big-picture \
+    help2man --no-info --locale en_US.UTF-8 --name 'Visualize Git repositories' git-big-picture \
     | sed "${sed_args[@]}" \
     > git-big-picture.1
