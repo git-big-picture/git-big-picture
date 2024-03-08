@@ -68,6 +68,22 @@ except ImportError:
     pass
 SITECUSTOMIZE_PY_EOF
 
+# Run smoke-test for determinism with real Git history;
+# these modes are opposites of FILTER_DEFAULTS in _main.py .
+for mode in \
+        --all \
+        --no-branches \
+        --no-tags \
+        --no-roots \
+        --merges \
+        --bifurcations \
+        --commit-messages \
+        ; do
+    git-big-picture --graphviz "${mode}" "${source_dir}" > 1.dot
+    git-big-picture --graphviz "${mode}" "${source_dir}" > 2.dot
+    diff -U 0 1.dot 2.dot  # i.e. fail if there is any diff
+    rm 1.dot 2.dot
+done
 
 # Actually run the tests
 exit_code=0
