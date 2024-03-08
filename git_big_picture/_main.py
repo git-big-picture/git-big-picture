@@ -1036,7 +1036,7 @@ class CommitGraph:
         if history_direction is not None:
             rankdir = RANKDIR_OF_HISTORY_DIRECTION[history_direction]
             dot_file_lines.append(f'\trankdir="{rankdir}";')
-        for sha_one, labels, color in label_gen():
+        for sha_one, labels, color in sorted(label_gen()):
             label = '\\n'.join(labels + ((with_commit_messages or sha_ones_on_labels) and [
                 format_label(sha_one),
             ] or list()))
@@ -1051,7 +1051,7 @@ class CommitGraph:
                 sha_label = format_label(sha_one)
                 dot_file_lines.append(f'\t"{sha_one}"[label="{sha_label}"];')
         for child, self.parents in self.parents.items():
-            for p in self.parents:
+            for p in sorted(self.parents):
                 dot_file_lines.append(f'\t"{child}" -> "{p}";')
         dot_file_lines.append('}')
         return dot_file_lines
