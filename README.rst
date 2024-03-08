@@ -470,7 +470,7 @@ Changelog
 
   * **New Features and Improvements**
 
-    * Make Graphviz output more determistic (`#398 <https://github.com/git-big-picture/git-big-picture/pull/398>`_)
+    * Make Graphviz output more deterministic (`#398 <https://github.com/git-big-picture/git-big-picture/pull/398>`_)
     * Add support for Python 3.11 (`#296 <https://github.com/git-big-picture/git-big-picture/pull/296>`_)
     * Add support for Python 3.12 (`#365 <https://github.com/git-big-picture/git-big-picture/pull/365>`_)
     * Fix link clickability for help output and man page (`#371 <https://github.com/git-big-picture/git-big-picture/pull/371>`_)
