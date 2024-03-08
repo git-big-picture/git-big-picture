@@ -466,7 +466,15 @@ uses Graphviz too:
 Changelog
 ---------
 
-* ``XXXXXX`` — XXXX-XX-XX
+* ``v1.3.0`` — 2024-03-08
+
+  * **New Features and Improvements**
+
+    * Make Graphviz output more determistic (`#398 <https://github.com/git-big-picture/git-big-picture/pull/398>`_)
+    * Add support for Python 3.11 (`#296 <https://github.com/git-big-picture/git-big-picture/pull/296>`_)
+    * Add support for Python 3.12 (`#365 <https://github.com/git-big-picture/git-big-picture/pull/365>`_)
+    * Fix link clickability for help output and man page (`#371 <https://github.com/git-big-picture/git-big-picture/pull/371>`_)
+    * ``README.rst``: Make screenshot dimensions match reality (`#399 <https://github.com/git-big-picture/git-big-picture/pull/399>`_)
 
   * **Dropped Features**
 
