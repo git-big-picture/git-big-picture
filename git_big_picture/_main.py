@@ -426,7 +426,7 @@ def run_graphviz_command(argv: List[str],
         if e.errno == errno.ENOENT:
             barf(f'{tool!r} not found! Please install the Graphviz utility.', enoent_exit_code)
         else:
-            barf(f'A problem occured calling {" ".join(argv)!r}', exception_exit_code)
+            barf(f'A problem occurred calling {" ".join(argv)!r}', exception_exit_code)
 
     out, err = p.communicate(input='\n'.join(stdin_lines).encode('utf-8'))
 
@@ -755,7 +755,7 @@ class Git:
                 add_to_dict(rbranches, sha1, name.replace(rbranch_prefix, ''))
                 add_to_dict(abranches, sha1, name.replace(rbranch_prefix, ''))
             elif name.startswith(tag_prefix):
-                # recusively dereference until we find a non-tag object
+                # recursively dereference until we find a non-tag object
                 sha1 = self(['git', 'rev-parse', '%s^{}' % name])[0]
                 # determine object type and to respective dict
                 obj_type = self(['git', 'cat-file', '-t', sha1])[0]
@@ -992,7 +992,7 @@ class CommitGraph:
         sha_ones_on_labels : boolean
             if True show sha1 (or minimal) on labels in addition to ref names
         with_commit_messages : boolean
-            if True the commit messages are displyed too
+            if True the commit messages are displayed too
         sha_one_digits : int
             number of digits to use for showing sha1
 
