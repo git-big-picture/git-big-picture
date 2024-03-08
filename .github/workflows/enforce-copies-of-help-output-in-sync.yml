@@ -17,6 +17,10 @@
 
 name: Enforce that copies of --help output are in sync
 
+# Drop permissions to minimum for security
+permissions:
+  contents: read
+
 on:
 - pull_request
 - push

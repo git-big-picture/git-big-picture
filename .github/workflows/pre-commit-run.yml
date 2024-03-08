@@ -17,6 +17,10 @@
 
 name: Run pre-commit on all files
 
+# Drop permissions to minimum for security
+permissions:
+  contents: read
+
 on:
 - pull_request
 - push
