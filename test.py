@@ -117,7 +117,7 @@ class RunGraphvizCommandTest(ut.TestCase):
 
     def test_exception_handled(self):
         magic_exit_code = 123  # arbitrary
-        expected_stderr = "fatal: A problem occured calling 'true'\n"
+        expected_stderr = "fatal: A problem occurred calling 'true'\n"
 
         with patch('subprocess.Popen', side_effect=OSError(1, 2, 3)), \
                 patch('sys.exit', self._custom_sys_exit), \
