@@ -8,7 +8,7 @@ pytest==8.2.2
 # Indirect dependencies
 attrs==23.2.0
 exceptiongroup==1.2.1
-importlib-metadata==7.2.0
+importlib-metadata==7.2.1
 iniconfig==2.0.0
 packaging==24.1
 pluggy==1.5.0
