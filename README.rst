@@ -187,7 +187,7 @@ Usage
     output options:
       Options to control output and format
 
-      -f FMT, --format FMT  set output format [svg, png, ps, pdf, ...]
+      -f, --format FMT      set output format [svg, png, ps, pdf, ...]
       --history-direction {downwards,leftwards,rightwards,upwards}
                             enforce a specific direction of history on Graphviz
                             (default: rightwards)
@@ -197,13 +197,11 @@ Usage
       -G, --no-graphviz     disable dot/graphviz output
       -p, --processed       output the dot processed, binary data
       -P, --no-processed    disable binary output
-      -v CMD, --viewer CMD  write image to tempfile and start specified viewer
+      -v, --viewer CMD      write image to tempfile and start specified viewer
       -V, --no-viewer       disable starting viewer
-      -o FILE, --outfile FILE
-                            write image to specified file
+      -o, --outfile FILE    write image to specified file
       -O, --no-outfile      disable writing image to file
-      -w SECONDS, --wait SECONDS
-                            wait for SECONDS seconds before deleting the temporary
+      -w, --wait SECONDS    wait for SECONDS seconds before deleting the temporary
                             file that is opened using the viewer command (default:
                             2.0 seconds); this helps e.g. with viewer commands that
                             tell other running processes to open that file on their
