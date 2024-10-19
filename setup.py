@@ -23,45 +23,45 @@ from setuptools import find_packages, setup
 
 from git_big_picture import __version__ as VERSION
 
-with open('README.rst') as f:
+with open("README.rst") as f:
     long_description = f.read()
 
 _tests_require = [
     # Keep in sync with test_requirements.txt
-    'coverage',
-    'cram',
-    'parameterized',
-    'pytest',
+    "coverage",
+    "cram",
+    "parameterized",
+    "pytest",
 ]
 
 _extras_require = {
-    'tests': _tests_require,
+    "tests": _tests_require,
 }
 
 setup(
-    name='git-big-picture',
+    name="git-big-picture",
     version=VERSION,
-    author='Sebastian Pipping, Julius Plenz, and Valentin Haenel',
-    description='Git — the big picture',
+    author="Sebastian Pipping, Julius Plenz, and Valentin Haenel",
+    description="Git — the big picture",
     long_description=long_description,
-    url='https://github.com/git-big-picture/git-big-picture',
-    license='GPL v3 or later',
-    python_requires='>=3.9',
+    url="https://github.com/git-big-picture/git-big-picture",
+    license="GPL v3 or later",
+    python_requires=">=3.9",
     packages=find_packages(),
     extras_require=_extras_require,
     tests_require=_tests_require,
     entry_points={
-        'console_scripts': [
-            'git-big-picture = git_big_picture._main:main',
+        "console_scripts": [
+            "git-big-picture = git_big_picture._main:main",
         ],
     },
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Programming Language :: Python :: 3 :: Only',
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3 :: Only",
     ],
-    data_files=[('share/man/man1', ['git-big-picture.1'])],
+    data_files=[("share/man/man1", ["git-big-picture.1"])],
 )

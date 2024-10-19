@@ -1,7 +1,0 @@
-[flake8]
-# W503 line break before binary operator
-# W504 line break after binary operator
-ignore =
-    W503
-    W504
-max-line-length = 99
