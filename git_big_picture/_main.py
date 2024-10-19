@@ -32,7 +32,6 @@ import sys
 import tempfile
 import textwrap
 import time
-from typing import List
 
 __version__ = '1.3.0'
 __docformat__ = "restructuredtext"
@@ -410,8 +409,8 @@ def parse_variable_args(args):
     return args[0] if len(args) == 1 else os.getcwd()
 
 
-def run_graphviz_command(argv: List[str],
-                         stdin_lines: List[str],
+def run_graphviz_command(argv: list[str],
+                         stdin_lines: list[str],
                          enoent_exit_code: int,
                          nonzero_exit_code: int,
                          exception_exit_code: int,
