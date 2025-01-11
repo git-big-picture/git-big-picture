@@ -160,7 +160,7 @@ def create_parser():
         "--history-direction",
         default="rightwards",
         choices=sorted(RANKDIR_OF_HISTORY_DIRECTION.keys()),
-        help="enforce a specific direction of history on Graphviz\n" "(default: %(default)s)",
+        help="enforce a specific direction of history on Graphviz\n(default: %(default)s)",
     )
 
     format_group.add_argument(
@@ -393,7 +393,7 @@ def create_parser():
         "repo_dirs",
         metavar="REPOSITORY",
         nargs="*",
-        help="path to the Git working directory" "\n(default: current directory)",
+        help="path to the Git working directory\n(default: current directory)",
     )
 
     return parser
@@ -475,16 +475,16 @@ def run_graphviz_command(
         if e.errno == errno.ENOENT:
             barf(f"{tool!r} not found! Please install the Graphviz utility.", enoent_exit_code)
         else:
-            barf(f'A problem occurred calling {" ".join(argv)!r}', exception_exit_code)
+            barf(f"A problem occurred calling {' '.join(argv)!r}", exception_exit_code)
 
     out, err = p.communicate(input="\n".join(stdin_lines).encode("utf-8"))
 
     if p.returncode != 0:
         hint_part = f";\n{hint}" if hint else ""
         barf(
-            f'{tool!r} terminated prematurely with error code {p.returncode}{hint_part}.\n'
-            f'The error from {tool!r} was:\n'
-            f'>>>{err.decode("utf-8")}',
+            f"{tool!r} terminated prematurely with error code {p.returncode}{hint_part}.\n"
+            f"The error from {tool!r} was:\n"
+            f">>>{err.decode('utf-8')}",
             nonzero_exit_code,
         )
 

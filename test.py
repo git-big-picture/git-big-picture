@@ -85,7 +85,7 @@ class RunGraphvizCommandTest(ut.TestCase):
     def test_command_not_available(self):
         magic_exit_code = 123  # arbitrary
         expected_stderr = (
-            "fatal: 'no-such-thing-123' not found!" " Please install the Graphviz utility.\n"
+            "fatal: 'no-such-thing-123' not found! Please install the Graphviz utility.\n"
         )
 
         with (
