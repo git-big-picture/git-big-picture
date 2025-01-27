@@ -6,7 +6,7 @@ parameterized==0.9.0
 pytest==8.3.4
 
 # Indirect dependencies
-attrs==24.3.0
+attrs==25.1.0
 exceptiongroup==1.2.2
 importlib-metadata==8.6.1
 iniconfig==2.0.0
