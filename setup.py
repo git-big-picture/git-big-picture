@@ -49,7 +49,6 @@ setup(
     python_requires=">=3.9",
     packages=find_packages(),
     extras_require=_extras_require,
-    tests_require=_tests_require,
     entry_points={
         "console_scripts": [
             "git-big-picture = git_big_picture._main:main",
