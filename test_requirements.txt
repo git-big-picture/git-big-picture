@@ -3,7 +3,7 @@
 coverage==7.10.6
 cram==0.7
 parameterized==0.9.0
-pytest==8.4.1
+pytest==8.4.2
 
 # Indirect dependencies
 attrs==25.3.0
