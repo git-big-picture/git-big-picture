@@ -1,0 +1,83 @@
+#
+# This file is part of git-big-picture
+#
+# Copyright (c) 2010-2025 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2010      Julius Plenz <julius@plenz.com>
+# Copyright (c) 2010-2020 Valentin Haenel <valentin.haenel@gmx.de>
+# Copyright (c) 2025      Branch Vincent <branchevincent@gmail.com>
+#
+# git-big-picture is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# git-big-picture is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
+
+[project]
+name = "git-big-picture"
+description = "Git — the big picture"
+readme = "README.rst"
+license = "GPL-3.0-or-later"
+license-files = ["COPYING"]
+authors = [
+    { name = "Sebastian Pipping" },
+    { name = "Julius Plenz" },
+    { name = "Valentin Haenel" },
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/git-big-picture/git-big-picture"
+
+[project.optional-dependencies]
+# Keep in sync with test_requirements.txt
+tests = ["coverage", "cram", "parameterized", "pytest"]
+
+[project.scripts]
+git-big-picture = "git_big_picture._main:main"
+
+[tool.setuptools.data-files]
+"share/man/man1" = ["git-big-picture.1"]
+
+[tool.setuptools.dynamic]
+version = { attr = "git_big_picture.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["git_big_picture*"]
+
+[tool.ruff]
+indent-width = 4
+line-length = 99
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # Pyflakes + flake8
+    "I",  # isort
+    "UP", # pyupgrade
+    "W",  # pycodestyle
+]
+ignore = [
+    "UP031", # Use format specifiers instead of percent format; TODO drop
+]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
