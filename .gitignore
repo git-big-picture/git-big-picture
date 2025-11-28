@@ -1,6 +1,7 @@
 __pycache__/
 /.idea/
 /dist/
+/git_big_picture.egg-info/
 /htmlcov/
 /.coverage
 /README.htm
