@@ -15,6 +15,6 @@ pluggy==1.6.0
 Pygments==2.19.2
 pyparsing==3.3.1
 toml==0.10.2
-tomli==2.3.0
+tomli==2.4.0
 typing-extensions==4.15.0
 zipp==3.23.0
