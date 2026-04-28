@@ -69,12 +69,16 @@ TAGS = "tags"
 ROOTS = "roots"
 MERGES = "merges"
 BIFURCATIONS = "bifurcations"
+FILTER_INCLUDE = "include"
+FILTER_EXCLUDE = "exclude"
 FILTER_SETTINGS = [
     BRANCHES,
     TAGS,
     ROOTS,
     MERGES,
     BIFURCATIONS,
+    FILTER_INCLUDE,
+    FILTER_EXCLUDE,
 ]
 FILTER_DEFAULTS = {
     BRANCHES: True,
@@ -82,6 +86,8 @@ FILTER_DEFAULTS = {
     ROOTS: True,
     MERGES: False,
     BIFURCATIONS: False,
+    FILTER_INCLUDE: None,
+    FILTER_EXCLUDE: None,
 }
 
 # annotation settings
@@ -132,6 +138,11 @@ _EPILOG = textwrap.dedent("""
 
 _RIGHT_COLUMN_WRAP_WIDTH = 57
 
+def regex_type(s):
+    try:
+        return re.compile(s)
+    except re.error as e:
+        raise argparse.ArgumentTypeError(f"Invalid regex: {s} - {e}")
 
 def create_parser():
     parser = argparse.ArgumentParser(
@@ -372,6 +383,20 @@ def create_parser():
         action="store_false",
         dest=MESSAGES,
         help="do not include commit messages on labels",
+    )
+    filter_group.add_argument(
+        "--include",
+        default=None,
+        type=regex_type,
+        dest=FILTER_INCLUDE,
+        help="include tags/branches matching regexp FILTER_INCLUDE",
+    )
+    filter_group.add_argument(
+        "--exclude",
+        default=None,
+        type=regex_type,
+        dest=FILTER_EXCLUDE,
+        help="exclude tags/branches matching regexp FILTER_EXCLUDE",
     )
 
     # miscellaneous options
@@ -786,6 +811,7 @@ class Git:
         """
 
         ref_format = "[%(objectname), %(*objectname), %(objecttype), %(refname)]"
+
         output = self(["git", "for-each-ref", f"--format={ref_format}", "--python"])
         lbranch_prefix = "refs/heads/"
         rbranch_prefix = "refs/remotes/"
@@ -948,6 +974,8 @@ class CommitGraph:
         merges=FILTER_DEFAULTS[MERGES],
         bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
         additional=None,
+        include=FILTER_DEFAULTS[FILTER_INCLUDE],
+        exclude=FILTER_DEFAULTS[FILTER_EXCLUDE],
     ):
         """Filter the commit graph.
 
@@ -973,6 +1001,10 @@ class CommitGraph:
             include bifurcation commits
         additional : list of SHA1 sums
             any additional commits to include
+        include : regexp
+            pattern to match branches/tags to include
+        exclude : regexp
+            pattern to match branches/tags to exclude
 
         Returns
         -------
@@ -981,10 +1013,35 @@ class CommitGraph:
 
         """
         interesting = []
+
         if branches:
-            interesting.extend(self.branches.keys())
+            if include:
+                if exclude:
+                    interesting.extend({k for k, v in self.branches.items()
+                                        if any((re.search(include, elt) and
+                                                not re.search(exclude, elt)) for elt in v) })
+                else:
+                    interesting.extend({k for k, v in self.branches.items()
+                                        if any((re.search(include, elt)) for elt in v) })
+            elif exclude:
+                interesting.extend({k for k, v in self.branches.items()
+                                    if any((not re.search(exclude, elt)) for elt in v) })
+            else:
+                interesting.extend(self.branches.keys())
         if tags:
-            interesting.extend(self.tags.keys())
+            if include:
+                if exclude:
+                    interesting.extend({k for k, v in self.tags.items()
+                                        if any((re.search(include, elt) and
+                                                (not re.search(exclude, elt))) for elt in v) })
+                else:
+                    interesting.extend({k for k, v in self.tags.items()
+                                        if any(re.search(include, elt) for elt in v) })
+            elif exclude:
+                interesting.extend({k for k, v in self.tags.items()
+                                    if any((not re.search(exclude, elt)) for elt in v) })
+            else:
+                interesting.extend(self.tags.keys())
         if roots:
             interesting.extend(self.roots)
         if merges:
