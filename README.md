@@ -237,6 +237,12 @@ filter options:
                         include commit messages on labels
   -C, --no-commit-messages
                         do not include commit messages on labels
+  --keep-tags REGEX     show tags matching regexp pattern
+  --keep-branches REGEX
+                        show branches matching regexp pattern
+  --drop-tags REGEX     drop tags matching regexp pattern
+  --drop-branches REGEX
+                        drop branches matching regexp pattern
 
 git-big-picture is software libre, licensed under the GPL v3 or later license.
 Please report bugs at https://github.com/git-big-picture/git-big-picture/issues — thank you!
@@ -364,6 +370,21 @@ Show all commits:
 $ git-big-picture -a
 ```
 
+### Using Filter Pattern Options
+
+By default, if `--tags` or `--branches` are active, then all nodes
+with tags or branches are shown.
+
+The four options `--keep-branches`, `--keep-tags`, `--drop-branches`,
+and `--drop-tags` allow suppression of some of these labels.  If a
+flag `--keep-tags re` is provided, then only those tags matching the
+regular expression `re` are shown.  If a flag `--drop-tags re_drop` is
+provided, then those tags matching `re_drop` are *not* shown.  The
+flags `--keep-branches re` and `--drop-branches re` work the same way
+for branch labels.
+
+If `--no-tags` or `--no-branches` is selected, then these flags have
+no effect.
 
 ## Configuration
 
@@ -473,6 +494,12 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
 
 ## Changelog
+
+- Unreleased changes
+  - **New Features and Improvements**
+    - Add flags to show or suppress tags or labels matching regular
+      expressions.
+      ([#671](https://github.com/git-big-picture/git-big-picture/pull/671))
 
 - `v1.3.0` — 2024-03-08
   - **New Features and Improvements**

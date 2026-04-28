@@ -20,6 +20,7 @@
 # along with git-big-picture.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 import shlex
 import shutil as sh
 import sys
@@ -478,3 +479,244 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
             p: {b},
         }
         self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+
+    def test_keep_drop(self):
+        r"""Test keep and drop.
+
+        Before:
+
+          x---A---B---C---D---E---F master
+              |   |    \         /
+             0.0 0.1    N---O---P topic1
+
+        After:
+
+            A 0.0---B 0.1---F master
+                      \     /
+                       P topic1
+
+        """
+        x = empty_commit("x")
+        a = empty_commit("A")
+        tag(a, "0.0")
+        b = empty_commit("B")
+        tag(b, "0.1")
+        c = empty_commit("C")
+        empty_commit("D")
+        empty_commit("E")
+        dispatch("git checkout -b topic1 %s" % c)
+        empty_commit("N")
+        empty_commit("O")
+        p = empty_commit("P")
+        dispatch("git checkout master")
+        dispatch("git merge topic1")
+        f = get_head_sha()
+        graph = self.graph
+        filtered_graph = graph.filter(roots=False)
+        expected_reduced_parents = {
+            a: set(),
+            b: {a},
+            f: {p, b},
+            p: {b},
+        }
+        dispatch(f"git log --oneline {f}..{p}")
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
+
+        # include nodes with tags matching "1" and branches matching "[a-z]"
+        # After:
+        #
+        #          B 0.1---F master
+        #             \     /
+        #              P topic1
+        filtered_graph2 = graph.filter(
+            roots=False, keep_tags=re.compile("1"), keep_branches=re.compile("[a-z]")
+        )
+        expected_reduced_parents2 = {
+            b: set(),
+            f: {p, b},
+            p: {b},
+        }
+        dispatch("git tree")
+        self.assertEqual(expected_reduced_parents2, filtered_graph2.parents)
+
+        # Check tags and branch patterns are used appropriately, by swapping patterns
+        # include nodes with branches matching "1" and tags matching "[a-z]"
+        # After:
+        #
+        #              P topic1
+        filtered_graph2a = graph.filter(
+            roots=False, keep_tags=re.compile("[a-z]"), keep_branches=re.compile("1")
+        )
+        expected_reduced_parents2a = {
+            p: set(),
+        }
+        dispatch("git tree")
+        self.assertEqual(expected_reduced_parents2a, filtered_graph2a.parents)
+
+        # drop node topic1, exclude roots
+        # After:
+        #     A 0.0---B 0.1---master
+
+        filtered_graph3 = graph.filter(roots=False, drop_branches=re.compile("topic1"))
+        expected_reduced_parents3 = {
+            a: set(),
+            b: {a},
+            f: {b},
+        }
+        dispatch("git tree")
+        self.assertEqual(expected_reduced_parents3, filtered_graph3.parents)
+
+        # drop node topic1 and tag 0.1, exclude roots
+        # After:
+        #     A 0.0---master
+
+        filtered_graph3a = graph.filter(
+            roots=False, drop_branches=re.compile("topic1"), drop_tags=re.compile("0\\.1")
+        )
+        expected_reduced_parents3a = {
+            a: set(),
+            f: {a},
+        }
+        dispatch("git tree")
+        self.assertEqual(expected_reduced_parents3a, filtered_graph3a.parents)
+
+        # drop node topic1, keep roots
+        # After:
+        #     x -- A 0.0---B 0.1---master
+
+        filtered_graph4 = graph.filter(roots=True, drop_branches=re.compile("topic1"))
+        expected_reduced_parents4 = {
+            x: set(),
+            a: {x},
+            b: {a},
+            f: {b},
+        }
+        dispatch("git tree")
+        self.assertEqual(expected_reduced_parents4, filtered_graph4.parents)
+
+        # drop node topic1, keep tags 0.0 except those containing 1, keep roots
+        # After:
+        #     x -- A 0.0---master
+
+        filtered_graph4 = graph.filter(
+            roots=True,
+            drop_branches=re.compile("topic1"),
+            keep_tags=re.compile("0"),
+            drop_tags=re.compile("1"),
+        )
+        expected_reduced_parents4 = {
+            x: set(),
+            a: {x},
+            f: {a},
+        }
+        dispatch("git tree")
+        self.assertEqual(expected_reduced_parents4, filtered_graph4.parents)
+
+    def test_more_realistic_keep_drop(self):
+        r"""Test a slightly larger DAG
+
+        input:
+                        0.1.1   0.1.2     lab
+                          |       |       |
+            0.0       G---H---I---J---K---L---M maint
+            |        /
+            |       |          epic
+            A---Q---B---C---D---E---F master
+                |   |    \         /
+               qed  0.1    N---O---P topic
+                               |
+                              optic
+        output:
+
+                       0.1.1   0.1.2    lab
+                         |       |       |
+                     ----H-------J-------L
+                    /
+                   |
+               Q---B-----------E epic
+               |   |    \
+              qed  0.1   -----O optic
+
+        """
+        a = empty_commit("A")
+        tag(a, "0.0")
+        q = empty_commit("Q")
+        dispatch("git checkout -b qed %s" % q)
+        dispatch("git checkout master")
+        b = empty_commit("B")
+        tag(b, "0.1")
+        c = empty_commit("C")
+        empty_commit("D")
+        e = empty_commit("E")
+        dispatch("git checkout -b epic %s" % e)
+        dispatch("git checkout -b maint %s" % b)
+        empty_commit("G")
+        h = empty_commit("H")
+        tag(h, "0.1.1")
+        empty_commit("I")
+        j = empty_commit("J")
+        tag(j, "0.1.2")
+        empty_commit("K")
+        node_l = empty_commit("L")
+        dispatch("git checkout -b lab")
+        dispatch("git checkout maint")
+        empty_commit("M")
+        dispatch("git checkout -b topic %s" % c)
+        empty_commit("N")
+        o = empty_commit("O")
+        dispatch("git checkout -b optic")
+        dispatch("git checkout topic")
+        empty_commit("P")
+        dispatch("git checkout master")
+        dispatch("git merge topic")
+        get_head_sha()
+        graph = self.graph
+        dispatch("git tree")
+        filtered_graph = graph.filter(
+            roots=False,
+            keep_tags=re.compile("1"),
+            keep_branches=re.compile("[a-z]"),
+            drop_branches=re.compile("main|aster|topic"),
+        )
+        expected_reduced_parents = {
+            node_l: {j},
+            j: {h},
+            h: {b},
+            b: {q},
+            e: {b},
+            o: {b},
+            q: set(),
+        }
+
+        # same thing, but include bifurcations
+        # output:
+        #
+        #                0.1.1   0.1.2    lab
+        #                  |       |       |
+        #              ----H-------J-------L
+        #             /
+        #            |
+        #        Q---B---C-------E epic
+        #        |   |    \
+        #       qed  0.1   -----O optic
+        self.maxDiff = None
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
+
+        filtered_graph2 = graph.filter(
+            roots=False,
+            bifurcations=True,
+            keep_tags=re.compile("[1]"),
+            keep_branches=re.compile("[a-z]"),
+            drop_branches=re.compile("main|aster|topic"),
+        )
+        expected_reduced_parents2 = {
+            node_l: {j},
+            j: {h},
+            h: {b},
+            b: {q},
+            c: {b},
+            e: {c},
+            o: {c},
+            q: set(),
+        }
+        self.assertEqual(expected_reduced_parents2, filtered_graph2.parents)
