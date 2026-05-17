@@ -58,6 +58,6 @@ jobs:
 
       - name: Check if the readme is in sync with --help output
         run: |-
-          sed 's,OPTIONS,XXX,' -i README.rst  # to enforce a diff for the generator to remove
+          sed 's,OPTIONS,XXX,' -i README.md  # to enforce a diff for the generator to remove
           ./sync-readme-with-help-output.sh
-          git diff --exit-code -- README.rst
+          git diff --exit-code -- README.md

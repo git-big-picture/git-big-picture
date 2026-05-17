@@ -36,10 +36,12 @@ text_after_help_output() {
 }
 
 {
-    text_before_help_output README.rst
-    git-big-picture --help | sed '/./ s,^,    ,'
+    text_before_help_output README.md
+    git-big-picture --help
+    echo '```'
     echo
-    text_after_help_output README.rst
+    echo
+    text_after_help_output README.md
 } > "${tempfile}"
 
-mv "${tempfile}" README.rst
+mv "${tempfile}" README.md
