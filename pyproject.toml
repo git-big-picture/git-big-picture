@@ -22,7 +22,7 @@
 [project]
 name = "git-big-picture"
 description = "Git — the big picture"
-readme = "README.rst"
+readme = "README.md"
 license = "GPL-3.0-or-later"
 license-files = ["COPYING"]
 authors = [
