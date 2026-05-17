@@ -53,11 +53,11 @@ But since the commits would be labeled with their refs, it would look
 more like (within the limits of ASCII art):
 
 ```
-      0.1.1---0.1.2---maint
-     /
+          0.1.1---0.1.2---maint
+         /
 0.0---0.1---master
-        \     /
-         topic
+         \     /
+          topic
 ```
 
 
