@@ -210,6 +210,16 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         }
         self.assertEqual(expected_parents, filterd_graph.parents)
 
+    def test_filter_no_roots(self):
+        a = empty_commit("a")
+        b = empty_commit("b")
+        graph = self.graph
+        filterd_graph = graph.filter(roots=False)
+        expected_parents = {
+            b: set(),
+        }
+        self.assertEqual(expected_parents, filterd_graph.parents)
+
     def test_find_merges_bifurcations(self):
         r"""Check that finding merges and bifurcations works.
 
