@@ -65,7 +65,7 @@ class _GitRepoTestMixin:
         self.oldpwd = os.getcwd()
         os.chdir(self.testing_dir)
 
-        dispatch("git init")
+        dispatch("git init -b master")
         dispatch("git config user.name git-big-picture")
         dispatch("git config user.email git-big-picture@example.org")
 
