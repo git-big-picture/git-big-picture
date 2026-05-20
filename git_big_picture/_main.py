@@ -69,12 +69,20 @@ TAGS = "tags"
 ROOTS = "roots"
 MERGES = "merges"
 BIFURCATIONS = "bifurcations"
+FILTER_KEEP_BRANCHES = "keep_branches"
+FILTER_KEEP_TAGS = "keep_tags"
+FILTER_DROP_BRANCHES = "drop_branches"
+FILTER_DROP_TAGS = "drop_tags"
 FILTER_SETTINGS = [
     BRANCHES,
     TAGS,
     ROOTS,
     MERGES,
     BIFURCATIONS,
+    FILTER_KEEP_BRANCHES,
+    FILTER_KEEP_TAGS,
+    FILTER_DROP_BRANCHES,
+    FILTER_DROP_TAGS,
 ]
 FILTER_DEFAULTS = {
     BRANCHES: True,
@@ -82,6 +90,10 @@ FILTER_DEFAULTS = {
     ROOTS: True,
     MERGES: False,
     BIFURCATIONS: False,
+    FILTER_KEEP_BRANCHES: None,
+    FILTER_KEEP_TAGS: None,
+    FILTER_DROP_BRANCHES: None,
+    FILTER_DROP_TAGS: None,
 }
 
 # annotation settings
@@ -131,6 +143,13 @@ _EPILOG = textwrap.dedent("""
 """)
 
 _RIGHT_COLUMN_WRAP_WIDTH = 57
+
+
+def regex_type(s):
+    try:
+        return re.compile(s)
+    except re.error as e:
+        raise argparse.ArgumentTypeError(f"Invalid regex: {s} - {e}")
 
 
 def create_parser():
@@ -372,6 +391,34 @@ def create_parser():
         action="store_false",
         dest=MESSAGES,
         help="do not include commit messages on labels",
+    )
+    filter_group.add_argument(
+        "--keep-tags",
+        type=regex_type,
+        dest=FILTER_KEEP_TAGS,
+        metavar="REGEX",
+        help="show tags matching regexp pattern",
+    )
+    filter_group.add_argument(
+        "--keep-branches",
+        type=regex_type,
+        dest=FILTER_KEEP_BRANCHES,
+        metavar="REGEX",
+        help="show branches matching regexp pattern",
+    )
+    filter_group.add_argument(
+        "--drop-tags",
+        type=regex_type,
+        dest=FILTER_DROP_TAGS,
+        metavar="REGEX",
+        help="drop tags matching regexp pattern",
+    )
+    filter_group.add_argument(
+        "--drop-branches",
+        type=regex_type,
+        dest=FILTER_DROP_BRANCHES,
+        metavar="REGEX",
+        help="drop branches matching regexp pattern",
     )
 
     # miscellaneous options
@@ -948,6 +995,10 @@ class CommitGraph:
         merges=FILTER_DEFAULTS[MERGES],
         bifurcations=FILTER_DEFAULTS[BIFURCATIONS],
         additional=None,
+        keep_branches=FILTER_DEFAULTS[FILTER_KEEP_BRANCHES],
+        keep_tags=FILTER_DEFAULTS[FILTER_KEEP_TAGS],
+        drop_branches=FILTER_DEFAULTS[FILTER_DROP_BRANCHES],
+        drop_tags=FILTER_DEFAULTS[FILTER_DROP_TAGS],
     ):
         """Filter the commit graph.
 
@@ -973,6 +1024,14 @@ class CommitGraph:
             include bifurcation commits
         additional : list of SHA1 sums
             any additional commits to include
+        keep_branches : regexp
+            pattern to match branches to include (if branches=True), default=All
+        keep_tags : regexp
+            pattern to match tags to include (if tags=True), default=All
+        drop_branches : regexp
+            pattern to match branches to drop (of those included above), default=None
+        drop_tags : regexp
+            pattern to match tags to drop (of those included above), default=None
 
         Returns
         -------
@@ -981,10 +1040,81 @@ class CommitGraph:
 
         """
         interesting = []
+
         if branches:
-            interesting.extend(self.branches.keys())
+            if keep_branches:
+                if drop_branches:
+                    interesting.extend(
+                        {
+                            sha1
+                            for sha1, branch_names in self.branches.items()
+                            if any(
+                                (
+                                    re.search(keep_branches, branch_name)
+                                    and not re.search(drop_branches, branch_name)
+                                )
+                                for branch_name in branch_names
+                            )
+                        }
+                    )
+                else:
+                    interesting.extend(
+                        {
+                            sha1
+                            for sha1, branch_names in self.branches.items()
+                            if any(
+                                re.search(keep_branches, branch_name)
+                                for branch_name in branch_names
+                            )
+                        }
+                    )
+            elif drop_branches:
+                interesting.extend(
+                    {
+                        sha1
+                        for sha1, branch_names in self.branches.items()
+                        if any(
+                            (not re.search(drop_branches, branch_name))
+                            for branch_name in branch_names
+                        )
+                    }
+                )
+            else:
+                interesting.extend(self.branches.keys())
         if tags:
-            interesting.extend(self.tags.keys())
+            if keep_tags:
+                if drop_tags:
+                    interesting.extend(
+                        {
+                            sha1
+                            for sha1, tag_names in self.tags.items()
+                            if any(
+                                (
+                                    re.search(keep_tags, tag_name)
+                                    and (not re.search(drop_tags, tag_name))
+                                )
+                                for tag_name in tag_names
+                            )
+                        }
+                    )
+                else:
+                    interesting.extend(
+                        {
+                            sha1
+                            for sha1, tag_names in self.tags.items()
+                            if any(re.search(keep_tags, tag_name) for tag_name in tag_names)
+                        }
+                    )
+            elif drop_tags:
+                interesting.extend(
+                    {
+                        sha1
+                        for sha1, tag_names in self.tags.items()
+                        if any((not re.search(drop_tags, tag_name)) for tag_name in tag_names)
+                    }
+                )
+            else:
+                interesting.extend(self.tags.keys())
         if roots:
             interesting.extend(self.roots)
         if merges:

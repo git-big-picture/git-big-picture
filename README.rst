@@ -187,7 +187,7 @@ Usage
     output options:
       Options to control output and format
 
-      -f, --format FMT      set output format [svg, png, ps, pdf, ...]
+      -f FMT, --format FMT  set output format [svg, png, ps, pdf, ...]
       --history-direction {downwards,leftwards,rightwards,upwards}
                             enforce a specific direction of history on Graphviz
                             (default: rightwards)
@@ -197,11 +197,13 @@ Usage
       -G, --no-graphviz     disable dot/graphviz output
       -p, --processed       output the dot processed, binary data
       -P, --no-processed    disable binary output
-      -v, --viewer CMD      write image to tempfile and start specified viewer
+      -v CMD, --viewer CMD  write image to tempfile and start specified viewer
       -V, --no-viewer       disable starting viewer
-      -o, --outfile FILE    write image to specified file
+      -o FILE, --outfile FILE
+                            write image to specified file
       -O, --no-outfile      disable writing image to file
-      -w, --wait SECONDS    wait for SECONDS seconds before deleting the temporary
+      -w SECONDS, --wait SECONDS
+                            wait for SECONDS seconds before deleting the temporary
                             file that is opened using the viewer command (default:
                             2.0 seconds); this helps e.g. with viewer commands that
                             tell other running processes to open that file on their
@@ -230,6 +232,12 @@ Usage
                             include commit messages on labels
       -C, --no-commit-messages
                             do not include commit messages on labels
+      --keep-tags REGEX     show tags matching regexp pattern
+      --keep-branches REGEX
+                            show branches matching regexp pattern
+      --drop-tags REGEX     drop tags matching regexp pattern
+      --drop-branches REGEX
+                            drop branches matching regexp pattern
 
     git-big-picture is software libre, licensed under the GPL v3 or later license.
     Please report bugs at https://github.com/git-big-picture/git-big-picture/issues — thank you!
@@ -463,6 +471,13 @@ uses Graphviz too:
 
 Changelog
 ---------
+
+* Unreleased changes
+
+  * **New Features and Improvements**
+
+    * Add flags to show or suppress tags or labels matching regular expressions.
+      ([#671](https://github.com/git-big-picture/git-big-picture/pull/671))
 
 * ``v1.3.0`` — 2024-03-08
 
