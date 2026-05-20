@@ -105,7 +105,7 @@ We also have a real world examples from:
 
 ## Dependencies
 
-- Python \>=3.10
+- Python \>=3.10 (Python \>=3.13 to generate docs)
 - Git (1.7.1 works)
 - Graphviz utility
 - pytest and Cram (only for running tests)
@@ -509,6 +509,12 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
       ([#678](https://github.com/git-big-picture/git-big-picture/pull/678))
     - Document changes since release 1.3.0
       ([#683](https://github.com/git-big-picture/git-big-picture/pull/683))
+    - Document that doc creation scripts need Python >=3.13.
+      ([#681](https://github.com/git-big-picture/git-big-picture/pull/681))
+    - Fix creation scripts to test for appropriate Python version.
+      ([#681](https://github.com/git-big-picture/git-big-picture/pull/681))
+    - Fix doc creation scripts to generate docs for version in current directory.
+      ([#681](https://github.com/git-big-picture/git-big-picture/pull/681))
 - `v1.3.0` — 2024-03-08
   - **New Features and Improvements**
     - Make Graphviz output more deterministic
