@@ -474,6 +474,41 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
 ## Changelog
 
+- `UNRELEASED` — YYYY-MM-DD
+  - **New Features and Improvements**
+    - Add support for Python 3.13 and 3.14
+      ([#485](https://github.com/git-big-picture/git-big-picture/pull/485),
+      [#601](https://github.com/git-big-picture/git-big-picture/pull/601),
+      [#675](https://github.com/git-big-picture/git-big-picture/pull/675))
+  - **Dropped Features**
+    - Drop support for end-of-life Python 3.8 and 3.9
+      ([#478](https://github.com/git-big-picture/git-big-picture/pull/478),
+      [#483](https://github.com/git-big-picture/git-big-picture/pull/483),
+      [#601](https://github.com/git-big-picture/git-big-picture/pull/601))
+  - **Under the Hood**
+    - Fix typos in the readme
+      ([#401](https://github.com/git-big-picture/git-big-picture/pull/401))
+    - Make GitHub Actions enforce codespell clean code
+      ([#402](https://github.com/git-big-picture/git-big-picture/pull/402))
+    - Drop GitHub Actions permissions to minimum for security
+      ([#403](https://github.com/git-big-picture/git-big-picture/pull/403))
+    - Migrate from YAPF to ruff format
+      ([#484](https://github.com/git-big-picture/git-big-picture/pull/484))
+    - Remove `tests_require=` from `setup.py` for Setuptools >=72.0.0
+      ([#537](https://github.com/git-big-picture/git-big-picture/pull/537))
+    - Migrate to `pyproject.toml`
+      ([#602](https://github.com/git-big-picture/git-big-picture/pull/602))
+    - Migrate the readme from reStructuredText to Markdown
+      ([#673](https://github.com/git-big-picture/git-big-picture/pull/673),
+      [#682](https://github.com/git-big-picture/git-big-picture/pull/XXXXXXXX))
+    - Fix an ASCII Git graph in the readme
+      ([#673](https://github.com/git-big-picture/git-big-picture/pull/673))
+    - Document that the project is in maintenance mode
+      ([#674](https://github.com/git-big-picture/git-big-picture/pull/674))
+    - Explicitly specify initial branch name in tests
+      ([#678](https://github.com/git-big-picture/git-big-picture/pull/678))
+    - Document changes since release 1.3.0
+      ([#683](https://github.com/git-big-picture/git-big-picture/pull/683))
 - `v1.3.0` — 2024-03-08
   - **New Features and Improvements**
     - Make Graphviz output more deterministic
