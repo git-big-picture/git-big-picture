@@ -19,6 +19,14 @@
 set -e
 set -o pipefail
 
+python3 <<EOF
+import sys
+if sys.version_info < (3, 13):
+    print("Error: Need Python >= 3.13 to update manpage;" +
+          f" found version {'.'.join(map(str, sys.version_info[:3]))}.", file=sys.stderr)
+    sys.exit(1)
+EOF
+
 _BUILD_MONTH=2024-03  # for reproducible builds; bump when doing releases
 
 sed_args=(
@@ -41,6 +49,6 @@ sed_args=(
 )
 
 SOURCE_DATE_EPOCH="$(date --date="${_BUILD_MONTH}-15" +%s)" \
-    help2man --no-info --locale en_US.UTF-8 --name 'Visualize Git repositories' git-big-picture \
+    help2man --no-info --locale en_US.UTF-8 --name 'Visualize Git repositories' 'python3 ./git_big_picture/_main.py' \
     | sed "${sed_args[@]}" \
     > git-big-picture.1

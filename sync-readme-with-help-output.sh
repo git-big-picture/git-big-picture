@@ -19,6 +19,14 @@
 set -e
 set -o pipefail
 
+python3 <<EOF
+import sys
+if sys.version_info < (3, 13):
+    print("Error: Need Python version >= 3.13 to update README.md;" +
+          f" found version {'.'.join(map(str, sys.version_info[:3]))}.", file=sys.stderr)
+    sys.exit(1)
+EOF
+
 tempfile="$(mktemp)"
 remove_tempfile() {
     if [[ -e "${tempfile}" ]]; then
@@ -37,7 +45,7 @@ text_after_help_output() {
 
 {
     text_before_help_output README.md
-    git-big-picture --help
+    python3 ./git_big_picture/_main.py --help
     echo '```'
     echo
     echo
