@@ -173,7 +173,6 @@ def create_parser():
     format_group.add_argument(
         "-g",
         "--graphviz",
-        default=None,
         action="store_true",
         dest=GRAPHVIZ,
         help="output lines suitable as input for dot/graphviz",
@@ -181,7 +180,6 @@ def create_parser():
     format_group.add_argument(
         "-G",
         "--no-graphviz",
-        default=None,
         action="store_false",
         dest=GRAPHVIZ,
         help="disable dot/graphviz output",
@@ -190,7 +188,6 @@ def create_parser():
     format_group.add_argument(
         "-p",
         "--processed",
-        default=None,
         action="store_true",
         dest=PROCESSED,
         help="output the dot processed, binary data",
@@ -198,7 +195,6 @@ def create_parser():
     format_group.add_argument(
         "-P",
         "--no-processed",
-        default=None,
         action="store_false",
         dest=PROCESSED,
         help="disable binary output",
@@ -214,7 +210,6 @@ def create_parser():
     format_group.add_argument(
         "-V",
         "--no-viewer",
-        default=None,
         action="store_false",
         dest=VIEWER,
         help="disable starting viewer",
@@ -226,7 +221,6 @@ def create_parser():
     format_group.add_argument(
         "-O",
         "--no-outfile",
-        default=None,
         action="store_false",
         dest=OUT_FILE,
         help="disable writing image to file",
@@ -260,7 +254,6 @@ def create_parser():
     filter_group.add_argument(
         "-a",
         "--all",
-        default=None,
         action="store_true",
         dest="all_commits",
         help="include all commits",
@@ -269,7 +262,6 @@ def create_parser():
     filter_group.add_argument(
         "-b",
         "--branches",
-        default=None,
         action="store_true",
         dest=BRANCHES,
         help="show commits pointed to by branches",
@@ -277,7 +269,6 @@ def create_parser():
     filter_group.add_argument(
         "-B",
         "--no-branches",
-        default=None,
         action="store_false",
         dest=BRANCHES,
         help="do not show commits pointed to by branches",
@@ -286,7 +277,6 @@ def create_parser():
     filter_group.add_argument(
         "-t",
         "--tags",
-        default=None,
         action="store_true",
         dest=TAGS,
         help="show commits pointed to by tags",
@@ -294,19 +284,17 @@ def create_parser():
     filter_group.add_argument(
         "-T",
         "--no-tags",
-        default=None,
         action="store_false",
         dest=TAGS,
         help="do not show commits pointed to by tags",
     )
 
     filter_group.add_argument(
-        "-r", "--roots", default=None, action="store_true", dest=ROOTS, help="show root commits"
+        "-r", "--roots", action="store_true", dest=ROOTS, help="show root commits"
     )
     filter_group.add_argument(
         "-R",
         "--no-roots",
-        default=None,
         action="store_false",
         dest=ROOTS,
         help="do not show root commits",
@@ -315,7 +303,6 @@ def create_parser():
     filter_group.add_argument(
         "-m",
         "--merges",
-        default=None,
         action="store_true",
         dest=MERGES,
         help="include merge commits",
@@ -323,7 +310,6 @@ def create_parser():
     filter_group.add_argument(
         "-M",
         "--no-merges",
-        default=None,
         action="store_false",
         dest=MERGES,
         help="do not include merge commits",
@@ -332,7 +318,6 @@ def create_parser():
     filter_group.add_argument(
         "-i",
         "--bifurcations",
-        default=None,
         action="store_true",
         dest=BIFURCATIONS,
         help="\n".join(
@@ -351,7 +336,6 @@ def create_parser():
     filter_group.add_argument(
         "-I",
         "--no-bifurcations",
-        default=None,
         action="store_false",
         dest=BIFURCATIONS,
         help="do not include bifurcation commits",
@@ -360,7 +344,6 @@ def create_parser():
     filter_group.add_argument(
         "-c",
         "--commit-messages",
-        default=None,
         action="store_true",
         dest=MESSAGES,
         help="include commit messages on labels",
@@ -368,7 +351,6 @@ def create_parser():
     filter_group.add_argument(
         "-C",
         "--no-commit-messages",
-        default=None,
         action="store_false",
         dest=MESSAGES,
         help="do not include commit messages on labels",
