@@ -203,12 +203,12 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         a = empty_commit("a")
         b = empty_commit("b")
         graph = self.graph
-        filterd_graph = graph.filter(roots=True)
+        filtered_graph = graph.filter(roots=True)
         expected_parents = {
             a: set(),
             b: {a},
         }
-        self.assertEqual(expected_parents, filterd_graph.parents)
+        self.assertEqual(expected_parents, filtered_graph.parents)
 
     def test_filter_no_roots(self):
         empty_commit("a")
@@ -278,12 +278,12 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         empty_commit("B")
         c = empty_commit("C")
         graph = self.graph
-        filterd_graph = graph.filter()
+        filtered_graph = graph.filter()
         expected_reduced_parents = {
             a: set(),
             c: {a},
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
 
     def test_filter_with_tags(self):
         """Remove three commits and root commit
@@ -302,25 +302,25 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         f = empty_commit("F")
         graph = self.graph
         # use the defaults
-        filterd_graph = graph.filter()
+        filtered_graph = graph.filter()
         expected_reduced_parents = {
             a: set(),
             b: {a},
             f: {b},
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
-        filterd_graph = graph.filter(roots=False)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
+        filtered_graph = graph.filter(roots=False)
         expected_reduced_parents = {
             b: set(),
             f: {b},
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
-        filterd_graph = graph.filter(tags=False)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
+        filtered_graph = graph.filter(tags=False)
         expected_reduced_parents = {
             a: set(),
             f: {a},
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
 
     def test_no_commit_tags(self):
         """Test for tree-tag and a blob-tag."""
@@ -341,13 +341,13 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         dispatch("git reset")
 
         graph = self.graph
-        filterd_graph = graph.filter()
+        filtered_graph = graph.filter()
         expected_reduced_parents = {
             blob_hash: set(),
             tree_hash: set(),
             a: set(),
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
 
     def test_parent_of_parent_loop(self):
         r"""Test the case, where an alternative route may lead to a parents
@@ -382,13 +382,13 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         dispatch("git branch -d topic")
 
         graph = self.graph
-        filterd_graph = graph.filter()
+        filtered_graph = graph.filter()
         expected_reduced_parents = {
             d: {a},
             a: set(),
             f: {a, d},
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
 
     def test_expose_multi_parent_bug(self):
         r"""Test for a peculiar bug that used to exist in pruning the graph.
@@ -421,7 +421,7 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         dispatch("git merge topic")
         f = get_head_sha()
         graph = self.graph
-        filterd_graph = graph.filter()
+        filtered_graph = graph.filter()
         expected_reduced_parents = {
             b: {a},
             a: set(),
@@ -429,7 +429,7 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
             p: {b},
         }
         dispatch(f"git log --oneline {f}..{p}")
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
 
     def test_more_realistic(self):
         r"""Test a slightly larger DAG
@@ -476,7 +476,7 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
         dispatch("git merge topic")
         f = get_head_sha()
         graph = self.graph
-        filterd_graph = graph.filter()
+        filtered_graph = graph.filter()
         expected_reduced_parents = {
             m: {j},
             j: {h},
@@ -486,4 +486,4 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
             f: {p, b},
             p: {b},
         }
-        self.assertEqual(expected_reduced_parents, filterd_graph.parents)
+        self.assertEqual(expected_reduced_parents, filtered_graph.parents)
