@@ -17,4 +17,4 @@ pyparsing==3.3.3
 toml==0.10.2
 tomli==2.5.0
 typing-extensions==4.16.0
-zipp==4.1.1
+zipp==4.1.2
