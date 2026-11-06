@@ -41,7 +41,7 @@ jobs:
     - name: Install build dependencies (Linux only)
       if: runner.os == 'Linux'
       run: |
-        sudo apt-get install --no-install-recommends -y graphviz
+        sudo apt-get install --no-install-recommends -y graphviz graphviz-tools
     - name: Install build dependencies (macOS only)
       if: runner.os == 'macOS'
       run: |
