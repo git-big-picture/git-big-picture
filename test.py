@@ -487,3 +487,39 @@ class TestGitTools(_GitRepoTestMixin, ut.TestCase):
             p: {b},
         }
         self.assertEqual(expected_reduced_parents, filtered_graph.parents)
+
+class EmptyCommitMessageTest(ut.TestCase):
+    """Commits with an empty message must not crash commit-message labels."""
+
+    def setUp(self):
+        """Create a temporary repo with a normal and an empty-message commit."""
+        self.testing_dir = tf.mkdtemp(prefix="gbp-testing-")
+        self.oldpwd = os.getcwd()
+        os.chdir(self.testing_dir)
+
+        dispatch("git init -b master")
+        dispatch("git config user.name git-big-picture")
+        dispatch("git config user.email git-big-picture@example.org")
+        dispatch("git commit --allow-empty -m subject")
+        dispatch("git commit --allow-empty --allow-empty-message -m ''")
+
+    def tearDown(self):
+        os.chdir(self.oldpwd)
+        # Retry removal: on Windows, fresh git objects may still be
+        # held briefly by background indexing/virus scanners.
+        for _ in range(10):
+            try:
+                sh.rmtree(self.testing_dir)
+                break
+            except PermissionError:
+                import time
+
+                time.sleep(0.5)
+        else:
+            sh.rmtree(self.testing_dir, ignore_errors=True)
+
+    def test_generate_dot_file_with_empty_commit_message(self):
+        opts = gbp.create_parser().parse_args(["--graphviz", "-c"])
+
+        with patch("sys.stdout", StringIO()):
+            gbp.innermost_main(opts)
