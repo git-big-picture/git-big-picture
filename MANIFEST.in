@@ -1,2 +1,3 @@
+include .cramrc
 include test.cram
 include test.py
