@@ -27,7 +27,7 @@ if sys.version_info < (3, 13):
     sys.exit(1)
 EOF
 
-_BUILD_MONTH=2024-03  # for reproducible builds; bump when doing releases
+_BUILD_MONTH=2026-11  # for reproducible builds; bump when doing releases
 
 sed_args=(
     # Produce familiar section "synopsis"
