@@ -504,7 +504,7 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
       ([#620](https://github.com/git-big-picture/git-big-picture/pull/620))
     - Migrate the readme from reStructuredText to Markdown
       ([#673](https://github.com/git-big-picture/git-big-picture/pull/673),
-      [#682](https://github.com/git-big-picture/git-big-picture/pull/XXXXXXXX))
+      [#682](https://github.com/git-big-picture/git-big-picture/pull/682))
     - Fix an ASCII Git graph in the readme
       ([#673](https://github.com/git-big-picture/git-big-picture/pull/673))
     - Document that the project is in maintenance mode
