@@ -474,6 +474,16 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
 ## Changelog
 
+- `1.4.2` — 2026-11-15
+  - **Under the Hood**
+    - Add missing file `.cramrc` to `MANIFEST.in`
+      ([#750⁠](https://github.com/git-big-picture/git-big-picture/pull/750⁠))
+- `1.4.1` — 2026-11-15
+  - **Under the Hood**
+    - Extend the incomplete 1.4.0 change log in `README.md`
+      ([#747](https://github.com/git-big-picture/git-big-picture/pull/))
+    - Include files `test.{cram,py}` with source release tarballs
+      ([#748](https://github.com/git-big-picture/git-big-picture/pull/))
 - `1.4.0` — 2026-11-15
   - **New Features and Improvements**
     - Stop crashing with `-c` on empty commit messages
