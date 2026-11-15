@@ -474,17 +474,21 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
 
 ## Changelog
 
-- `UNRELEASED` — YYYY-MM-DD
+- `1.4.0` — 2026-11-15
   - **New Features and Improvements**
-    - Add support for Python 3.13 and 3.14
+    - Stop crashing with `-c` on empty commit messages
+      ([#745](https://github.com/git-big-picture/git-big-picture/pull/745))
+    - Add support for Python 3.13, 3.14 and 3.15
       ([#485](https://github.com/git-big-picture/git-big-picture/pull/485),
       [#601](https://github.com/git-big-picture/git-big-picture/pull/601),
-      [#675](https://github.com/git-big-picture/git-big-picture/pull/675))
+      [#675](https://github.com/git-big-picture/git-big-picture/pull/675),
+      [#726](https://github.com/git-big-picture/git-big-picture/pull/726))
   - **Dropped Features**
-    - Drop support for end-of-life Python 3.8 and 3.9
+    - Drop support for end-of-life Python 3.8, 3.9 and 3.10
       ([#478](https://github.com/git-big-picture/git-big-picture/pull/478),
       [#483](https://github.com/git-big-picture/git-big-picture/pull/483),
-      [#601](https://github.com/git-big-picture/git-big-picture/pull/601))
+      [#601](https://github.com/git-big-picture/git-big-picture/pull/601),
+      [#726](https://github.com/git-big-picture/git-big-picture/pull/726))
   - **Under the Hood**
     - Fix typos in the readme
       ([#401](https://github.com/git-big-picture/git-big-picture/pull/401))
@@ -497,7 +501,7 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
     - Remove `tests_require=` from `setup.py` for Setuptools >=72.0.0
       ([#537](https://github.com/git-big-picture/git-big-picture/pull/537))
     - Migrate to `pyproject.toml`
-      ([#602](https://github.com/git-big-picture/git-big-picture/pull/602))
+      ([#620](https://github.com/git-big-picture/git-big-picture/pull/620))
     - Migrate the readme from reStructuredText to Markdown
       ([#673](https://github.com/git-big-picture/git-big-picture/pull/673),
       [#682](https://github.com/git-big-picture/git-big-picture/pull/XXXXXXXX))
@@ -515,6 +519,14 @@ $ gprof2dot -f pstats profile-stats | dot -Tsvg -o profile_stats.svg
       ([#681](https://github.com/git-big-picture/git-big-picture/pull/681))
     - Fix doc creation scripts to generate docs for version in current directory.
       ([#681](https://github.com/git-big-picture/git-big-picture/pull/681))
+    - Make Github Dependabot keep pre-commit hooks up to date by
+      ([#663](https://github.com/git-big-picture/git-big-picture/pull/663))
+    - tests: Cover case `filter(roots=False)`
+      ([#679](https://github.com/git-big-picture/git-big-picture/pull/679))
+    - tests: Mass-fix variable name typo `filter[e]d_graph`
+      ([#686](https://github.com/git-big-picture/git-big-picture/pull/686))
+    - CI: Install package `graphviz-tools` for command `tred` in `run-tests.yml`
+      ([#740](https://github.com/git-big-picture/git-big-picture/pull/740))
 - `v1.3.0` — 2024-03-08
   - **New Features and Improvements**
     - Make Graphviz output more deterministic
